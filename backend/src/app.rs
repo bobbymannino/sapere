@@ -3,6 +3,7 @@ pub mod app_state;
 
 use std::sync::Arc;
 
+use anyhow::bail;
 use tracing::{error, info};
 
 use crate::app::{app_router::AppRouter, app_state::AppState};
@@ -18,22 +19,23 @@ impl App {
         }
     }
 
-    pub async fn run(self, port: u16) {
-        let router = AppRouter::new(self.app_state.clone());
+    pub async fn run(self, port: u16) -> anyhow::Result<()> {
+        let router = AppRouter::router(self.app_state.clone());
 
         let listen_on = format!("0.0.0.0:{port}");
         let Ok(listener) = tokio::net::TcpListener::bind(listen_on).await else {
             error!("Failed to bind to port {port}");
-            panic!("Failed to bind to port {port}");
+            bail!("Failed to bind to port {port}");
         };
         info!("Starting API on port {port}");
         axum::serve(listener, router)
             .with_graceful_shutdown(shutdown_signal())
             .await
-            .unwrap();
+            .map_err(|e| anyhow::anyhow!(e))?;
 
         info!("Closing database connection");
         self.app_state.db().close().await;
+        Ok(())
     }
 }
 

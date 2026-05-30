@@ -9,7 +9,7 @@ use crate::app::{app_router::auth_router::signup_router::SignupRouter, app_state
 pub struct AuthRouter;
 
 impl AuthRouter {
-    pub fn new() -> Router<Arc<AppState>> {
-        Router::new().nest("/signup", SignupRouter::new())
+    pub fn router() -> Router<Arc<AppState>> {
+        Router::new().nest("/signup", SignupRouter::router())
     }
 }

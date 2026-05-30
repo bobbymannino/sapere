@@ -7,7 +7,7 @@ use crate::app::app_state::AppState;
 pub struct SignupRouter;
 
 impl SignupRouter {
-    pub fn new() -> Router<Arc<AppState>> {
+    pub fn router() -> Router<Arc<AppState>> {
         Router::new().route("/email", post(signup_with_email))
     }
 }

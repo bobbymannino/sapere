@@ -11,35 +11,43 @@ pub struct Db {
 impl Db {
     pub async fn new(database_url: &str) -> anyhow::Result<Self> {
         info!("Connecting to database");
-        let result = PgPool::connect(database_url).await;
-        if result.is_err() {
-            error!("Failed to connect to database: {:?}", result);
-            bail!(result.err().unwrap())
-        }
-        Ok(Db { conn: result? })
+        let conn = PgPool::connect(database_url).await;
+        let conn = match conn {
+            Ok(conn) => conn,
+            Err(e) => {
+                error!("Failed to connect to database: {:?}", e);
+                bail!(e)
+            }
+        };
+        Ok(Db { conn })
     }
 
-    /// Create a new database from env.DATABASE_URL
+    /// Create a new database from `env.DATABASE_URL`
     pub async fn from_database_url() -> anyhow::Result<Self> {
         let database_url = std::env::var("DATABASE_URL");
-        let Ok(database_url) = database_url else {
-            error!("DATABASE_URL is not defined");
-            bail!(database_url.err().unwrap());
+        let database_url = match database_url {
+            Ok(url) => url,
+            Err(e) => {
+                error!("DATABASE_URL is not defined");
+                bail!(e);
+            }
         };
-        Ok(Db::new(&database_url).await?)
+        Db::new(&database_url).await
     }
 
     pub async fn run_migrations(&self) -> anyhow::Result<()> {
         info!("Running migrations");
         let result = sqlx::migrate!("./migrations").run(&self.conn).await;
-        if result.is_err() {
-            error!("Failed to run migrations: {:?}", result);
-            bail!(result.err().unwrap())
+        match result {
+            Ok(()) => Ok(()),
+            Err(e) => {
+                error!("Failed to run migrations: {:?}", e);
+                bail!(e)
+            }
         }
-        Ok(())
     }
 
     pub async fn close(&self) {
-        self.conn.close().await
+        self.conn.close().await;
     }
 }
