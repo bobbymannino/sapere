@@ -36,4 +36,8 @@ impl Db {
         }
         Ok(())
     }
+
+    pub async fn close(&self) {
+        self.conn.close().await
+    }
 }
