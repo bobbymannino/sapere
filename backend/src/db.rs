@@ -1,3 +1,5 @@
+pub mod models;
+
 use anyhow::bail;
 use sqlx::PgPool;
 use tracing::{error, info};
