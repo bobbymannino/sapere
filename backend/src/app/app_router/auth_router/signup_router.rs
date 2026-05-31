@@ -7,7 +7,10 @@ use validator::Validate;
 
 use crate::{
     app::{app_error::AppError, app_state::AppState},
-    db::models::{sessions::Session, users::User},
+    db::models::{
+        sessions::Session,
+        users::{CreateUserError, User},
+    },
     regexes::{PATTERN_PASSWORD, PATTERN_USERNAME},
 };
 
@@ -26,7 +29,7 @@ struct SignupWithEmailBody {
     email: String,
     #[validate(length(min = 3, max = 32), regex(path = PATTERN_USERNAME))]
     username: String,
-    #[validate(length(min = 8, max = 50), regex(path = PATTERN_PASSWORD))]
+    #[validate(length(min = 8, max = 255), regex(path = PATTERN_PASSWORD))]
     password: String,
 }
 
@@ -36,15 +39,13 @@ async fn signup_with_email(
 ) -> Result<(StatusCode, Json<Value>), AppError> {
     body.validate()?;
 
-    if User::does_username_exist(state.db(), &body.username).await? {
-        return Err(AppError::Conflict("Username already exists"));
-    }
-
-    if User::does_email_exist(state.db(), &body.email).await? {
-        return Err(AppError::Conflict("Email already exists"));
-    }
-
-    let user = User::new(state.db(), body.email, body.username, body.password).await?;
+    let user = User::create(state.db(), &body.email, &body.username, &body.password)
+        .await
+        .map_err(|e| match e {
+            CreateUserError::EmailTaken => AppError::Conflict("Email already exists"),
+            CreateUserError::UsernameTaken => AppError::Conflict("Username already exists"),
+            CreateUserError::Other(err) => AppError::Internal(err),
+        })?;
 
     let session = Session::create(state.db(), user.id(), Duration::from_hours(12)).await?;
 

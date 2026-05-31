@@ -26,7 +26,7 @@ struct LoginWithEmailBody {
     email: Option<String>,
     #[validate(length(min = 3, max = 32), regex(path = PATTERN_USERNAME))]
     username: Option<String>,
-    #[validate(length(min = 8, max = 50), regex(path = PATTERN_PASSWORD))]
+    #[validate(length(min = 8, max = 255), regex(path = PATTERN_PASSWORD))]
     password: String,
 }
 
@@ -40,15 +40,16 @@ async fn login_with_email(
         (None, None) => {
             return Err(AppError::BadRequest("Please provide a username or email"));
         }
-        (None, Some(username)) => User::find_by_username(state.db(), username.as_str()).await,
-        (Some(email), None | Some(_)) => User::find_by_email(state.db(), email.as_str()).await,
-    }?;
+        (Some(email), _) => User::find_by_email(state.db(), &email).await?,
+        (None, Some(username)) => User::find_by_username(state.db(), &username).await?,
+    };
+
     let Some(user) = user else {
-        return Err(AppError::NotFound("There is no user by those credentials"));
+        return Err(AppError::Unauthorized("Invalid credentials"));
     };
 
     if !user.verify_password(&body.password)? {
-        return Err(AppError::Unauthorized("Invalid email or password"));
+        return Err(AppError::Unauthorized("Invalid credentials"));
     }
 
     let session = Session::create(state.db(), user.id(), Duration::from_hours(12)).await?;
