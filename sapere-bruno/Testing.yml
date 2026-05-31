@@ -6,6 +6,14 @@ info:
 http:
   method: POST
   url: "{{baseUrl}}/auth/signup/email"
+  body:
+    type: json
+    data: |-
+      {
+        "email": "manninobobby@icloud.com",
+        "username": "manninobobby",
+        "password": "password"
+      }
   auth: inherit
 
 settings:
