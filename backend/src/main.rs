@@ -18,7 +18,7 @@ async fn main() -> anyhow::Result<()> {
     let app_state = AppState::new(db);
     let app = App::new(app_state);
 
-    let port = std::env::var("PORT").unwrap_or("3000".to_string());
+    let port = std::env::var("PORT").unwrap_or_else(|_| "3000".to_string());
     let Ok(port) = port.parse::<u16>() else {
         error!("PORT must be a u16, received: {port}");
         bail!("PORT must be a u16, received: {port}");

@@ -15,7 +15,6 @@ pub enum AppError {
     Unauthorized(&'static str),
     Validation(ValidationErrors),
     BadRequest(&'static str),
-    NotFound(&'static str),
     Internal(anyhow::Error),
 }
 
@@ -25,7 +24,6 @@ impl IntoResponse for AppError {
             AppError::BadRequest(msg) => (StatusCode::BAD_REQUEST, Json(json!({ "message": msg }))).into_response(),
             AppError::Conflict(msg) => (StatusCode::CONFLICT, Json(json!({ "message": msg }))).into_response(),
             AppError::Unauthorized(msg) => (StatusCode::UNAUTHORIZED, Json(json!({ "message": msg }))).into_response(),
-            AppError::NotFound(msg) => (StatusCode::NOT_FOUND, Json(json!({ "message": msg }))).into_response(),
             AppError::Validation(errors) => (
                 StatusCode::UNPROCESSABLE_ENTITY,
                 Json(json!({
