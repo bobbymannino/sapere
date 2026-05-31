@@ -3,7 +3,10 @@ use sqlx::Row;
 
 use anyhow::Result;
 
-use crate::{db::Db, password::hash_password};
+use crate::{
+    db::Db,
+    password::{hash_password, verify_password},
+};
 
 #[derive(Debug, Clone, serde::Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -39,6 +42,50 @@ impl User {
         Ok(count > 0)
     }
 
+    pub async fn find_by_email(db: &Db, email: &str) -> Result<Option<Self>> {
+        let row = sqlx::query(
+            "select id, email, username, password_hash, created_at, updated_at from users where email = $1",
+        )
+        .bind(email)
+        .fetch_optional(&db.conn)
+        .await?;
+
+        let Some(row) = row else {
+            return Ok(None);
+        };
+
+        Ok(Some(User {
+            id: row.try_get("id")?,
+            email: row.try_get("email")?,
+            username: row.try_get("username")?,
+            password_hash: row.try_get("password_hash")?,
+            created_at: row.try_get("created_at")?,
+            updated_at: row.try_get("updated_at")?,
+        }))
+    }
+
+    pub async fn find_by_username(db: &Db, username: &str) -> Result<Option<Self>> {
+        let row = sqlx::query(
+            "select id, email, username, password_hash, created_at, updated_at from users where username = $1",
+        )
+        .bind(username)
+        .fetch_optional(&db.conn)
+        .await?;
+
+        let Some(row) = row else {
+            return Ok(None);
+        };
+
+        Ok(Some(User {
+            id: row.try_get("id")?,
+            email: row.try_get("email")?,
+            username: row.try_get("username")?,
+            password_hash: row.try_get("password_hash")?,
+            created_at: row.try_get("created_at")?,
+            updated_at: row.try_get("updated_at")?,
+        }))
+    }
+
     pub async fn new(db: &Db, email: String, username: String, password: String) -> Result<Self> {
         let password_hash = hash_password(password.as_str())?;
         let user = sqlx::query(
@@ -57,5 +104,9 @@ impl User {
             created_at: user.try_get("created_at")?,
             updated_at: user.try_get("updated_at")?,
         })
+    }
+
+    pub(crate) fn verify_password(&self, password: &str) -> Result<bool> {
+        verify_password(password, &self.password_hash)
     }
 }

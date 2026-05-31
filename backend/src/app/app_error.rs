@@ -12,14 +12,20 @@ use validator::{ValidationError, ValidationErrors};
 #[derive(Debug)]
 pub enum AppError {
     Conflict(&'static str),
+    Unauthorized(&'static str),
     Validation(ValidationErrors),
+    BadRequest(&'static str),
+    NotFound(&'static str),
     Internal(anyhow::Error),
 }
 
 impl IntoResponse for AppError {
     fn into_response(self) -> Response {
         match self {
+            AppError::BadRequest(msg) => (StatusCode::BAD_REQUEST, Json(json!({ "message": msg }))).into_response(),
             AppError::Conflict(msg) => (StatusCode::CONFLICT, Json(json!({ "message": msg }))).into_response(),
+            AppError::Unauthorized(msg) => (StatusCode::UNAUTHORIZED, Json(json!({ "message": msg }))).into_response(),
+            AppError::NotFound(msg) => (StatusCode::NOT_FOUND, Json(json!({ "message": msg }))).into_response(),
             AppError::Validation(errors) => (
                 StatusCode::UNPROCESSABLE_ENTITY,
                 Json(json!({

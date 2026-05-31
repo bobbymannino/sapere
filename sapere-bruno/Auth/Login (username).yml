@@ -1,16 +1,15 @@
 info:
-  name: Testing
+  name: Login (username)
   type: http
-  seq: 1
+  seq: 3
 
 http:
   method: POST
-  url: "{{baseUrl}}/auth/signup/email"
+  url: "{{baseUrl}}/auth/login/email"
   body:
     type: json
     data: |-
       {
-        "email": "manninobobby@icloud.com",
         "username": "manninobobby",
         "password": "password"
       }
