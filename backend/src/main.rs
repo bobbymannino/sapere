@@ -1,5 +1,6 @@
 mod app;
 mod db;
+mod password;
 mod regexes;
 
 use anyhow::bail;

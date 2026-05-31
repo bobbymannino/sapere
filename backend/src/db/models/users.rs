@@ -3,7 +3,7 @@ use sqlx::Row;
 
 use anyhow::Result;
 
-use crate::db::Db;
+use crate::{db::Db, password::hash_password};
 
 #[derive(Debug, Clone, serde::Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -40,19 +40,20 @@ impl User {
     }
 
     pub async fn new(db: &Db, email: String, username: String, password: String) -> Result<Self> {
+        let password_hash = hash_password(password.as_str())?;
         let user = sqlx::query(
             "insert into users (username, email, password_hash) values ($1, $2, $3) returning id, created_at, updated_at",
         )
         .bind(&username)
         .bind(&email)
-        .bind(&password)
+        .bind(&password_hash)
         .fetch_one(&db.conn).await?;
 
         Ok(User {
             id: user.try_get("id")?,
             username,
             email,
-            password_hash: password,
+            password_hash,
             created_at: user.try_get("created_at")?,
             updated_at: user.try_get("updated_at")?,
         })
