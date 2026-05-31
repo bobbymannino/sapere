@@ -1,12 +1,18 @@
 use std::sync::Arc;
 
-use axum::{Json, Router, extract::State, http::StatusCode, routing::post};
+use axum::{
+    Json, Router,
+    extract::{Query, State},
+    http::StatusCode,
+    routing::post,
+};
 use serde::Deserialize;
 use validator::Validate;
 
 use crate::{
     app::{app_error::AppError, app_state::AppState, auth::AuthUser},
     db::models::workspaces::{CreateWorkspaceError, Workspace},
+    pagination::{Paginated, Pagination},
     regexes::{PATTERN_SLUG, PATTERN_TITLE},
 };
 
@@ -48,8 +54,11 @@ async fn create_workspace(
 async fn list_workspaces(
     State(state): State<Arc<AppState>>,
     AuthUser(user): AuthUser,
-) -> Result<Json<Vec<Workspace>>, AppError> {
-    let workspaces = Workspace::find_all_by_user(state.db(), user.id()).await?;
+    Query(pagination): Query<Pagination>,
+) -> Result<Json<Paginated<Workspace>>, AppError> {
+    pagination.validate()?;
 
-    Ok(Json(workspaces))
+    let (items, total) = Workspace::find_paginated_by_user(state.db(), user.id(), pagination).await?;
+
+    Ok(Json(Paginated::new(items, pagination, total)))
 }

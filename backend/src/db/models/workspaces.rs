@@ -2,7 +2,7 @@ use anyhow::{Result, anyhow};
 use chrono::{DateTime, Utc};
 use sqlx::error::ErrorKind;
 
-use crate::db::Db;
+use crate::{db::Db, pagination::Pagination};
 
 #[derive(Debug, Clone, sqlx::FromRow, serde::Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -71,17 +71,30 @@ impl Workspace {
         Ok(workspace)
     }
 
-    pub async fn find_all_by_user(db: &Db, user_id: i32) -> Result<Vec<Self>> {
-        sqlx::query_as::<_, Workspace>(
+    pub async fn find_paginated_by_user(
+        db: &Db,
+        user_id: i32,
+        pagination: Pagination,
+    ) -> Result<(Vec<Self>, i64)> {
+        let items_query = sqlx::query_as::<_, Workspace>(
             "SELECT w.id, w.author_id, w.owner_id, w.title, w.slug, w.created_at, w.updated_at \
              FROM workspaces w \
              INNER JOIN workspace_members m ON m.workspace_id = w.id \
              WHERE m.user_id = $1 \
-             ORDER BY w.created_at DESC",
+             ORDER BY w.created_at DESC \
+             LIMIT $2 OFFSET $3",
         )
         .bind(user_id)
-        .fetch_all(&db.conn)
-        .await
-        .map_err(Into::into)
+        .bind(pagination.limit())
+        .bind(pagination.offset())
+        .fetch_all(&db.conn);
+
+        let count_query =
+            sqlx::query_scalar::<_, i64>("SELECT COUNT(*) FROM workspace_members WHERE user_id = $1")
+                .bind(user_id)
+                .fetch_one(&db.conn);
+
+        let (items, total) = tokio::try_join!(items_query, count_query)?;
+        Ok((items, total))
     }
 }

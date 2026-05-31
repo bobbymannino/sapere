@@ -1,5 +1,6 @@
 mod app;
 mod db;
+mod pagination;
 mod password;
 mod regexes;
 
