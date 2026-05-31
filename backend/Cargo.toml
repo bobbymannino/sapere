@@ -8,13 +8,15 @@ anyhow = "1.0"
 dotenvy = "0.15"
 tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
-sqlx = { version = "0.9", features = ["runtime-tokio", "postgres", "migrate"] }
+sqlx = { version = "0.9", features = ["runtime-tokio", "postgres", "migrate", "chrono"] }
 tokio = { version = "1", features = ["full"] }
 axum = "0.8"
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 validator = { version = "0.20", features = ["derive"] }
 regex = "1.12"
+chrono = { version = "0.4.44", features = ["serde"] }
+argon2 = "0.5"
 
 [lints.clippy]
 pedantic = "warn"

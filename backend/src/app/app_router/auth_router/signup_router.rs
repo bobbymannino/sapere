@@ -36,15 +36,15 @@ async fn signup_with_email(
 ) -> Result<(StatusCode, Json<Value>), AppError> {
     body.validate()?;
 
-    if User::does_username_exist(state.db(), body.username).await? {
+    if User::does_username_exist(state.db(), &body.username).await? {
         return Err(AppError::Conflict("Username already exists"));
     }
 
-    if User::does_email_exist(state.db(), body.email).await? {
+    if User::does_email_exist(state.db(), &body.email).await? {
         return Err(AppError::Conflict("Email already exists"));
     }
 
-    // TODO create user, return id
+    let user = User::new(state.db(), body.email, body.username, body.password).await?;
 
-    Ok((StatusCode::CREATED, Json(json!({}))))
+    Ok((StatusCode::CREATED, Json(json!({ "id": user.id() }))))
 }
