@@ -18,6 +18,9 @@ regex = "1.12"
 chrono = { version = "0.4.44", features = ["serde"] }
 argon2 = { version = "0.5", features = ["std"] }
 uuid = { version = "1.23.2", features = ["v7"] }
+rand = "0.10"
+sha2 = "0.11"
+hex = "0.4"
 
 [lints.clippy]
 pedantic = "warn"

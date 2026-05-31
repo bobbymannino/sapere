@@ -1,4 +1,4 @@
-use std::sync::Arc;
+use std::{sync::Arc, time::Duration};
 
 use axum::{Json, Router, extract::State, http::StatusCode, routing::post};
 use serde::Deserialize;
@@ -7,7 +7,7 @@ use validator::Validate;
 
 use crate::{
     app::{app_error::AppError, app_state::AppState},
-    db::models::users::User,
+    db::models::{sessions::Session, users::User},
     regexes::{PATTERN_PASSWORD, PATTERN_USERNAME},
 };
 
@@ -46,5 +46,10 @@ async fn signup_with_email(
 
     let user = User::new(state.db(), body.email, body.username, body.password).await?;
 
-    Ok((StatusCode::CREATED, Json(json!({ "id": user.id() }))))
+    let session = Session::create(state.db(), user.id(), Duration::from_hours(12)).await?;
+
+    Ok((
+        StatusCode::CREATED,
+        Json(json!({ "id": user.id(), "token": session.token(), "session_expires_at": session.expires_at() })),
+    ))
 }
