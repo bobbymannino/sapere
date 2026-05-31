@@ -1,5 +1,6 @@
 mod app;
 mod db;
+mod regexes;
 
 use anyhow::bail;
 use tracing::error;
