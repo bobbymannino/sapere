@@ -48,6 +48,20 @@ impl User {
         .map_err(Into::into)
     }
 
+    pub async fn find_by_active_session(db: &Db, token_hash: &str) -> Result<Option<Self>> {
+        sqlx::query_as::<_, User>(
+            "SELECT u.id, u.email, u.username, u.password_hash, u.created_at, u.updated_at \
+             FROM users u \
+             INNER JOIN sessions s ON s.user_id = u.id \
+             WHERE s.token_hash = $1 AND s.expires_at > NOW() \
+             LIMIT 1",
+        )
+        .bind(token_hash)
+        .fetch_optional(&db.conn)
+        .await
+        .map_err(Into::into)
+    }
+
     pub async fn find_by_username(db: &Db, username: &str) -> Result<Option<Self>> {
         sqlx::query_as::<_, User>(
             "SELECT id, email, username, password_hash, created_at, updated_at \
