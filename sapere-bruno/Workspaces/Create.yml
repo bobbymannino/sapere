@@ -1,0 +1,22 @@
+info:
+  name: Create
+  type: http
+  seq: 1
+
+http:
+  method: POST
+  url: "{{baseUrl}}/workspaces"
+  body:
+    type: json
+    data: |-
+      {
+        "title": "My Workspace",
+        "slug": "my-workspace"
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

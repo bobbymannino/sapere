@@ -1,6 +1,7 @@
 pub mod app_error;
 mod app_router;
 pub mod app_state;
+mod auth;
 
 use std::sync::Arc;
 
