@@ -1,8 +1,8 @@
 @import "tailwindcss";
+@import "@catppuccin/tailwindcss/mocha.css";
 
 :root {
     --color-base: white;
-    --color-overlay-2: rgb(170, 170, 170);
     --color-crust: #dcdcdc;
     --color-mantle: #ebebeb;
     --color-surface-0: #f5f5f5;
@@ -10,16 +10,16 @@
     --color-surface-2: #e4e4e4;
     --color-overlay-0: #d0d0d0;
     --color-overlay-1: #bbbbbb;
+    --color-overlay-2: #aaaaaa;
     --color-subtext-0: #737373;
     --color-subtext-1: #5a5a5a;
     --color-text: #3c3c3c;
-    --color-primary: rgb(41, 136, 223);
-    --color-danger: rgb(225, 65, 65);
+    --color-primary: #2988df;
+    --color-danger: #e14141;
 }
 
 body[data-theme="dark"] {
-    --color-base: rgb(35, 35, 35);
-    --color-overlay-2: rgb(88, 88, 88);
+    --color-base: #232323;
     --color-crust: #0f0f0f;
     --color-mantle: #181818;
     --color-surface-0: #2d2d2d;
@@ -27,11 +27,29 @@ body[data-theme="dark"] {
     --color-surface-2: #444444;
     --color-overlay-0: #4e4e4e;
     --color-overlay-1: #555555;
+    --color-overlay-2: #585858;
     --color-subtext-0: #808080;
     --color-subtext-1: #9a9a9a;
     --color-text: #c0c0c0;
-    --color-primary: rgb(134, 198, 225);
-    --color-danger: rgb(255, 139, 139);
+    --color-primary: #86c6e1;
+    --color-danger: #ff8b8b;
+}
+
+body[data-theme="catppuccin"] {
+    --color-base: var(--color-ctp-base);
+    --color-crust: var(--color-ctp-crust);
+    --color-mantle: var(--color-ctp-mantle);
+    --color-surface-0: var(--color-ctp-surface-0);
+    --color-surface-1: var(--color-ctp-surface-1);
+    --color-surface-2: var(--color-ctp-surface-2);
+    --color-overlay-0: var(--color-ctp-overlay-0);
+    --color-overlay-1: var(--color-ctp-overlay-1);
+    --color-overlay-2: var(--color-ctp-overlay-2);
+    --color-subtext-0: var(--color-ctp-subtext-0);
+    --color-subtext-1: var(--color-ctp-subtext-1);
+    --color-text: var(--color-ctp-text);
+    --color-primary: var(--color-ctp-primary);
+    --color-danger: var(--color-ctp-danger);
 }
 
 @theme {
