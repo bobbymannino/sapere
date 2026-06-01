@@ -1,16 +1,40 @@
 @import "tailwindcss";
 
-@theme {
-    --color-background: var(--color-background);
-    --color-dashes: var(--color-dashes);
-}
-
 :root {
-    --color-background: var(--color-white);
-    --color-dashes: var(--color-gray-200);
+    --color-base: white;
+    --color-overlay-2: rgb(170, 170, 170);
+    --color-crust: #dcdcdc;
+    --color-mantle: #ebebeb;
+    --color-surface-0: #f5f5f5;
+    --color-surface-1: #eeeeee;
+    --color-surface-2: #e4e4e4;
+    --color-overlay-0: #d0d0d0;
+    --color-overlay-1: #bbbbbb;
+    --color-subtext-0: #737373;
+    --color-subtext-1: #5a5a5a;
+    --color-text: #3c3c3c;
+    --color-primary: rgb(41, 136, 223);
+    --color-danger: rgb(225, 65, 65);
 }
 
 body[data-theme="dark"] {
-    --color-background: var(--color-gray-900);
-    --color-dashes: var(--color-gray-700);
+    --color-base: rgb(35, 35, 35);
+    --color-overlay-2: rgb(88, 88, 88);
+    --color-crust: #0f0f0f;
+    --color-mantle: #181818;
+    --color-surface-0: #2d2d2d;
+    --color-surface-1: #383838;
+    --color-surface-2: #444444;
+    --color-overlay-0: #4e4e4e;
+    --color-overlay-1: #555555;
+    --color-subtext-0: #808080;
+    --color-subtext-1: #9a9a9a;
+    --color-text: #c0c0c0;
+    --color-primary: rgb(134, 198, 225);
+    --color-danger: rgb(255, 139, 139);
+}
+
+@theme {
+    --color-background: var(--color-base);
+    --color-dashes: var(--color-surface-2);
 }
