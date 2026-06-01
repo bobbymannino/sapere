@@ -75,19 +75,22 @@ impl Workspace {
         db: &Db,
         user_id: i32,
         pagination: Pagination,
+        order_by: &'static str,
     ) -> Result<(Vec<Self>, i64)> {
-        let items_query = sqlx::query_as::<_, Workspace>(
+        let sql = format!(
             "SELECT w.id, w.author_id, w.owner_id, w.title, w.slug, w.created_at, w.updated_at \
              FROM workspaces w \
              INNER JOIN workspace_members m ON m.workspace_id = w.id \
              WHERE m.user_id = $1 \
-             ORDER BY w.created_at DESC \
-             LIMIT $2 OFFSET $3",
-        )
-        .bind(user_id)
-        .bind(pagination.limit())
-        .bind(pagination.offset())
-        .fetch_all(&db.conn);
+             ORDER BY {order_by} \
+             LIMIT $2 OFFSET $3"
+        );
+
+        let items_query = sqlx::query_as::<_, Workspace>(sqlx::AssertSqlSafe(sql))
+            .bind(user_id)
+            .bind(pagination.limit())
+            .bind(pagination.offset())
+            .fetch_all(&db.conn);
 
         let count_query =
             sqlx::query_scalar::<_, i64>("SELECT COUNT(*) FROM workspace_members WHERE user_id = $1")

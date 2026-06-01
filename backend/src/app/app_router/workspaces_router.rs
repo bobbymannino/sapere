@@ -33,6 +33,43 @@ struct CreateWorkspaceBody {
     slug: String,
 }
 
+#[derive(Debug, Default, Clone, Copy, Deserialize)]
+enum WorkspaceSortBy {
+    #[serde(rename = "-createdAt")]
+    CreatedAtDesc,
+    #[serde(rename = "createdAt")]
+    CreatedAtAsc,
+    #[serde(rename = "-updatedAt")]
+    #[default]
+    UpdatedAtDesc,
+    #[serde(rename = "updatedAt")]
+    UpdatedAtAsc,
+    #[serde(rename = "-title")]
+    TitleDesc,
+    #[serde(rename = "title")]
+    TitleAsc,
+}
+
+impl WorkspaceSortBy {
+    fn order_by_clause(self) -> &'static str {
+        match self {
+            Self::CreatedAtDesc => "w.created_at DESC",
+            Self::CreatedAtAsc => "w.created_at ASC",
+            Self::UpdatedAtDesc => "w.updated_at DESC",
+            Self::UpdatedAtAsc => "w.updated_at ASC",
+            Self::TitleDesc => "w.title DESC",
+            Self::TitleAsc => "w.title ASC",
+        }
+    }
+}
+
+#[derive(Debug, Default, Deserialize)]
+#[serde(rename_all = "camelCase")]
+struct WorkspaceSortQuery {
+    #[serde(default)]
+    sort_by: WorkspaceSortBy,
+}
+
 async fn create_workspace(
     State(state): State<Arc<AppState>>,
     AuthUser(user): AuthUser,
@@ -55,10 +92,12 @@ async fn list_workspaces(
     State(state): State<Arc<AppState>>,
     AuthUser(user): AuthUser,
     Query(pagination): Query<Pagination>,
+    Query(WorkspaceSortQuery { sort_by }): Query<WorkspaceSortQuery>,
 ) -> Result<Json<Paginated<Workspace>>, AppError> {
     pagination.validate()?;
 
-    let (items, total) = Workspace::find_paginated_by_user(state.db(), user.id(), pagination).await?;
+    let (items, total) =
+        Workspace::find_paginated_by_user(state.db(), user.id(), pagination, sort_by.order_by_clause()).await?;
 
     Ok(Json(Paginated::new(items, pagination, total)))
 }
