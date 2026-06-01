@@ -13,7 +13,7 @@ pub static PATTERN_PASSWORD: LazyLock<Regex> = LazyLock::new(|| {
 
 #[allow(clippy::expect_used, reason = "regex literal is verified at first access")]
 pub static PATTERN_TITLE: LazyLock<Regex> =
-    LazyLock::new(|| Regex::new(r"^[a-zA-Z0-9 _:\s-]+$").expect("PATTERN_TITLE regex should be valid"));
+    LazyLock::new(|| Regex::new(r"^[a-zA-Z0-9 _:-]+$").expect("PATTERN_TITLE regex should be valid"));
 
 #[allow(clippy::expect_used, reason = "regex literal is verified at first access")]
 pub static PATTERN_SLUG: LazyLock<Regex> =
