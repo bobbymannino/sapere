@@ -39,17 +39,17 @@ body[data-theme="catppuccin"] {
     --color-base: var(--color-ctp-base);
     --color-crust: var(--color-ctp-crust);
     --color-mantle: var(--color-ctp-mantle);
-    --color-surface-0: var(--color-ctp-surface-0);
-    --color-surface-1: var(--color-ctp-surface-1);
-    --color-surface-2: var(--color-ctp-surface-2);
-    --color-overlay-0: var(--color-ctp-overlay-0);
-    --color-overlay-1: var(--color-ctp-overlay-1);
-    --color-overlay-2: var(--color-ctp-overlay-2);
-    --color-subtext-0: var(--color-ctp-subtext-0);
-    --color-subtext-1: var(--color-ctp-subtext-1);
+    --color-surface-0: var(--color-ctp-surface0);
+    --color-surface-1: var(--color-ctp-surface1);
+    --color-surface-2: var(--color-ctp-surface2);
+    --color-overlay-0: var(--color-ctp-overlay0);
+    --color-overlay-1: var(--color-ctp-overlay1);
+    --color-overlay-2: var(--color-ctp-overlay2);
+    --color-subtext-0: var(--color-ctp-subtext0);
+    --color-subtext-1: var(--color-ctp-subtext1);
     --color-text: var(--color-ctp-text);
-    --color-primary: var(--color-ctp-primary);
-    --color-danger: var(--color-ctp-danger);
+    --color-primary: var(--color-ctp-mauve);
+    --color-danger: var(--color-ctp-red);
 }
 
 @theme {
