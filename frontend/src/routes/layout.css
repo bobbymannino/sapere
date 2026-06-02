@@ -1,6 +1,22 @@
 @import "tailwindcss";
 @import "@catppuccin/tailwindcss/mocha.css";
 
+@font-face {
+    font-family: "Figtree";
+    src: url("/fonts/Figtree.woff2") format("woff2");
+    font-weight: 300 900;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "Figtree";
+    src: url("/fonts/Figtree-Italic.woff2") format("woff2");
+    font-weight: 300 900;
+    font-style: italic;
+    font-display: swap;
+}
+
 :root {
     --color-base: white;
     --color-crust: #dcdcdc;
@@ -53,6 +69,8 @@ body[data-theme="catppuccin"] {
 }
 
 @theme {
+    --font-sans: "Figtree", ui-sans-serif, system-ui, sans-serif;
+
     --color-background: var(--color-base);
     --color-dashes: var(--color-surface-2);
 }
