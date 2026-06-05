@@ -56,6 +56,6 @@ async fn login_with_email(
 
     Ok((
         StatusCode::OK,
-        Json(json!({ "id": user.id(), "token": session.token(), "session_expires_at": session.expires_at() })),
+        Json(json!({ "id": user.id(), "token": session.token(), "sessionExpiresAt": session.expires_at() })),
     ))
 }

@@ -26,7 +26,7 @@ type LoginBody = v.InferInput<typeof loginBodySchema>;
 const loginResponseSchema = v.object({
   id: v.number(),
   token: v.string(),
-  session_expires_at: v.pipe(v.string(), v.toDate()),
+  sessionExpiresAt: v.pipe(v.string(), v.toDate()),
 });
 
 type LoginResponse = v.InferOutput<typeof loginResponseSchema>;
