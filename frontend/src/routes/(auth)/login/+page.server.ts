@@ -1,9 +1,9 @@
 import { login } from "$lib/server/api/index.js";
-import { setSessionTokenInCookies } from "$lib/server/session.js";
+import { requireGuest, setSessionTokenInCookies } from "$lib/server/session.js";
 import { redirect } from "@sveltejs/kit";
 
-export const load = async ({ parent }) => {
-  await parent();
+export const load = () => {
+  requireGuest();
 };
 
 export const actions = {

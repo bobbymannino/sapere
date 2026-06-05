@@ -18,7 +18,23 @@ export function setSessionTokenInCookies(token: string, expiresAt: Date) {
   });
 }
 
+export function deleteSessionTokenInCookies() {
+  getRequestEvent().cookies.delete(COOKIE_SESSION, {
+    path: "/",
+    sameSite: "lax",
+    httpOnly: !dev,
+    secure: true,
+  });
+}
+
 export function requireGuest() {
   const { locals } = getRequestEvent();
   if (locals.user) redirect(303, "/");
+}
+
+export function requireUser() {
+  const { locals, url } = getRequestEvent();
+  if (!locals.user)
+    redirect(303, `/login?redirectTo=${encodeURIComponent(url.pathname)}`);
+  return locals.user;
 }
