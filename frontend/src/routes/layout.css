@@ -71,6 +71,23 @@ body[data-theme="catppuccin"] {
 @theme {
     --font-sans: "Figtree", ui-sans-serif, system-ui, sans-serif;
 
+    --color-surface-0: var(--color-surface-0);
+    --color-surface-1: var(--color-surface-1);
+    --color-surface-2: var(--color-surface-2);
+
+    --color-overlay-0: var(--color-overlay-0);
+    --color-overlay-1: var(--color-overlay-1);
+    --color-overlay-2: var(--color-overlay-2);
+
+    --color-txt: var(--color-text);
+
+    --color-mantle: var(--color-mantle);
+    --color-crust: var(--color-crust);
+
     --color-background: var(--color-base);
     --color-dashes: var(--color-surface-2);
+}
+
+@utility stack {
+    @apply flex flex-col gap-4;
 }

@@ -4,4 +4,5 @@ export default defineConfig({
   sortTailwindcss: true,
   sortImports: true,
   svelte: true,
+  printWidth: 120,
 });
