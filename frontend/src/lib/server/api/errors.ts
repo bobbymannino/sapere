@@ -32,6 +32,13 @@ export class UnauthorizedApiError extends ApiError {
   }
 }
 
+export class NotFoundApiError extends ApiError {
+  constructor(message = "Not Found") {
+    super(message, 404);
+    this.name = "NotFoundApiError";
+  }
+}
+
 export class ConflictApiError extends ApiError {
   constructor(message = "Conflict") {
     super(message, 409);
@@ -75,6 +82,8 @@ export async function handleHttpError(response: Response) {
       return new BadRequestApiError(message);
     case 401:
       return new UnauthorizedApiError(message);
+    case 404:
+      return new NotFoundApiError(message);
     case 409:
       return new ConflictApiError(message);
     case 422:
