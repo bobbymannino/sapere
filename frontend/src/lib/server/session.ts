@@ -1,5 +1,6 @@
 import { dev } from "$app/environment";
 import { getRequestEvent } from "$app/server";
+import { redirect } from "@sveltejs/kit";
 
 const COOKIE_SESSION = "session";
 
@@ -15,4 +16,9 @@ export function setSessionTokenInCookies(token: string, expiresAt: Date) {
     httpOnly: !dev,
     secure: true,
   });
+}
+
+export function requireGuest() {
+  const { locals } = getRequestEvent();
+  if (locals.user) redirect(303, "/");
 }
