@@ -13,7 +13,7 @@ export const actions = {
     if (user.isErr()) {
       return { success: false, error: JSON.stringify(user.error) };
     }
-    setSessionTokenInCookies(user.value.token, user.value.session_expires_at);
+    setSessionTokenInCookies(user.value.token, user.value.sessionExpiresAt);
     return { success: true, user: user.value };
   },
 };

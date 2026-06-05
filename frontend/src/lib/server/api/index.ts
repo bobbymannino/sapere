@@ -2,10 +2,11 @@ import { getRequestEvent } from "$app/server";
 import * as v from "valibot";
 import { API_BASE } from "$env/static/private";
 import { emailSchema, passwordSchema, usernameSchema } from "$lib/schemas";
-import { err, ResultAsync, ok } from "neverthrow";
+import { err, ResultAsync, ok, Result } from "neverthrow";
 import {
   ApiError,
   handleHttpError,
+  UnauthorizedApiError,
   UnknownApiError,
   valibotIssuesToApiError,
 } from "./errors";
@@ -59,6 +60,46 @@ export async function login(body: LoginBody) {
         })
       : ResultAsync.fromSafePromise(handleHttpError(res)).andThen<
           LoginResponse,
+          ApiError
+        >(err);
+  });
+}
+
+const userSchema = v.object({
+  id: v.number(),
+  email: v.string(),
+  username: v.string(),
+  createdAt: v.pipe(v.string(), v.toDate()),
+  updatedAt: v.pipe(v.string(), v.toDate()),
+});
+
+export type User = v.InferOutput<typeof userSchema>;
+
+export async function me(): Promise<Result<User, ApiError>> {
+  const { fetch, locals } = getRequestEvent();
+
+  const { token } = locals;
+  if (!token) return err(new UnauthorizedApiError("Invalid or missing token"));
+
+  const response = await ResultAsync.fromPromise(
+    fetch(`${API_BASE}/auth/me`, {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    }),
+    (err) => new UnknownApiError("Failed to execute API request", err),
+  );
+  return await response.asyncAndThen<User, ApiError>((res) => {
+    return res.ok
+      ? ResultAsync.fromSafePromise(res.json()).andThen((json) => {
+          const parsed = v.safeParse(userSchema, json);
+          return parsed.success
+            ? ok<User, ApiError>(parsed.output)
+            : err<User, ApiError>(valibotIssuesToApiError(parsed.issues));
+        })
+      : ResultAsync.fromSafePromise(handleHttpError(res)).andThen<
+          User,
           ApiError
         >(err);
   });
