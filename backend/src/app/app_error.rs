@@ -22,8 +22,8 @@ impl IntoResponse for AppError {
     fn into_response(self) -> Response {
         match self {
             AppError::BadRequest(msg) => (StatusCode::BAD_REQUEST, Json(json!({ "message": msg }))).into_response(),
-            AppError::Conflict(msg) => (StatusCode::CONFLICT, Json(json!({ "message": msg }))).into_response(),
             AppError::Unauthorized(msg) => (StatusCode::UNAUTHORIZED, Json(json!({ "message": msg }))).into_response(),
+            AppError::Conflict(msg) => (StatusCode::CONFLICT, Json(json!({ "message": msg }))).into_response(),
             AppError::Validation(errors) => (
                 StatusCode::UNPROCESSABLE_ENTITY,
                 Json(json!({
