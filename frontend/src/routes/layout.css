@@ -29,7 +29,7 @@
     --color-overlay-2: #aaaaaa;
     --color-subtext-0: #737373;
     --color-subtext-1: #5a5a5a;
-    --color-text: #3c3c3c;
+    --color-txt: #3c3c3c;
     --color-primary: #2988df;
     --color-danger: #e14141;
 }
@@ -46,7 +46,7 @@ body[data-theme="dark"] {
     --color-overlay-2: #585858;
     --color-subtext-0: #808080;
     --color-subtext-1: #9a9a9a;
-    --color-text: #c0c0c0;
+    --color-txt: #c0c0c0;
     --color-primary: #86c6e1;
     --color-danger: #ff8b8b;
 }
@@ -63,7 +63,7 @@ body[data-theme="catppuccin"] {
     --color-overlay-2: var(--color-ctp-overlay2);
     --color-subtext-0: var(--color-ctp-subtext0);
     --color-subtext-1: var(--color-ctp-subtext1);
-    --color-text: var(--color-ctp-text);
+    --color-txt: var(--color-ctp-text);
     --color-primary: var(--color-ctp-mauve);
     --color-danger: var(--color-ctp-red);
 }
@@ -79,7 +79,7 @@ body[data-theme="catppuccin"] {
     --color-overlay-1: var(--color-overlay-1);
     --color-overlay-2: var(--color-overlay-2);
 
-    --color-txt: var(--color-text);
+    --color-txt: var(--color-txt);
 
     --color-mantle: var(--color-mantle);
     --color-crust: var(--color-crust);
