@@ -91,6 +91,8 @@ body[data-theme="catppuccin"] {
     --color-overlay-0: var(--color-overlay-0);
     --color-overlay-1: var(--color-overlay-1);
     --color-overlay-2: var(--color-overlay-2);
+    --color-subtext-0: var(--color-subtext-0);
+    --color-subtext-1: var(--color-subtext-1);
 
     --color-txt: var(--color-txt);
     --color-primary: var(--color-primary);
@@ -111,24 +113,32 @@ body[data-theme="catppuccin"] {
     }
 
     h2 {
-        @apply text-balance text-3xl font-bold text-txt leading-tight;
+        @apply text-balance text-3xl font-bold text-subtext-0 leading-tight;
     }
 
     h3 {
-        @apply text-balance text-2xl font-bold text-txt leading-tight;
+        @apply text-balance text-2xl font-bold text-subtext-0 leading-tight;
     }
 
     h4 {
-        @apply text-balance text-xl font-semibold text-txt leading-tight;
+        @apply text-balance text-xl font-semibold text-subtext-0 leading-tight;
     }
 
     p {
         @apply text-pretty text-txt leading-relaxed;
     }
+
+    label {
+        @apply text-subtext-1 font-medium;
+    }
 }
 
 @utility stack {
     @apply flex flex-col gap-4;
+}
+
+@utility stack-1 {
+    @apply flex flex-col gap-1;
 }
 
 @utility flex-center {
