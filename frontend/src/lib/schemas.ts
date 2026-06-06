@@ -1,4 +1,22 @@
+import { Result } from "neverthrow";
 import * as v from "valibot";
+import {
+  UnprocessableEntityApiError,
+  valibotIssuesToApiError,
+} from "./api/errors";
+
+export function validate<TSchema extends v.GenericSchema>(
+  schema: TSchema,
+  data: unknown,
+): Result<v.InferOutput<TSchema>, UnprocessableEntityApiError> {
+  return Result.fromThrowable(
+    (input: unknown) => v.parse(schema, input),
+    (error) =>
+      error instanceof v.ValiError
+        ? valibotIssuesToApiError(error.issues)
+        : new UnprocessableEntityApiError(),
+  )(data);
+}
 
 export const usernameSchema = v.pipe(
   v.string(),

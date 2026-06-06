@@ -1,16 +1,29 @@
 import { login } from "$lib/server/api/index.js";
+import * as v from "valibot";
 import { requireGuest, setSessionTokenInCookies } from "$lib/server/session.js";
 import { redirect } from "@sveltejs/kit";
+import type { Actions } from "./$types";
+import { validate } from "$lib/schemas";
 
 export const load = () => {
   requireGuest();
 };
 
-export const actions = {
+const Schema = v.object({
+  email: v.string(),
+  password: v.string(),
+});
+
+export const actions: Actions = {
   default: async ({ request, url }) => {
     const formData = await request.formData();
-    const email = String(formData.get("email") ?? "");
-    const password = String(formData.get("password") ?? "");
+    const result = validate(Schema, {
+      email: formData.get("email"),
+      password: formData.get("password"),
+    });
+    if (result.isErr())
+      return { email: formData.get("email"), error: result.error };
+    const { email, password } = result.value;
     const user = await login(
       email.includes("@") ? { email, password } : { username: email, password },
     );

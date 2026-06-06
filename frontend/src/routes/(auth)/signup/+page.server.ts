@@ -1,18 +1,37 @@
 import { signup } from "$lib/server/api/index.js";
 import { requireGuest, setSessionTokenInCookies } from "$lib/server/session.js";
 import { redirect } from "@sveltejs/kit";
+import type { Actions } from "./$types";
+import { validate } from "$lib/schemas";
+import * as v from "valibot";
 
 export const load = () => {
   requireGuest();
 };
 
-export const actions = {
+const Schema = v.object({
+  email: v.string(),
+  username: v.string(),
+  password: v.string(),
+  confirmPassword: v.string(),
+});
+
+export const actions: Actions = {
   default: async ({ request, url }) => {
     const formData = await request.formData();
-    const email = String(formData.get("email") ?? "");
-    const username = String(formData.get("username") ?? "");
-    const password = String(formData.get("password") ?? "");
-    const confirmPassword = String(formData.get("confirmPassword") ?? "");
+    const result = validate(Schema, {
+      email: formData.get("email"),
+      username: formData.get("username"),
+      password: formData.get("password"),
+      confirmPassword: formData.get("confirmPassword"),
+    });
+    if (result.isErr())
+      return {
+        email: formData.get("email"),
+        username: formData.get("username"),
+        error: result.error,
+      };
+    const { email, username, password, confirmPassword } = result.value;
     const user = await signup({ email, username, password, confirmPassword });
     if (user.isErr()) return { email, username, error: user.error };
     setSessionTokenInCookies(user.value.token, user.value.sessionExpiresAt);
