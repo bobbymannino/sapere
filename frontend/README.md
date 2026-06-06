@@ -1,5 +1,7 @@
 # Sapere Frontend
 
+<!-- Central Icons: Line, 1.5px, Medium -->
+
 This is the frontend for Sapere. It is a
 [SvelteKit](https://svelte.dev/docs/kit/introduction) application that will
 power the user interface and interactions with the backend. It is separated link
