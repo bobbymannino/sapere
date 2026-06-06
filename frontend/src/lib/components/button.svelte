@@ -2,7 +2,7 @@
     import type { Snippet } from "svelte";
     import type { ClassValue } from "svelte/elements";
 
-    const variants = ["primary", "ghost", "destructive"] as const;
+    const variants = ["primary", "ghost", "destructive", "text"] as const;
     type Variant = (typeof variants)[number];
 
     const sizes = ["sm", "md", "lg"] as const;
@@ -30,6 +30,7 @@
         primary: "bg-primary hover:bg-primary-dark text-base",
         destructive: "bg-danger hover:bg-danger-darker text-base",
         ghost: "text-primary hover:bg-primary/10",
+        text: "text-txt hover:underline",
     };
 
     const sizeClasses: Record<Size, ClassValue> = {
@@ -41,6 +42,7 @@
 
 <a
     {href}
+    tabindex="0"
     class={[
         "inline-block font-medium",
         variantClasses[variant],

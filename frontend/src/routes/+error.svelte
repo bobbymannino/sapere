@@ -2,11 +2,12 @@
     import { resolve } from "$app/paths";
     import { page } from "$app/state";
     import Button from "$lib/components/button.svelte";
+    import Logo from "$lib/components/logo.svelte";
 </script>
 
 <div class="min-h-svh flex-center">
     <div class="stack items-center text-center">
-        <h2><a href={resolve("/")}>Sapere</a></h2>
+        <Logo />
 
         <h1 class="text-primary text-6xl">{page.status}</h1>
 
