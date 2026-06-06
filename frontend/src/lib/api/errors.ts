@@ -50,7 +50,7 @@ export class UnprocessableEntityApiError extends ApiError {
   errors: Record<string, string[]> = {};
   constructor(message = "Unprocessable Entity", json?: any) {
     super(message, 422);
-    this.name = "InternalServerErrorApiError";
+    this.name = "UnprocessableEntityApiError";
     if (json) {
       const errors = v.safeParse(
         v.object({

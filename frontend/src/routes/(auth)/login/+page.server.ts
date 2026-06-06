@@ -9,7 +9,6 @@ export const load = () => {
 export const actions = {
   default: async ({ request, url }) => {
     const formData = await request.formData();
-
     const email = String(formData.get("email") ?? "");
     const password = String(formData.get("password") ?? "");
     const user = await login(
