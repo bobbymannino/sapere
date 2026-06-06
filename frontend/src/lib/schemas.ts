@@ -18,7 +18,7 @@ export const passwordSchema = v.pipe(
   v.minLength(8, "Password must be at least 8 characters long"),
   v.maxLength(255, "Password must be at most 255 characters long"),
   v.regex(
-    /^[a-zA-Z0-9_!@#$%^&*()_+=-]{8,255}/,
+    /^[a-zA-Z0-9_!@#$%^&*()_+=-]{8,255}$/,
     "Password must only contain letters, numbers, and special characters",
   ),
 );
