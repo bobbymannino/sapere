@@ -79,7 +79,7 @@ export class InternalServerErrorApiError extends ApiError {
 export async function handleHttpError(response: Response) {
   let json: any;
   let message: string | undefined;
-  if (response.headers.get("Content-Type") === "application/json") {
+  if (response.headers.get("Content-Type")?.includes("application/json")) {
     json = await response.json();
     message = json.message;
   }
