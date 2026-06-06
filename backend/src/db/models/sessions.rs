@@ -47,4 +47,15 @@ impl Session {
 
         Ok(NewSession { token, expires_at })
     }
+
+    pub async fn delete_by_token(db: &Db, token: &str) -> Result<()> {
+        let token_hash = hex::encode(Sha256::digest(token.as_bytes()));
+
+        sqlx::query("DELETE FROM sessions WHERE token_hash = $1")
+            .bind(&token_hash)
+            .execute(&db.conn)
+            .await?;
+
+        Ok(())
+    }
 }

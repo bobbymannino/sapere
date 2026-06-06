@@ -8,7 +8,7 @@ import {
   valibotIssuesToApiError,
 } from "$lib/api/errors";
 import { emailSchema, passwordSchema, usernameSchema } from "$lib/schemas";
-import { err, ResultAsync, ok, Result } from "neverthrow";
+import { err, ResultAsync, ok, okAsync, Result } from "neverthrow";
 import * as v from "valibot";
 
 const loginBodySchema = v.union([
@@ -112,6 +112,29 @@ export async function signup(body: SignupBody) {
         })
       : ResultAsync.fromSafePromise(handleHttpError(res)).andThen<
           LoginResponse,
+          ApiError
+        >(err);
+  });
+}
+
+export async function logout(): Promise<Result<null, ApiError>> {
+  const { fetch, locals } = getRequestEvent();
+
+  const { token } = locals;
+  if (!token) return err(new UnauthorizedApiError("Invalid or missing token"));
+
+  const response = await ResultAsync.fromPromise(
+    fetch(`${API_BASE}/auth/logout`, {
+      method: "DELETE",
+      headers: { Authorization: `Bearer ${token}` },
+    }),
+    (err) => new UnknownApiError("Failed to execute API request", err),
+  );
+  return await response.asyncAndThen<null, ApiError>((res) => {
+    return res.ok
+      ? okAsync<null, ApiError>(null)
+      : ResultAsync.fromSafePromise(handleHttpError(res)).andThen<
+          null,
           ApiError
         >(err);
   });

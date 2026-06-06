@@ -1,6 +1,9 @@
 import { UnauthorizedApiError } from "$lib/api/errors";
 import { me } from "$lib/server/api";
-import { getSessionTokenFromCookies } from "$lib/server/session";
+import {
+  deleteSessionTokenInCookies,
+  getSessionTokenFromCookies,
+} from "$lib/server/session";
 
 export const handle = async ({ event, resolve }) => {
   event.locals.user = null;
@@ -11,7 +14,10 @@ export const handle = async ({ event, resolve }) => {
     user.match(
       (user) => (event.locals.user = user),
       (err) => {
-        if (err instanceof UnauthorizedApiError) event.locals.token = null;
+        if (err instanceof UnauthorizedApiError) {
+          deleteSessionTokenInCookies();
+          event.locals.token = null;
+        }
       },
     );
   }
