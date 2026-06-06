@@ -9,7 +9,7 @@ import {
   UnauthorizedApiError,
   UnknownApiError,
   valibotIssuesToApiError,
-} from "./errors";
+} from "$lib/api/errors";
 
 const loginBodySchema = v.union([
   v.object({

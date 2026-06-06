@@ -15,9 +15,7 @@ export const actions = {
     const user = await login(
       email.includes("@") ? { email, password } : { username: email, password },
     );
-    if (user.isErr()) {
-      return { success: false, error: JSON.stringify(user.error) };
-    }
+    if (user.isErr()) return { email, error: user.error };
     setSessionTokenInCookies(user.value.token, user.value.sessionExpiresAt);
     redirect(303, url.searchParams.get("redirectTo") ?? "/");
   },
