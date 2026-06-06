@@ -15,9 +15,16 @@
         variant?: Variant;
         /** @default md */
         size?: Size;
+        class?: ClassValue;
     };
 
-    let { href, children, variant = "primary", size = "md" }: Props = $props();
+    let {
+        href,
+        children,
+        variant = "primary",
+        size = "md",
+        class: klass,
+    }: Props = $props();
 
     const variantClasses: Record<Variant, ClassValue> = {
         primary: "bg-primary hover:bg-primary-dark text-base",
@@ -38,6 +45,7 @@
         "inline-block font-medium",
         variantClasses[variant],
         sizeClasses[size],
+        klass,
     ]}
 >
     {@render children()}

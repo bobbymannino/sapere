@@ -102,11 +102,43 @@ body[data-theme="catppuccin"] {
     --color-danger-darker: var(--color-danger-darker);
 }
 
+@layer base {
+    h1 {
+        @apply text-balance text-4xl font-extrabold text-txt leading-tight;
+    }
+
+    h2 {
+        @apply text-balance text-3xl font-bold text-txt leading-tight;
+    }
+
+    h3 {
+        @apply text-balance text-2xl font-bold text-txt leading-tight;
+    }
+
+    h4 {
+        @apply text-balance text-xl font-semibold text-txt leading-tight;
+    }
+
+    p {
+        @apply text-pretty text-txt leading-relaxed;
+    }
+}
+
 @utility stack {
     @apply flex flex-col gap-4;
+}
+
+@utility flex-center {
+    @apply flex items-center justify-center;
 }
 
 @utility dashed-grid {
     background-color: color-mix(var(--color-overlay-0), transparent 40%);
     mask-image: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='104'%20height='104'%3E%3Cpath%20d='M0%200H104M0%200V104'%20fill='none'%20stroke='black'%20stroke-width='1'%20stroke-dasharray='8%208'/%3E%3C/svg%3E");
+}
+
+@utility prose {
+    & > * + * {
+        @apply mbs-[1em];
+    }
 }
