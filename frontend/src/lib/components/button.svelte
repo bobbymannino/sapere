@@ -27,10 +27,12 @@
     }: Props = $props();
 
     const variantClasses: Record<Variant, ClassValue> = {
-        primary: "bg-primary hover:bg-primary-dark text-base",
-        destructive: "bg-danger hover:bg-danger-darker text-base",
-        ghost: "text-primary hover:bg-primary/10",
-        text: "text-txt hover:underline",
+        primary:
+            "bg-primary hover:bg-primary-dark text-base ring-primary-darker",
+        destructive:
+            "bg-danger hover:bg-danger-darker text-base ring-danger-darker",
+        ghost: "text-primary hover:bg-primary/10 ring-primary",
+        text: "text-txt hover:underline ring-txt",
     };
 
     const sizeClasses: Record<Size, ClassValue> = {
@@ -44,7 +46,7 @@
     {href}
     tabindex="0"
     class={[
-        "inline-block font-medium",
+        "inline-block font-medium focus-visible:ring-3 focus-visible:outline-none",
         variantClasses[variant],
         sizeClasses[size],
         klass,
