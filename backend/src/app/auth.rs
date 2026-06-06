@@ -11,18 +11,30 @@ use crate::{
     db::models::users::User,
 };
 
-pub struct AuthUser(pub User);
+pub struct BearerToken(pub String);
 
-impl FromRequestParts<Arc<AppState>> for AuthUser {
+impl<S: Send + Sync> FromRequestParts<S> for BearerToken {
     type Rejection = AppError;
 
-    async fn from_request_parts(parts: &mut Parts, state: &Arc<AppState>) -> Result<Self, Self::Rejection> {
+    async fn from_request_parts(parts: &mut Parts, _state: &S) -> Result<Self, Self::Rejection> {
         let token = parts
             .headers
             .get(AUTHORIZATION)
             .and_then(|v| v.to_str().ok())
             .and_then(|v| v.strip_prefix("Bearer "))
             .ok_or(AppError::Unauthorized("Missing or invalid Authorization header"))?;
+
+        Ok(BearerToken(token.to_string()))
+    }
+}
+
+pub struct AuthUser(pub User);
+
+impl FromRequestParts<Arc<AppState>> for AuthUser {
+    type Rejection = AppError;
+
+    async fn from_request_parts(parts: &mut Parts, state: &Arc<AppState>) -> Result<Self, Self::Rejection> {
+        let BearerToken(token) = BearerToken::from_request_parts(parts, state).await?;
 
         let token_hash = hex::encode(Sha256::digest(token.as_bytes()));
         let user = User::find_by_active_session(state.db(), &token_hash)
