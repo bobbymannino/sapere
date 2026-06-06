@@ -83,11 +83,13 @@ body[data-theme="catppuccin"] {
 
     --color-mantle: var(--color-mantle);
     --color-crust: var(--color-crust);
-
-    --color-background: var(--color-base);
-    --color-dashes: var(--color-surface-2);
 }
 
 @utility stack {
     @apply flex flex-col gap-4;
+}
+
+@utility dashed-grid {
+    background-color: color-mix(var(--color-overlay-0), transparent 40%);
+    mask-image: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='104'%20height='104'%3E%3Cpath%20d='M0%200H104M0%200V104'%20fill='none'%20stroke='black'%20stroke-width='1'%20stroke-dasharray='8%208'/%3E%3C/svg%3E");
 }
