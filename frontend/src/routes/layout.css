@@ -83,7 +83,6 @@ body[data-theme="catppuccin"] {
 @theme {
     --font-sans: "Figtree", ui-sans-serif, system-ui, sans-serif;
 
-    --color-bse: var(--color-base);
     --color-mantle: var(--color-mantle);
     --color-crust: var(--color-crust);
     --color-surface-0: var(--color-surface-0);
@@ -103,6 +102,10 @@ body[data-theme="catppuccin"] {
 }
 
 @layer base {
+    body {
+        @apply bg-(--color-base) scroll-smooth;
+    }
+
     h1 {
         @apply text-balance text-4xl font-extrabold text-txt leading-tight;
     }

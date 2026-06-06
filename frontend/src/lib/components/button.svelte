@@ -16,10 +16,10 @@
         variants: {
             variant: {
                 primary: {
-                    button: "bg-primary hover:bg-primary-dark text-bse ring-primary-darker",
+                    button: "bg-primary hover:bg-primary-dark text-(--color-base) ring-primary-darker",
                 },
                 destructive: {
-                    button: "bg-danger hover:bg-danger-darker text-bse ring-danger-darker",
+                    button: "bg-danger hover:bg-danger-darker text-(--color-base) ring-danger-darker",
                 },
                 ghost: {
                     button: "text-primary hover:bg-primary/10 ring-primary",
