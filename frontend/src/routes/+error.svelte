@@ -5,8 +5,8 @@
     import Logo from "$lib/components/logo.svelte";
 </script>
 
-<div class="min-h-svh flex-center">
-    <div class="stack items-center text-center">
+<div class="min-h-svh flex-center p-6">
+    <div class="stack items-center text-center w-full max-w-md">
         <Logo />
 
         <h1 class="text-primary text-6xl">{page.status}</h1>
