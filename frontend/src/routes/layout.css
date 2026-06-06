@@ -33,6 +33,12 @@
     --color-primary: #2988df;
     --color-primary-dark: oklch(from var(--color-primary) calc(l - 0.1) c h);
     --color-primary-darker: oklch(from var(--color-primary) calc(l - 0.16) c h);
+    --color-success: #4caf50;
+    --color-success-dark: oklch(from var(--color-success) calc(l - 0.1) c h);
+    --color-success-darker: oklch(from var(--color-success) calc(l - 0.16) c h);
+    --color-warning: #ffc107;
+    --color-warning-dark: oklch(from var(--color-warning) calc(l - 0.1) c h);
+    --color-warning-darker: oklch(from var(--color-warning) calc(l - 0.16) c h);
     --color-danger: #e14141;
     --color-danger-dark: oklch(from var(--color-danger) calc(l - 0.1) c h);
     --color-danger-darker: oklch(from var(--color-danger) calc(l - 0.16) c h);
@@ -75,6 +81,12 @@ body[data-theme="catppuccin"] {
     --color-primary: var(--color-ctp-mauve);
     --color-primary-dark: oklch(from var(--color-primary) calc(l - 0.1) c h);
     --color-primary-darker: oklch(from var(--color-primary) calc(l - 0.16) c h);
+    --color-success: var(--color-ctp-green);
+    --color-success-dark: oklch(from var(--color-success) calc(l - 0.1) c h);
+    --color-success-darker: oklch(from var(--color-success) calc(l - 0.16) c h);
+    --color-warning: var(--color-ctp-yellow);
+    --color-warning-dark: oklch(from var(--color-warning) calc(l - 0.1) c h);
+    --color-warning-darker: oklch(from var(--color-warning) calc(l - 0.16) c h);
     --color-danger: var(--color-ctp-red);
     --color-danger-dark: oklch(from var(--color-danger) calc(l - 0.1) c h);
     --color-danger-darker: oklch(from var(--color-danger) calc(l - 0.16) c h);
@@ -98,6 +110,12 @@ body[data-theme="catppuccin"] {
     --color-primary: var(--color-primary);
     --color-primary-dark: var(--color-primary-dark);
     --color-primary-darker: var(--color-primary-darker);
+    --color-success: var(--color-success);
+    --color-success-dark: var(--color-success-dark);
+    --color-success-darker: var(--color-success-darker);
+    --color-warning: var(--color-warning);
+    --color-warning-dark: var(--color-warning-dark);
+    --color-warning-darker: var(--color-warning-darker);
     --color-danger: var(--color-danger);
     --color-danger-dark: var(--color-danger-dark);
     --color-danger-darker: var(--color-danger-darker);
