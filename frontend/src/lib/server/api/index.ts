@@ -36,8 +36,7 @@ export async function login(body: LoginBody) {
   const { fetch } = getRequestEvent();
 
   const parsedBody = v.safeParse(loginBodySchema, body);
-  if (!parsedBody.success)
-    return err(valibotIssuesToApiError(parsedBody.issues));
+  if (!parsedBody.success) return err(valibotIssuesToApiError(parsedBody.issues));
   const response = await ResultAsync.fromPromise(
     fetch(`${API_BASE}/auth/login/email`, {
       method: "POST",
@@ -54,14 +53,9 @@ export async function login(body: LoginBody) {
           const parsed = v.safeParse(loginResponseSchema, json);
           return parsed.success
             ? ok<LoginResponse, ApiError>(parsed.output)
-            : err<LoginResponse, ApiError>(
-                valibotIssuesToApiError(parsed.issues),
-              );
+            : err<LoginResponse, ApiError>(valibotIssuesToApiError(parsed.issues));
         })
-      : ResultAsync.fromSafePromise(handleHttpError(res)).andThen<
-          LoginResponse,
-          ApiError
-        >(err);
+      : ResultAsync.fromSafePromise(handleHttpError(res)).andThen<LoginResponse, ApiError>(err);
   });
 }
 
@@ -72,10 +66,7 @@ const signupBodySchema = v.pipe(
     password: passwordSchema,
     confirmPassword: v.string(),
   }),
-  v.check(
-    (body) => body.password === body.confirmPassword,
-    "Passwords do not match",
-  ),
+  v.check((body) => body.password === body.confirmPassword, "Passwords do not match"),
 );
 
 type SignupBody = v.InferInput<typeof signupBodySchema>;
@@ -84,8 +75,7 @@ export async function signup(body: SignupBody) {
   const { fetch } = getRequestEvent();
 
   const parsedBody = v.safeParse(signupBodySchema, body);
-  if (!parsedBody.success)
-    return err(valibotIssuesToApiError(parsedBody.issues));
+  if (!parsedBody.success) return err(valibotIssuesToApiError(parsedBody.issues));
   const response = await ResultAsync.fromPromise(
     fetch(`${API_BASE}/auth/signup/email`, {
       method: "POST",
@@ -106,14 +96,9 @@ export async function signup(body: SignupBody) {
           const parsed = v.safeParse(loginResponseSchema, json);
           return parsed.success
             ? ok<LoginResponse, ApiError>(parsed.output)
-            : err<LoginResponse, ApiError>(
-                valibotIssuesToApiError(parsed.issues),
-              );
+            : err<LoginResponse, ApiError>(valibotIssuesToApiError(parsed.issues));
         })
-      : ResultAsync.fromSafePromise(handleHttpError(res)).andThen<
-          LoginResponse,
-          ApiError
-        >(err);
+      : ResultAsync.fromSafePromise(handleHttpError(res)).andThen<LoginResponse, ApiError>(err);
   });
 }
 
@@ -133,10 +118,7 @@ export async function logout(): Promise<Result<null, ApiError>> {
   return await response.asyncAndThen<null, ApiError>((res) => {
     return res.ok
       ? okAsync<null, ApiError>(null)
-      : ResultAsync.fromSafePromise(handleHttpError(res)).andThen<
-          null,
-          ApiError
-        >(err);
+      : ResultAsync.fromSafePromise(handleHttpError(res)).andThen<null, ApiError>(err);
   });
 }
 
@@ -173,9 +155,6 @@ export async function me(): Promise<Result<User, ApiError>> {
             ? ok<User, ApiError>(parsed.output)
             : err<User, ApiError>(valibotIssuesToApiError(parsed.issues));
         })
-      : ResultAsync.fromSafePromise(handleHttpError(res)).andThen<
-          User,
-          ApiError
-        >(err);
+      : ResultAsync.fromSafePromise(handleHttpError(res)).andThen<User, ApiError>(err);
   });
 }

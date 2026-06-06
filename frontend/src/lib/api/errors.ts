@@ -62,8 +62,7 @@ export class UnprocessableEntityApiError extends ApiError {
       );
       if (errors.success) {
         this.errors = errors.output.errors;
-        if (errors.output.rootErrors)
-          this.rootErrors = errors.output.rootErrors;
+        if (errors.output.rootErrors) this.rootErrors = errors.output.rootErrors;
       }
     }
   }
@@ -101,10 +100,9 @@ export async function handleHttpError(response: Response) {
   }
 }
 
-export function valibotIssuesToApiError<
-  TSchema extends v.GenericSchema,
-  TIssue extends v.InferIssue<TSchema>,
->(issues: [TIssue, ...TIssue[]]): UnprocessableEntityApiError {
+export function valibotIssuesToApiError<TSchema extends v.GenericSchema, TIssue extends v.InferIssue<TSchema>>(
+  issues: [TIssue, ...TIssue[]],
+): UnprocessableEntityApiError {
   const flattened = v.flatten(issues);
   const rootErrors: string[] = [];
   if (flattened.root) rootErrors.push(...flattened.root);

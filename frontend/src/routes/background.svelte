@@ -1,4 +1,1 @@
-<div
-    class="dashed-grid fixed inset-0 pointer-events-none bg-repeat mask-repeat -z-10"
-    aria-hidden="true"
-></div>
+<div class="dashed-grid pointer-events-none fixed inset-0 -z-10 bg-repeat mask-repeat" aria-hidden="true"></div>

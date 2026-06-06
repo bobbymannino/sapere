@@ -18,9 +18,7 @@ export const transport: Transport = {
         value.message,
         value.status,
         value instanceof UnprocessableEntityApiError ? value.errors : undefined,
-        value instanceof UnprocessableEntityApiError
-          ? value.rootErrors
-          : undefined,
+        value instanceof UnprocessableEntityApiError ? value.rootErrors : undefined,
       ],
     decode: ([name, message, status, errors, rootErrors]) => {
       switch (name) {

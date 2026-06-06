@@ -1,9 +1,6 @@
 import { UnauthorizedApiError } from "$lib/api/errors";
 import { me } from "$lib/server/api";
-import {
-  deleteSessionTokenInCookies,
-  getSessionTokenFromCookies,
-} from "$lib/server/session";
+import { deleteSessionTokenInCookies, getSessionTokenFromCookies } from "$lib/server/session";
 import type { Handle } from "@sveltejs/kit";
 
 export const handle: Handle = async ({ event, resolve }) => {

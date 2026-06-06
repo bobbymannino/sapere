@@ -34,7 +34,6 @@ export function requireGuest() {
 
 export function requireUser() {
   const { locals, url } = getRequestEvent();
-  if (!locals.user)
-    redirect(303, `/login?redirectTo=${encodeURIComponent(url.pathname)}`);
+  if (!locals.user) redirect(303, `/login?redirectTo=${encodeURIComponent(url.pathname)}`);
   return locals.user;
 }

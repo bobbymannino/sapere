@@ -1,9 +1,10 @@
+import { validate } from "$lib/schemas";
 import { signup } from "$lib/server/api/index.js";
 import { requireGuest, setSessionTokenInCookies } from "$lib/server/session.js";
 import { redirect } from "@sveltejs/kit";
-import type { Actions } from "./$types";
-import { validate } from "$lib/schemas";
 import * as v from "valibot";
+
+import type { Actions } from "./$types";
 
 export const load = () => {
   requireGuest();
