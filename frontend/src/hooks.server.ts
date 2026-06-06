@@ -1,3 +1,4 @@
+import { UnauthorizedApiError } from "$lib/api/errors";
 import { me } from "$lib/server/api";
 import { getSessionTokenFromCookies } from "$lib/server/session";
 
@@ -9,7 +10,9 @@ export const handle = async ({ event, resolve }) => {
     const user = await me();
     user.match(
       (user) => (event.locals.user = user),
-      () => (event.locals.token = null),
+      (err) => {
+        if (err instanceof UnauthorizedApiError) event.locals.token = null;
+      },
     );
   }
 
