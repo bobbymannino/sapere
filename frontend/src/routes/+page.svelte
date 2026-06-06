@@ -6,9 +6,9 @@
     let { data }: PageProps = $props();
 </script>
 
-<div class="m-4 p-4 bg-mantle text-txt">
+<div class="m-6 p-4 bg-mantle text-txt stack">
     {#if data.user}
-        <h1>you are logged in</h1>
+        <h1>Welcome, {data.user.username}</h1>
         <Button href={resolve("/logout")} variant="destructive">Logout</Button>
     {:else}
         <Button href={resolve("/login")}>Login</Button>
