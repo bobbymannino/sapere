@@ -18,8 +18,11 @@ export const transport: Transport = {
         value.message,
         value.status,
         value instanceof UnprocessableEntityApiError ? value.errors : undefined,
+        value instanceof UnprocessableEntityApiError
+          ? value.rootErrors
+          : undefined,
       ],
-    decode: ([name, message, status, errors]) => {
+    decode: ([name, message, status, errors, rootErrors]) => {
       switch (name) {
         case "BadRequestApiError":
           return new BadRequestApiError(message);
@@ -30,7 +33,10 @@ export const transport: Transport = {
         case "ConflictApiError":
           return new ConflictApiError(message);
         case "UnprocessableEntityApiError":
-          return new UnprocessableEntityApiError(message, { errors });
+          return new UnprocessableEntityApiError(message, {
+            errors,
+            rootErrors,
+          });
         case "InternalServerErrorApiError":
           return new InternalServerErrorApiError(message);
         case "UnknownApiError":

@@ -1,8 +1,5 @@
 import { getRequestEvent } from "$app/server";
-import * as v from "valibot";
 import { API_BASE } from "$env/static/private";
-import { emailSchema, passwordSchema, usernameSchema } from "$lib/schemas";
-import { err, ResultAsync, ok, Result } from "neverthrow";
 import {
   ApiError,
   handleHttpError,
@@ -10,6 +7,9 @@ import {
   UnknownApiError,
   valibotIssuesToApiError,
 } from "$lib/api/errors";
+import { emailSchema, passwordSchema, usernameSchema } from "$lib/schemas";
+import { err, ResultAsync, ok, Result } from "neverthrow";
+import * as v from "valibot";
 
 const loginBodySchema = v.union([
   v.object({
@@ -42,6 +42,58 @@ export async function login(body: LoginBody) {
     fetch(`${API_BASE}/auth/login/email`, {
       method: "POST",
       body: JSON.stringify(body),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }),
+    (err) => new UnknownApiError("Failed to execute API request", err),
+  );
+  return await response.asyncAndThen<LoginResponse, ApiError>((res) => {
+    return res.ok
+      ? ResultAsync.fromSafePromise(res.json()).andThen((json) => {
+          const parsed = v.safeParse(loginResponseSchema, json);
+          return parsed.success
+            ? ok<LoginResponse, ApiError>(parsed.output)
+            : err<LoginResponse, ApiError>(
+                valibotIssuesToApiError(parsed.issues),
+              );
+        })
+      : ResultAsync.fromSafePromise(handleHttpError(res)).andThen<
+          LoginResponse,
+          ApiError
+        >(err);
+  });
+}
+
+const signupBodySchema = v.pipe(
+  v.object({
+    email: emailSchema,
+    username: usernameSchema,
+    password: passwordSchema,
+    confirmPassword: v.string(),
+  }),
+  v.check(
+    (body) => body.password === body.confirmPassword,
+    "Passwords do not match",
+  ),
+);
+
+type SignupBody = v.InferInput<typeof signupBodySchema>;
+
+export async function signup(body: SignupBody) {
+  const { fetch } = getRequestEvent();
+
+  const parsedBody = v.safeParse(signupBodySchema, body);
+  if (!parsedBody.success)
+    return err(valibotIssuesToApiError(parsedBody.issues));
+  const response = await ResultAsync.fromPromise(
+    fetch(`${API_BASE}/auth/signup/email`, {
+      method: "POST",
+      body: JSON.stringify({
+        email: body.email,
+        username: body.username,
+        password: body.password,
+      }),
       headers: {
         "Content-Type": "application/json",
       },

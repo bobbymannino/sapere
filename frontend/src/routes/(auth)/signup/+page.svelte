@@ -1,23 +1,23 @@
 <script lang="ts">
     import { enhance } from "$app/forms";
-    import Button from "$lib/components/button.svelte";
-    import Input from "$lib/components/input.svelte";
-    import Logo from "$lib/components/logo.svelte";
+    import { resolve } from "$app/paths";
     import {
-        UnauthorizedApiError,
+        ConflictApiError,
         UnprocessableEntityApiError,
     } from "$lib/api/errors";
     import Alert from "$lib/components/alert.svelte";
-    import type { PageProps } from "./$types";
+    import Button from "$lib/components/button.svelte";
     import FormErrors from "$lib/components/form-errors.svelte";
-    import { resolve } from "$app/paths";
+    import Input from "$lib/components/input.svelte";
+    import Logo from "$lib/components/logo.svelte";
+    import type { PageProps } from "./$types";
 
     let { form }: PageProps = $props();
 
     let pending = $state(false);
 </script>
 
-<div class="min-h-svh flex-center p-6">
+<div class="flex-center min-h-svh p-6">
     <form
         method="post"
         use:enhance={() => {
@@ -28,24 +28,36 @@
                 pending = false;
             };
         }}
-        class="stack w-full max-w-md p-6 bg-mantle border border-crust rounded-lg shadow-lg shadow-primary/10"
+        class="stack bg-mantle border-crust shadow-primary/10 w-full max-w-md rounded-lg border p-6 shadow-lg"
     >
         <Logo />
 
-        <h1>Login</h1>
+        <h1>Sign up</h1>
 
         <div class="stack-1">
-            <label for="email">Email or username</label>
+            <label for="email">Email</label>
             <Input
                 id="email"
                 required
                 name="email"
-                type="text"
+                type="email"
                 defaultValue={form?.email}
                 placeholder="johnsmith@email.com"
             />
-            <FormErrors name="username" error={form?.error} />
             <FormErrors name="email" error={form?.error} />
+        </div>
+
+        <div class="stack-1">
+            <label for="username">Username</label>
+            <Input
+                id="username"
+                required
+                name="username"
+                type="text"
+                defaultValue={form?.username}
+                placeholder="johnsmith"
+            />
+            <FormErrors name="username" error={form?.error} />
         </div>
 
         <div class="stack-1">
@@ -60,22 +72,34 @@
             <FormErrors name="password" error={form?.error} />
         </div>
 
+        <div class="stack-1">
+            <label for="confirm-password">Confirm Password</label>
+            <Input
+                required
+                type="password"
+                name="confirmPassword"
+                id="confirm-password"
+                placeholder="Password"
+            />
+            <FormErrors name="confirmPassword" error={form?.error} />
+        </div>
+
         {#if form?.error instanceof UnprocessableEntityApiError}
             {#each form.error.rootErrors as error}
                 <Alert type="error">{error}</Alert>
             {/each}
         {/if}
 
-        {#if form?.error instanceof UnauthorizedApiError}
-            <Alert type="error">Invalid credentials</Alert>
+        {#if form?.error instanceof ConflictApiError}
+            <Alert type="error">{form.error.message}</Alert>
         {/if}
 
-        <Button type="submit" {pending} disabled={pending}>Login</Button>
+        <Button type="submit" {pending} disabled={pending}>Sign up</Button>
         <p class="text-center">
-            Not got an account? <a
-                href={resolve("/signup")}
+            Already got an account? <a
+                href={resolve("/login")}
                 class="text-primary hover:underline focus:outline-none focus:ring-2"
-                >Sign up</a
+                >Login</a
             >
         </p>
     </form>

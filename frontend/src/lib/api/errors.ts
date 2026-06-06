@@ -48,6 +48,7 @@ export class ConflictApiError extends ApiError {
 
 export class UnprocessableEntityApiError extends ApiError {
   errors: Record<string, string[]> = {};
+  rootErrors: string[] = [];
   constructor(message = "Unprocessable Entity", json?: any) {
     super(message, 422);
     this.name = "UnprocessableEntityApiError";
@@ -55,10 +56,15 @@ export class UnprocessableEntityApiError extends ApiError {
       const errors = v.safeParse(
         v.object({
           errors: v.record(v.string(), v.array(v.string())),
+          rootErrors: v.optional(v.array(v.string())),
         }),
         json,
       );
-      if (errors.success) this.errors = errors.output.errors;
+      if (errors.success) {
+        this.errors = errors.output.errors;
+        if (errors.output.rootErrors)
+          this.rootErrors = errors.output.rootErrors;
+      }
     }
   }
 }
@@ -99,7 +105,12 @@ export function valibotIssuesToApiError<
   TSchema extends v.GenericSchema,
   TIssue extends v.InferIssue<TSchema>,
 >(issues: [TIssue, ...TIssue[]]): UnprocessableEntityApiError {
+  const flattened = v.flatten(issues);
+  const rootErrors: string[] = [];
+  if (flattened.root) rootErrors.push(...flattened.root);
+  if (flattened.other) rootErrors.push(...flattened.other);
   return new UnprocessableEntityApiError("Unprocessable Entity", {
-    errors: v.flatten<TSchema>(issues).nested,
+    errors: flattened.nested,
+    rootErrors,
   });
 }
