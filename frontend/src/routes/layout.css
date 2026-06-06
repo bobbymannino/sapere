@@ -31,7 +31,11 @@
     --color-subtext-1: #5a5a5a;
     --color-txt: #3c3c3c;
     --color-primary: #2988df;
+    --color-primary-dark: oklch(from var(--color-primary) calc(l - 0.1) c h);
+    --color-primary-darker: oklch(from var(--color-primary) calc(l - 0.16) c h);
     --color-danger: #e14141;
+    --color-danger-dark: oklch(from var(--color-danger) calc(l - 0.1) c h);
+    --color-danger-darker: oklch(from var(--color-danger) calc(l - 0.16) c h);
 }
 
 body[data-theme="dark"] {
@@ -48,7 +52,11 @@ body[data-theme="dark"] {
     --color-subtext-1: #9a9a9a;
     --color-txt: #c0c0c0;
     --color-primary: #86c6e1;
+    --color-primary-dark: oklch(from var(--color-primary) calc(l - 0.1) c h);
+    --color-primary-darker: oklch(from var(--color-primary) calc(l - 0.16) c h);
     --color-danger: #ff8b8b;
+    --color-danger-dark: oklch(from var(--color-danger) calc(l - 0.1) c h);
+    --color-danger-darker: oklch(from var(--color-danger) calc(l - 0.16) c h);
 }
 
 body[data-theme="catppuccin"] {
@@ -65,24 +73,33 @@ body[data-theme="catppuccin"] {
     --color-subtext-1: var(--color-ctp-subtext1);
     --color-txt: var(--color-ctp-text);
     --color-primary: var(--color-ctp-mauve);
+    --color-primary-dark: oklch(from var(--color-primary) calc(l - 0.1) c h);
+    --color-primary-darker: oklch(from var(--color-primary) calc(l - 0.16) c h);
     --color-danger: var(--color-ctp-red);
+    --color-danger-dark: oklch(from var(--color-danger) calc(l - 0.1) c h);
+    --color-danger-darker: oklch(from var(--color-danger) calc(l - 0.16) c h);
 }
 
 @theme {
     --font-sans: "Figtree", ui-sans-serif, system-ui, sans-serif;
 
+    --color-base: var(--color-base);
+    --color-mantle: var(--color-mantle);
+    --color-crust: var(--color-crust);
     --color-surface-0: var(--color-surface-0);
     --color-surface-1: var(--color-surface-1);
     --color-surface-2: var(--color-surface-2);
-
     --color-overlay-0: var(--color-overlay-0);
     --color-overlay-1: var(--color-overlay-1);
     --color-overlay-2: var(--color-overlay-2);
 
     --color-txt: var(--color-txt);
-
-    --color-mantle: var(--color-mantle);
-    --color-crust: var(--color-crust);
+    --color-primary: var(--color-primary);
+    --color-primary-dark: var(--color-primary-dark);
+    --color-primary-darker: var(--color-primary-darker);
+    --color-danger: var(--color-danger);
+    --color-danger-dark: var(--color-danger-dark);
+    --color-danger-darker: var(--color-danger-darker);
 }
 
 @utility stack {
