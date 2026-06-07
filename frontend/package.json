@@ -24,7 +24,7 @@
   "devDependencies": {
     "@catppuccin/tailwindcss": "^1.0.0",
     "@sveltejs/adapter-node": "^5.5.4",
-    "@sveltejs/kit": "^2.62.0",
+    "@sveltejs/kit": "^2.63.0",
     "@sveltejs/vite-plugin-svelte": "^7.1.2",
     "@tailwindcss/vite": "^4.3.0",
     "@types/bun": "^1.3.14",
@@ -32,7 +32,7 @@
     "oxlint": "^1.68.0",
     "oxlint-tsgolint": "^0.23.0",
     "svelte": "^5.56.0",
-    "svelte-check": "^4.5.0",
+    "svelte-check": "^4.6.0",
     "tailwindcss": "^4.3.0",
     "typescript": "^6.0.3",
     "vite": "^8.0.16"
