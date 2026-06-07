@@ -9,6 +9,7 @@ const workspaceSchema = v.object({
   authorId: v.number(),
   ownerId: v.number(),
   title: v.string(),
+  description: v.nullable(v.string()),
   slug: v.string(),
   createdAt: v.pipe(v.string(), v.toDate()),
   updatedAt: v.pipe(v.string(), v.toDate()),
