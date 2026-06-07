@@ -146,6 +146,10 @@ body[data-theme="catppuccin"] {
     @apply text-txt leading-relaxed text-pretty;
   }
 
+  small {
+    @apply text-[75%];
+  }
+
   label {
     @apply text-subtext-1 font-medium;
   }
