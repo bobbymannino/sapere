@@ -46,6 +46,9 @@ const createWorkspaceBodySchema = v.object({
     v.maxLength(100, "Workspace title must be at most 100 characters long"),
     v.regex(/^[a-zA-Z0-9 _:-]+$/, "Workspace title contains invalid characters"),
   ),
+  description: v.optional(
+    v.pipe(v.string(), v.maxLength(1000, "Workspace description must be at most 1000 characters long")),
+  ),
   slug: v.pipe(
     v.string(),
     v.minLength(1, "Workspace slug is required"),
