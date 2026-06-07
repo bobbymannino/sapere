@@ -1,5 +1,5 @@
 import { UnauthorizedApiError } from "$lib/api/errors";
-import { me } from "$lib/server/api";
+import { api } from "$lib/server/api";
 import { deleteSessionTokenInCookies, getSessionTokenFromCookies } from "$lib/server/session";
 import type { Handle } from "@sveltejs/kit";
 
@@ -8,7 +8,7 @@ export const handle: Handle = async ({ event, resolve }) => {
   event.locals.token = getSessionTokenFromCookies();
 
   if (event.locals.token) {
-    const user = await me();
+    const user = await api.auth.me();
     user.match(
       (user) => (event.locals.user = user),
       (err) => {
