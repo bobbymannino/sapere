@@ -5,13 +5,19 @@
   import Alert from "$lib/components/alert.svelte";
   import Button from "$lib/components/button.svelte";
   import InputField from "$lib/components/input-field.svelte";
-  import Logo from "$lib/components/logo.svelte";
+  import TextareaField from "$lib/components/textarea-field.svelte";
 
   import type { PageProps } from "./$types";
 
   let { form }: PageProps = $props();
 
   let pending = $state(false);
+
+  function slugify(value: string) {
+    return value.toLowerCase().replace(/[^0-9a-z-]/g, "-");
+  }
+
+  let slug = $state("");
 </script>
 
 <div class="flex-center min-h-svh p-6">
@@ -27,49 +33,38 @@
     }}
     class="card max-w-md"
   >
-    <Logo />
-
-    <h1>Sign up</h1>
+    <h1>New workspace</h1>
 
     <InputField
-      id="email"
+      id="title"
       required
-      name="email"
-      type="email"
-      label="Email"
-      defaultValue={form?.email}
-      placeholder="johnsmith@email.com"
-      error={form?.error}
-    />
-
-    <InputField
-      id="username"
-      required
-      name="username"
+      name="title"
       type="text"
-      label="Username"
-      defaultValue={form?.username}
-      placeholder="johnsmith"
+      label="Title"
+      oninput={(e) => (slug = slugify(e.currentTarget.value))}
+      defaultValue={form?.title}
+      placeholder="Sapere"
       error={form?.error}
     />
 
     <InputField
-      id="password"
+      id="slug"
       required
-      name="password"
-      type="password"
-      label="Password"
-      placeholder="Password"
+      name="slug"
+      type="text"
+      label="Slug"
+      bind:value={() => slug, (v) => (slug = slugify(v))}
+      defaultValue={form?.slug}
+      placeholder="sapere"
       error={form?.error}
     />
 
-    <InputField
-      id="confirm-password"
-      required
-      name="confirmPassword"
-      type="password"
-      label="Confirm Password"
-      placeholder="Password"
+    <TextareaField
+      id="description"
+      name="description"
+      label="Description"
+      defaultValue={form?.description}
+      placeholder="(optional)"
       error={form?.error}
     />
 
@@ -83,12 +78,9 @@
       <Alert type="error">{form.error.message}</Alert>
     {/if}
 
-    <Button type="submit" {pending} disabled={pending}>Sign up</Button>
-    <p class="text-center">
-      Already got an account? <a
-        href={resolve("/login")}
-        class="text-primary hover:underline focus:ring-2 focus:outline-none">Login</a
-      >
-    </p>
+    <div class="grid grid-cols-2 gap-3">
+      <Button href={resolve("/")} variant="text" disabled={pending}>Cancel</Button>
+      <Button type="submit" {pending} disabled={pending}>Create workspace</Button>
+    </div>
   </form>
 </div>

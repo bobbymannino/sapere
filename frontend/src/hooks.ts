@@ -8,7 +8,7 @@ import {
   UnknownApiError,
   UnprocessableEntityApiError,
 } from "$lib/api/errors";
-import type { Transport } from "@sveltejs/kit";
+import type { Reroute, Transport } from "@sveltejs/kit";
 
 export const transport: Transport = {
   ApiError: {
@@ -44,4 +44,8 @@ export const transport: Transport = {
       }
     },
   },
+};
+
+export const reroute: Reroute = ({ url }) => {
+  if (/^\/workspaces\/?$/.test(url.pathname)) return "/";
 };

@@ -16,6 +16,17 @@ http:
       }
   auth: inherit
 
+runtime:
+  scripts:
+    - type: after-response
+      code: |-
+        if (res.status >= 200 && res.status < 300) {
+          const body = res.getBody(); 
+          if (body?.token) {
+            bru.setVar("token", body.token);
+          }
+        }
+
 settings:
   encodeUrl: true
   timeout: 0

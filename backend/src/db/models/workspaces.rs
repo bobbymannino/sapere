@@ -11,6 +11,7 @@ pub struct Workspace {
     author_id: i32,
     owner_id: i32,
     title: String,
+    description: Option<String>,
     slug: String,
     created_at: DateTime<Utc>,
     updated_at: DateTime<Utc>,
@@ -36,16 +37,17 @@ impl From<sqlx::Error> for CreateWorkspaceError {
 }
 
 impl Workspace {
-    pub async fn create(db: &Db, user_id: i32, title: &str, slug: &str) -> Result<Self, CreateWorkspaceError> {
+    pub async fn create(db: &Db, user_id: i32, title: &str, slug: &str, description: &Option<String>) -> Result<Self, CreateWorkspaceError> {
         let mut tx = db.conn.begin().await?;
 
         let workspace_result = sqlx::query_as::<_, Workspace>(
-            "INSERT INTO workspaces (author_id, owner_id, title, slug) VALUES ($1, $1, $2, $3) \
-             RETURNING id, author_id, owner_id, title, slug, created_at, updated_at",
+            "INSERT INTO workspaces (author_id, owner_id, title, slug, description) VALUES ($1, $1, $2, $3, $4) \
+             RETURNING id, author_id, owner_id, title, slug, description, created_at, updated_at",
         )
         .bind(user_id)
         .bind(title)
         .bind(slug)
+        .bind(description.clone())
         .fetch_one(&mut *tx)
         .await;
 
@@ -78,7 +80,7 @@ impl Workspace {
         order_by: &'static str,
     ) -> Result<(Vec<Self>, i64)> {
         let sql = format!(
-            "SELECT w.id, w.author_id, w.owner_id, w.title, w.slug, w.created_at, w.updated_at \
+            "SELECT w.id, w.author_id, w.owner_id, w.title, w.description, w.slug, w.created_at, w.updated_at \
              FROM workspaces w \
              INNER JOIN workspace_members m ON m.workspace_id = w.id \
              WHERE m.user_id = $1 \

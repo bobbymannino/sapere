@@ -146,6 +146,10 @@ body[data-theme="catppuccin"] {
     @apply text-txt leading-relaxed text-pretty;
   }
 
+  small {
+    @apply text-[75%];
+  }
+
   label {
     @apply text-subtext-1 font-medium;
   }
@@ -157,6 +161,10 @@ body[data-theme="catppuccin"] {
 
 @utility stack-1 {
   @apply flex flex-col gap-1;
+}
+
+@utility stack-2 {
+  @apply flex flex-col gap-2;
 }
 
 @utility flex-center {
@@ -172,4 +180,8 @@ body[data-theme="catppuccin"] {
   & > * + * {
     @apply mbs-[1em];
   }
+}
+
+@utility card {
+  @apply stack bg-mantle border-crust shadow-primary/10 w-full rounded-lg border p-6 shadow-lg;
 }

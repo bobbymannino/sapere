@@ -14,7 +14,7 @@ export function setSessionTokenInCookies(token: string, expiresAt: Date) {
     path: "/",
     sameSite: "lax",
     httpOnly: !dev,
-    secure: true,
+    secure: !dev,
   });
 }
 
@@ -23,7 +23,7 @@ export function deleteSessionTokenInCookies() {
     path: "/",
     sameSite: "lax",
     httpOnly: !dev,
-    secure: true,
+    secure: !dev,
   });
 }
 

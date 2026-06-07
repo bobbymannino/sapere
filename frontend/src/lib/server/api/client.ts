@@ -29,10 +29,7 @@ function getHeaders(options: ApiRequestOptions, token: string | null) {
   return headers;
 }
 
-async function apiFetch(
-  path: string,
-  options: ApiRequestOptions = {},
-): Promise<Result<Response, ApiError>> {
+async function apiFetch(path: string, options: ApiRequestOptions = {}): Promise<Result<Response, ApiError>> {
   const { fetch, locals } = getRequestEvent();
   const token = locals.token;
 
@@ -62,9 +59,7 @@ export function validateBody<TSchema extends v.GenericSchema>(
   body: v.InferInput<TSchema>,
 ): Result<v.InferOutput<TSchema>, ApiError> {
   const parsed = v.safeParse(schema, body);
-  return parsed.success
-    ? ok(parsed.output)
-    : err(valibotIssuesToApiError(parsed.issues));
+  return parsed.success ? ok(parsed.output) : err(valibotIssuesToApiError(parsed.issues));
 }
 
 export async function apiJson<TSchema extends v.GenericSchema>(
@@ -83,10 +78,7 @@ export async function apiJson<TSchema extends v.GenericSchema>(
   }
 }
 
-export async function apiEmpty(
-  path: string,
-  options?: ApiRequestOptions,
-): Promise<Result<null, ApiError>> {
+export async function apiEmpty(path: string, options?: ApiRequestOptions): Promise<Result<null, ApiError>> {
   const response = await apiFetch(path, options);
   return response.isOk() ? ok(null) : err(response.error);
 }
