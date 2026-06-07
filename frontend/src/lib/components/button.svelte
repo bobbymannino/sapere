@@ -41,7 +41,7 @@
           icon: "size-4",
         },
         icon: {
-          button: "p-2 rounded-lg [&_svg]:size-7",
+          button: "p-2 rounded-lg [&_svg]:size-6",
         },
       },
     },
