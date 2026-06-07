@@ -26,7 +26,7 @@
         pending = false;
       };
     }}
-    class="stack bg-mantle border-crust shadow-primary/10 w-full max-w-md rounded-lg border p-6 shadow-lg"
+    class="card max-w-md"
   >
     <Logo />
 

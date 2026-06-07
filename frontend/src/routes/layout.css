@@ -181,3 +181,7 @@ body[data-theme="catppuccin"] {
     @apply mbs-[1em];
   }
 }
+
+@utility card {
+  @apply stack bg-mantle border-crust shadow-primary/10 w-full rounded-lg border p-6 shadow-lg;
+}
