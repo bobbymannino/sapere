@@ -4,8 +4,7 @@
   import { UnauthorizedApiError, UnprocessableEntityApiError } from "$lib/api/errors";
   import Alert from "$lib/components/alert.svelte";
   import Button from "$lib/components/button.svelte";
-  import FormErrors from "$lib/components/form-errors.svelte";
-  import Input from "$lib/components/input.svelte";
+  import InputField from "$lib/components/input-field.svelte";
   import Logo from "$lib/components/logo.svelte";
 
   import type { PageProps } from "./$types";
@@ -32,25 +31,27 @@
 
     <h1>Login</h1>
 
-    <div class="stack-1">
-      <label for="email">Email or username</label>
-      <Input
-        id="email"
-        required
-        name="email"
-        type="text"
-        defaultValue={form?.email}
-        placeholder="johnsmith@email.com"
-      />
-      <FormErrors name="username" error={form?.error} />
-      <FormErrors name="email" error={form?.error} />
-    </div>
+    <InputField
+      id="email"
+      required
+      name="email"
+      type="text"
+      label="Email or username"
+      defaultValue={form?.email}
+      placeholder="johnsmith@email.com"
+      error={form?.error}
+      errorNames={["username", "email"]}
+    />
 
-    <div class="stack-1">
-      <label for="password">Password</label>
-      <Input required type="password" name="password" id="password" placeholder="Password" />
-      <FormErrors name="password" error={form?.error} />
-    </div>
+    <InputField
+      id="password"
+      required
+      name="password"
+      type="password"
+      label="Password"
+      placeholder="Password"
+      error={form?.error}
+    />
 
     {#if form?.error instanceof UnprocessableEntityApiError}
       {#each form.error.rootErrors as error}

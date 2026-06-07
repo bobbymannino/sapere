@@ -4,8 +4,7 @@
   import { ConflictApiError, UnprocessableEntityApiError } from "$lib/api/errors";
   import Alert from "$lib/components/alert.svelte";
   import Button from "$lib/components/button.svelte";
-  import FormErrors from "$lib/components/form-errors.svelte";
-  import Input from "$lib/components/input.svelte";
+  import InputField from "$lib/components/input-field.svelte";
   import Logo from "$lib/components/logo.svelte";
 
   import type { PageProps } from "./$types";
@@ -32,36 +31,47 @@
 
     <h1>Sign up</h1>
 
-    <div class="stack-1">
-      <label for="email">Email</label>
-      <Input
-        id="email"
-        required
-        name="email"
-        type="email"
-        defaultValue={form?.email}
-        placeholder="johnsmith@email.com"
-      />
-      <FormErrors name="email" error={form?.error} />
-    </div>
+    <InputField
+      id="email"
+      required
+      name="email"
+      type="email"
+      label="Email"
+      defaultValue={form?.email}
+      placeholder="johnsmith@email.com"
+      error={form?.error}
+    />
 
-    <div class="stack-1">
-      <label for="username">Username</label>
-      <Input id="username" required name="username" type="text" defaultValue={form?.username} placeholder="johnsmith" />
-      <FormErrors name="username" error={form?.error} />
-    </div>
+    <InputField
+      id="username"
+      required
+      name="username"
+      type="text"
+      label="Username"
+      defaultValue={form?.username}
+      placeholder="johnsmith"
+      error={form?.error}
+    />
 
-    <div class="stack-1">
-      <label for="password">Password</label>
-      <Input required type="password" name="password" id="password" placeholder="Password" />
-      <FormErrors name="password" error={form?.error} />
-    </div>
+    <InputField
+      id="password"
+      required
+      name="password"
+      type="password"
+      label="Password"
+      placeholder="Password"
+      error={form?.error}
+    />
 
-    <div class="stack-1">
-      <label for="confirm-password">Confirm Password</label>
-      <Input required type="password" name="confirmPassword" id="confirm-password" placeholder="Password" />
-      <FormErrors name="confirmPassword" error={form?.error} />
-    </div>
+    <InputField
+      id="confirm-password"
+      required
+      name="confirmPassword"
+      type="password"
+      label="Confirm Password"
+      placeholder="Password"
+      error={form?.error}
+    />
 
     {#if form?.error instanceof UnprocessableEntityApiError}
       {#each form.error.rootErrors as error}
