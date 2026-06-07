@@ -159,6 +159,10 @@ body[data-theme="catppuccin"] {
   @apply flex flex-col gap-1;
 }
 
+@utility stack-2 {
+  @apply flex flex-col gap-2;
+}
+
 @utility flex-center {
   @apply flex items-center justify-center;
 }

@@ -40,6 +40,9 @@
           button: "px-4 py-1.5 gap-2 rounded-lg text-lg",
           icon: "size-4",
         },
+        icon: {
+          button: "p-2 rounded-lg [&_svg]:size-7",
+        },
       },
     },
     defaultVariants: {
