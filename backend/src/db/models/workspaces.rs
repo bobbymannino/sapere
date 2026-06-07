@@ -37,16 +37,17 @@ impl From<sqlx::Error> for CreateWorkspaceError {
 }
 
 impl Workspace {
-    pub async fn create(db: &Db, user_id: i32, title: &str, slug: &str) -> Result<Self, CreateWorkspaceError> {
+    pub async fn create(db: &Db, user_id: i32, title: &str, slug: &str, description: &Option<String>) -> Result<Self, CreateWorkspaceError> {
         let mut tx = db.conn.begin().await?;
 
         let workspace_result = sqlx::query_as::<_, Workspace>(
-            "INSERT INTO workspaces (author_id, owner_id, title, slug) VALUES ($1, $1, $2, $3) \
-             RETURNING id, author_id, owner_id, title, slug, created_at, updated_at",
+            "INSERT INTO workspaces (author_id, owner_id, title, slug, description) VALUES ($1, $1, $2, $3, $4) \
+             RETURNING id, author_id, owner_id, title, slug, description, created_at, updated_at",
         )
         .bind(user_id)
         .bind(title)
         .bind(slug)
+        .bind(description.clone())
         .fetch_one(&mut *tx)
         .await;
 

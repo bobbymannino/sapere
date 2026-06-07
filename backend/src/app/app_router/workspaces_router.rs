@@ -31,6 +31,8 @@ struct CreateWorkspaceBody {
     title: String,
     #[validate(length(min = 1, max = 50), regex(path = PATTERN_SLUG))]
     slug: String,
+    #[validate(length(max = 1000))]
+    description: Option<String>,
 }
 
 #[derive(Debug, Default, Clone, Copy, Deserialize)]
@@ -77,7 +79,7 @@ async fn create_workspace(
 ) -> Result<(StatusCode, Json<Workspace>), AppError> {
     body.validate()?;
 
-    let workspace = Workspace::create(state.db(), user.id(), &body.title, &body.slug)
+    let workspace = Workspace::create(state.db(), user.id(), &body.title, &body.slug, &body.description.map(|v|v.to_string()))
         .await
         .map_err(|e| match e {
             CreateWorkspaceError::TitleTaken => AppError::Conflict("You already have a workspace with this title"),
