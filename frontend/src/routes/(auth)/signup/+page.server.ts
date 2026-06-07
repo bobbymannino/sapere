@@ -1,5 +1,5 @@
 import { validate } from "$lib/schemas";
-import { signup } from "$lib/server/api/index.js";
+import { api } from "$lib/server/api/index.js";
 import { requireGuest, setSessionTokenInCookies } from "$lib/server/session.js";
 import { redirect } from "@sveltejs/kit";
 import * as v from "valibot";
@@ -33,7 +33,7 @@ export const actions: Actions = {
         error: result.error,
       };
     const { email, username, password, confirmPassword } = result.value;
-    const user = await signup({ email, username, password, confirmPassword });
+    const user = await api.auth.signup({ email, username, password, confirmPassword });
     if (user.isErr()) return { email, username, error: user.error };
     setSessionTokenInCookies(user.value.token, user.value.sessionExpiresAt);
     redirect(303, url.searchParams.get("redirectTo") ?? "/");
