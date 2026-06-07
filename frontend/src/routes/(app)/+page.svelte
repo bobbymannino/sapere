@@ -1,5 +1,6 @@
 <script lang="ts">
   import { resolve } from "$app/paths";
+    import Button from "$lib/components/button.svelte";
   import PlaceholderIcon from "$lib/icons/placeholder-icon.svelte";
 
   import type { PageProps } from "./$types";
@@ -17,6 +18,7 @@
       </div>
       <h2>Empty</h2>
       <p>It seems you have no workspaces, maybe clear some filters</p>
+      <Button href={resolve("/workspaces/new")} size='lg' variant='primary'>New Workspace</Button>
     </div>
   {:else}
     <ol class="stack">
@@ -42,6 +44,8 @@
           </a>
         </li>
       {/each}
+
+      <Button href={resolve("/workspaces/new")} size='lg' variant='text'>New Workspace</Button>
     </ol>
   {/if}
 </div>
