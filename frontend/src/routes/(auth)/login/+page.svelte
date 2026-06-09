@@ -1,6 +1,7 @@
 <script lang="ts">
   import { enhance } from "$app/forms";
   import { resolve } from "$app/paths";
+  import { page } from "$app/state";
   import { UnauthorizedApiError, UnprocessableEntityApiError } from "$lib/api/errors";
   import Alert from "$lib/components/alert.svelte";
   import Button from "$lib/components/button.svelte";
@@ -12,6 +13,7 @@
   let { form }: PageProps = $props();
 
   let pending = $state(false);
+  const signupHref = $derived(`${resolve("/signup")}${page.url.search}`);
 </script>
 
 <div class="flex-center min-h-svh p-6">
@@ -65,10 +67,9 @@
 
     <Button type="submit" {pending} disabled={pending}>Login</Button>
     <p class="text-center">
-      Not got an account? <a
-        href={resolve("/signup")}
-        class="text-primary hover:underline focus:ring-2 focus:outline-none">Sign up</a
-      >
+      Not got an account? <a href={signupHref} class="text-primary hover:underline focus:ring-2 focus:outline-none">
+        Sign up
+      </a>
     </p>
   </form>
 </div>

@@ -1,6 +1,7 @@
 <script lang="ts">
   import { enhance } from "$app/forms";
   import { resolve } from "$app/paths";
+  import { page } from "$app/state";
   import { ConflictApiError, UnprocessableEntityApiError } from "$lib/api/errors";
   import Alert from "$lib/components/alert.svelte";
   import Button from "$lib/components/button.svelte";
@@ -12,6 +13,7 @@
   let { form }: PageProps = $props();
 
   let pending = $state(false);
+  const loginHref = $derived(`${resolve("/login")}${page.url.search}`);
 </script>
 
 <div class="flex-center min-h-svh p-6">
@@ -85,10 +87,9 @@
 
     <Button type="submit" {pending} disabled={pending}>Sign up</Button>
     <p class="text-center">
-      Already got an account? <a
-        href={resolve("/login")}
-        class="text-primary hover:underline focus:ring-2 focus:outline-none">Login</a
-      >
+      Already got an account? <a href={loginHref} class="text-primary hover:underline focus:ring-2 focus:outline-none">
+        Login
+      </a>
     </p>
   </form>
 </div>
