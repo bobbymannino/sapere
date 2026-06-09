@@ -31,7 +31,7 @@
 {/if}
 
 <header
-  class="bg-mantle border-crust shadow-primary/10 sticky top-0 z-30 grid-rows-[auto_1fr_auto] border-b shadow-lg md:grid md:h-svh md:border-r md:border-b-0"
+  class="bg-mantle border-crust sticky top-0 z-30 grid-rows-[auto_1fr_auto] border-b md:grid md:h-svh md:border-r md:border-b-0"
 >
   <div class="flex items-center justify-between p-3">
     <Logo />

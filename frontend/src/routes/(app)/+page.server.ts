@@ -7,6 +7,5 @@ export const load: PageServerLoad = async ({ parent }) => {
   await parent();
   const workspaces = await api.workspaces.list();
   if (workspaces.isErr()) error(workspaces.error.status, workspaces.error.message);
-  console.log(workspaces.value);
   return { workspaces: workspaces.value };
 };

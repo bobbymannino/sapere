@@ -183,5 +183,5 @@ body[data-theme="catppuccin"] {
 }
 
 @utility card {
-  @apply stack bg-mantle border-crust shadow-primary/10 w-full rounded-lg border p-6 shadow-lg;
+  @apply stack bg-mantle border-crust w-full rounded-lg border p-6;
 }
