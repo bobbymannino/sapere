@@ -20,8 +20,11 @@
 
         <CardFooter class="flex-col gap-2">
             <p class="text-center">
-                Already got an account? <a class="hover:underline" href="/login?{page.url.searchParams.toString()}">
-                    <b>Login</b>
+                Already got an account? <a
+                    class="hover:text-primary underline"
+                    href="/login?{page.url.searchParams.toString()}"
+                >
+                    Login
                 </a>
             </p>
         </CardFooter>
