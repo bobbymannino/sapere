@@ -2,15 +2,12 @@
     import { authClient } from "$lib/auth-client";
     import Button from "$lib/components/ui/button/button.svelte";
     import Input from "$lib/components/ui/input/input.svelte";
-    import Label from "$lib/components/ui/label/label.svelte";
     import SpinnerIcon from "$lib/icons/spinner-icon.svelte";
     import * as v from "valibot";
     import { NameSchema, UsernameSchema, EmailSchema, PasswordSchema } from "$lib/schemas/auth";
-    import Alert from "$lib/components/ui/alert/alert.svelte";
-    import ErrorIcon from "$lib/icons/error-icon.svelte";
-    import AlertTitle from "$lib/components/ui/alert/alert-title.svelte";
     import { goto } from "$app/navigation";
     import { page } from "$app/state";
+    import FormInput from "$lib/components/form-input.svelte";
 
     let formData = $state({
         name: "",
@@ -67,30 +64,24 @@
 </script>
 
 <form class="flex flex-col gap-5" onsubmit={handleSubmit}>
-    <div class="grid gap-2">
-        <Label for="name">Name</Label>
+    <FormInput inputId="name" label="Name" errors={valiErrors?.nested?.name}>
         <Input
             id="name"
             name="name"
             required
+            autocomplete="name"
             disabled={pending}
             bind:value={formData.name}
             placeholder="Enter your name"
         />
-        {#each valiErrors?.nested?.name as error}
-            <Alert variant="destructive">
-                <ErrorIcon />
-                <AlertTitle>{error}</AlertTitle>
-            </Alert>
-        {/each}
-    </div>
+    </FormInput>
 
-    <div class="grid gap-2">
-        <Label for="username">Username</Label>
+    <FormInput inputId="username" label="Username" errors={valiErrors?.nested?.username}>
         <Input
             id="username"
             name="username"
             required
+            autocomplete="username"
             disabled={pending}
             placeholder="Lowercase letters, numbers, underscores and dots"
             bind:value={
@@ -102,35 +93,22 @@
                         .replace(/[^a-z0-9_.]+/g, ""))
             }
         />
-        {#each valiErrors?.nested?.username as error}
-            <Alert variant="destructive">
-                <ErrorIcon />
-                <AlertTitle>{error}</AlertTitle>
-            </Alert>
-        {/each}
-    </div>
+    </FormInput>
 
-    <div class="grid gap-2">
-        <Label for="email">Email</Label>
+    <FormInput inputId="email" label="Email" errors={valiErrors?.nested?.email}>
         <Input
             id="email"
             name="email"
             type="email"
+            autocomplete="email"
             required
             disabled={pending}
             bind:value={formData.email}
             placeholder="Enter your email"
         />
-        {#each valiErrors?.nested?.email as error}
-            <Alert variant="destructive">
-                <ErrorIcon />
-                <AlertTitle>{error}</AlertTitle>
-            </Alert>
-        {/each}
-    </div>
+    </FormInput>
 
-    <div class="grid gap-2">
-        <Label for="password">Password</Label>
+    <FormInput inputId="password" label="Password" errors={valiErrors?.nested?.password}>
         <Input
             id="password"
             name="password"
@@ -140,16 +118,9 @@
             bind:value={formData.password}
             placeholder="Enter your password"
         />
-        {#each valiErrors?.nested?.password as error}
-            <Alert variant="destructive">
-                <ErrorIcon />
-                <AlertTitle>{error}</AlertTitle>
-            </Alert>
-        {/each}
-    </div>
+    </FormInput>
 
-    <div class="grid gap-2">
-        <Label for="confirm-password">Confirm Password</Label>
+    <FormInput inputId="confirm-password" label="Confirm Password" errors={valiErrors?.nested?.confirmPassword}>
         <Input
             id="confirm-password"
             name="confirmPassword"
@@ -159,13 +130,7 @@
             bind:value={formData.confirmPassword}
             placeholder="Confirm your password"
         />
-        {#each valiErrors?.nested?.confirmPassword as error}
-            <Alert variant="destructive">
-                <ErrorIcon />
-                <AlertTitle>{error}</AlertTitle>
-            </Alert>
-        {/each}
-    </div>
+    </FormInput>
 
     <Button type="submit" disabled={pending}>
         {#if pending}<SpinnerIcon class="animate-spin" />{/if}
