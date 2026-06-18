@@ -128,25 +128,25 @@
     @apply font-sans;
   }
   h1 {
-    @apply text-foreground text-3xl leading-none font-extrabold tracking-tight md:text-5xl;
+    @apply text-foreground text-3xl leading-none font-extrabold tracking-tight text-balance md:text-5xl;
   }
   h2 {
-    @apply text-foreground text-2xl font-bold tracking-tight md:text-3xl;
+    @apply text-foreground text-2xl font-bold tracking-tight text-balance md:text-3xl;
   }
   h3 {
-    @apply text-foreground text-xl font-semibold tracking-tight md:text-2xl;
+    @apply text-foreground text-xl font-semibold tracking-tight text-balance md:text-2xl;
   }
   h4 {
-    @apply text-foreground text-lg font-semibold tracking-tight md:text-xl;
+    @apply text-foreground text-lg font-semibold tracking-tight text-balance md:text-xl;
   }
   h5 {
-    @apply text-foreground/90 text-base font-medium tracking-wide uppercase;
+    @apply text-foreground/90 text-base font-medium tracking-wide text-balance uppercase;
   }
   h6 {
-    @apply text-muted-foreground text-sm font-semibold tracking-wider uppercase;
+    @apply text-muted-foreground text-sm font-semibold tracking-wider text-balance uppercase;
   }
   p {
-    @apply text-foreground/90 text-base leading-relaxed;
+    @apply text-foreground/90 text-base leading-relaxed text-pretty;
   }
 }
 
