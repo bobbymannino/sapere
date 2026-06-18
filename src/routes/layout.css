@@ -125,7 +125,7 @@
     @apply bg-background text-foreground;
   }
   html {
-    @apply font-sans;
+    @apply scrollbar-gutter-stable scroll-smooth font-sans;
   }
   h1 {
     @apply text-foreground text-3xl leading-none font-extrabold tracking-tight text-balance md:text-5xl;
