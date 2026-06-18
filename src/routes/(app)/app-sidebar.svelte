@@ -1,10 +1,12 @@
 <script lang="ts">
     import { goto } from "$app/navigation";
+    import { resolve } from "$app/paths";
     import { authClient } from "$lib/auth-client";
     import DropdownMenu from "$lib/components/ui/dropdown-menu/dropdown-menu.svelte";
     import DropdownMenuContent from "$lib/components/ui/dropdown-menu/dropdown-menu-content.svelte";
     import DropdownMenuTrigger from "$lib/components/ui/dropdown-menu/dropdown-menu-trigger.svelte";
     import DropdownMenuItem from "$lib/components/ui/dropdown-menu/dropdown-menu-item.svelte";
+    import DropdownMenuGroup from "$lib/components/ui/dropdown-menu/dropdown-menu-group.svelte";
     import ChevronUpIcon from "$lib/icons/chevron-up-icon.svelte";
     import SidebarHeader from "$lib/components/ui/sidebar/sidebar-header.svelte";
     import SidebarContent from "$lib/components/ui/sidebar/sidebar-content.svelte";
@@ -15,6 +17,7 @@
     import SidebarMenuButton from "$lib/components/ui/sidebar/sidebar-menu-button.svelte";
     import ExitIcon from "$lib/icons/exit-icon.svelte";
     import SpinnerIcon from "$lib/icons/spinner-icon.svelte";
+    import UserIcon from "$lib/icons/user-icon.svelte";
 
     type Props = { username: string };
 
@@ -55,18 +58,28 @@
                         side="top"
                         class="w-(--bits-dropdown-menu-anchor-width)"
                     >
-                        <DropdownMenuItem
-                            onclick={signOut}
-                            variant="destructive"
-                            disabled={pending}
-                        >
-                            {#if pending}
-                                <SpinnerIcon class="animate-spin" />
-                            {:else}
-                                <ExitIcon />
-                            {/if}
-                            <span>Sign out</span>
-                        </DropdownMenuItem>
+                        <DropdownMenuGroup>
+                            <DropdownMenuItem>
+                                {#snippet child({ props })}
+                                    <a {...props} href={"/account"}>
+                                        <UserIcon />
+                                        Account
+                                    </a>
+                                {/snippet}
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                                onclick={signOut}
+                                variant="destructive"
+                                disabled={pending}
+                            >
+                                {#if pending}
+                                    <SpinnerIcon class="animate-spin" />
+                                {:else}
+                                    <ExitIcon />
+                                {/if}
+                                <span>Sign out</span>
+                            </DropdownMenuItem>
+                        </DropdownMenuGroup>
                     </DropdownMenuContent>
                 </DropdownMenu>
             </SidebarMenuItem>

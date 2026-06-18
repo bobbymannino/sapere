@@ -1,6 +1,5 @@
 <script lang="ts">
     import SidebarProvider from "$lib/components/ui/sidebar/sidebar-provider.svelte";
-    import SidebarTrigger from "$lib/components/ui/sidebar/sidebar-trigger.svelte";
     import type { LayoutProps } from "./$types";
     import AppSidebar from "./app-sidebar.svelte";
 
@@ -9,8 +8,7 @@
 
 <SidebarProvider>
     <AppSidebar username={data.session.user.username} />
-    <main>
-        <SidebarTrigger />
+    <main class="w-full">
         {@render children?.()}
     </main>
 </SidebarProvider>
