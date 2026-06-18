@@ -1,6 +1,6 @@
 import { authClient } from "$lib/auth-client";
 
-type Session = typeof authClient.$Infer.Session;
+type Session = typeof authClient.$Infer.Session & { user: { username: string } };
 
 // See https://svelte.dev/docs/kit/types#app.d.ts
 // for information about these interfaces
