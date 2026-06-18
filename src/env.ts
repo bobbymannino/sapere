@@ -1,11 +1,11 @@
 import { defineEnvVars } from "@sveltejs/kit/hooks";
 import * as v from "valibot";
 
-const databaseUrlSchema = v.pipe(v.string(), v.url(), v.startsWith("postgres://"));
+const DatabaseUrlSchema = v.pipe(v.string(), v.url(), v.startsWith("postgres://"));
 
 export const variables = defineEnvVars({
   DATABASE_URL: {
-    schema: databaseUrlSchema,
+    schema: DatabaseUrlSchema,
     description: "Postgres database connection URL",
   },
 });
