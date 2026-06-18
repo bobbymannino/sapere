@@ -134,6 +134,6 @@
 
     <Button type="submit" disabled={pending}>
         {#if pending}<SpinnerIcon class="animate-spin" />{/if}
-        Signup
+        Sign Up
     </Button>
 </form>
