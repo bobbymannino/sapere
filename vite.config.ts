@@ -12,6 +12,9 @@ export default defineConfig({
         runes: ({ filename }) => (filename.split(/[/\\]/).includes("node_modules") ? undefined : true),
       },
       adapter: adapter(),
+      alias: {
+        $db: "./src/lib/server/db/index.ts",
+      },
       experimental: {
         explicitEnvironmentVariables: true,
       },
