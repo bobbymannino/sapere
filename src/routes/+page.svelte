@@ -2,6 +2,7 @@
     import { page } from "$app/state";
     import { authClient } from "$lib/auth-client";
     const session = authClient.useSession();
+    let lastMethod = $state(authClient.getLastUsedLoginMethod());
 
     const email = "manninobobby@icloud.com";
     const username = "manninobobby";
@@ -14,14 +15,17 @@
             password,
             name: "bob",
         });
+        lastMethod = authClient.getLastUsedLoginMethod();
     }
 
     async function logIn() {
         await authClient.signIn.email({ email, password });
+        lastMethod = authClient.getLastUsedLoginMethod();
     }
 
     async function logInWithUsername() {
         await authClient.signIn.username({ username, password });
+        lastMethod = authClient.getLastUsedLoginMethod();
     }
 
     async function signOut() {
@@ -30,10 +34,12 @@
 
     async function addPasskey() {
         await authClient.passkey.addPasskey();
+        lastMethod = authClient.getLastUsedLoginMethod();
     }
 
     async function logInWithPasskey() {
         await authClient.signIn.passkey();
+        lastMethod = authClient.getLastUsedLoginMethod();
     }
 </script>
 
@@ -57,34 +63,37 @@
         Loading...
     {:else}
         <div class="space-x-3">
-            <button onclick={signUp} class="p-2 bg-mist-100 hover:bg-mist-200"
-                >Signup</button
-            >
-            <button onclick={logIn} class="p-2 bg-mist-100 hover:bg-mist-200"
-                >Login</button
-            >
+            <button onclick={signUp} class="p-2 bg-mist-100 hover:bg-mist-200">
+                Signup
+            </button>
+            <button onclick={logIn} class="p-2 bg-mist-100 hover:bg-mist-200">
+                {#if lastMethod === "email"}<span class="text-blue-500">LM</span
+                    >{/if}
+                Login
+            </button>
             <button
                 onclick={logInWithUsername}
                 class="p-2 bg-mist-100 hover:bg-mist-200"
             >
+                {#if lastMethod === "username"}<span class="text-blue-500"
+                        >LM</span
+                    >{/if}
                 Login with Username
             </button>
             <button
                 onclick={logInWithPasskey}
                 class="p-2 bg-mist-100 hover:bg-mist-200"
             >
+                {#if lastMethod === "passkey"}<span class="text-blue-500"
+                        >LM</span
+                    >{/if}
                 Login with Passkey
             </button>
-            <button
-                onclick={async () => {
-                    await $session.refetch();
-                }}
-                class="p-2 bg-mist-100 hover:bg-mist-200">Refetch</button
-            >
         </div>
     {/if}
 </div>
 
 <div class="p-3 bg-mist-100">
+    <small>Last Method: {lastMethod}</small>
     <code><pre>{JSON.stringify($session, null, 2)}</pre></code>
 </div>
