@@ -4,6 +4,7 @@ import * as schema from "$db/schema";
 import { passkey } from "@better-auth/passkey";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { betterAuth } from "better-auth/minimal";
+import { username } from "better-auth/plugins";
 import { sveltekitCookies } from "better-auth/svelte-kit";
 
 export const auth = betterAuth({
@@ -16,5 +17,5 @@ export const auth = betterAuth({
   emailAndPassword: {
     enabled: true,
   },
-  plugins: [passkey(), sveltekitCookies(getRequestEvent)],
+  plugins: [username(), passkey(), sveltekitCookies(getRequestEvent)],
 });
