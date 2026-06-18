@@ -149,3 +149,7 @@
     @apply text-foreground/90 text-base leading-relaxed;
   }
 }
+
+@utility flex-center {
+  @apply flex items-center justify-center;
+}
