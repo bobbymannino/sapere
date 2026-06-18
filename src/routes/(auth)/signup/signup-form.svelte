@@ -1,14 +1,11 @@
 <script lang="ts">
     import { authClient } from "$lib/auth-client";
     import Button from "$lib/components/ui/button/button.svelte";
-    import InputGroup from "$lib/components/ui/input-group/input-group.svelte";
     import Input from "$lib/components/ui/input/input.svelte";
     import Label from "$lib/components/ui/label/label.svelte";
     import SpinnerIcon from "$lib/icons/spinner-icon.svelte";
     import * as v from "valibot";
     import { NameSchema, UsernameSchema, EmailSchema, PasswordSchema } from "$lib/schemas/auth";
-    import SignupForm from "./signup-form.svelte";
-    import { APIError, BetterAuthError } from "better-auth";
     import Alert from "$lib/components/ui/alert/alert.svelte";
     import ErrorIcon from "$lib/icons/error-icon.svelte";
     import AlertTitle from "$lib/components/ui/alert/alert-title.svelte";
