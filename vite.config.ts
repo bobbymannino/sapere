@@ -14,6 +14,7 @@ export default defineConfig({
       adapter: adapter(),
       alias: {
         $db: "./src/lib/server/db/index.ts",
+        "$db/*": "./src/lib/server/db/*",
       },
       experimental: {
         explicitEnvironmentVariables: true,
