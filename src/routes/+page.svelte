@@ -17,6 +17,14 @@
     async function signOut() {
         await authClient.signOut();
     }
+
+    async function addPasskey() {
+        await authClient.passkey.addPasskey();
+    }
+
+    async function logInWithPasskey() {
+        await authClient.signIn.passkey();
+    }
 </script>
 
 <div>
@@ -25,6 +33,12 @@
             <p>
                 {$session.data.user.name}
             </p>
+            <button
+                onclick={addPasskey}
+                class="p-2 bg-mist-100 hover:bg-mist-200"
+            >
+                add passkey
+            </button>
             <button onclick={signOut} class="p-2 bg-mist-100 hover:bg-mist-200">
                 Sign Out
             </button>
@@ -39,6 +53,12 @@
             <button onclick={logIn} class="p-2 bg-mist-100 hover:bg-mist-200"
                 >Login</button
             >
+            <button
+                onclick={logInWithPasskey}
+                class="p-2 bg-mist-100 hover:bg-mist-200"
+            >
+                Login with Passkey
+            </button>
             <button
                 onclick={async () => {
                     await $session.refetch();
