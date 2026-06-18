@@ -1,6 +1,7 @@
 <script lang="ts">
     import { goto } from "$app/navigation";
     import { resolve } from "$app/paths";
+    import { APP_NAME } from "$app/env/public";
     import { authClient } from "$lib/auth-client";
     import DropdownMenu from "$lib/components/ui/dropdown-menu/dropdown-menu.svelte";
     import DropdownMenuContent from "$lib/components/ui/dropdown-menu/dropdown-menu-content.svelte";
@@ -37,7 +38,9 @@
 </script>
 
 <Sidebar>
-    <SidebarHeader />
+    <SidebarHeader>
+        <span class="font-heading px-3 py-2 text-lg font-bold">{APP_NAME}</span>
+    </SidebarHeader>
     <SidebarContent />
     <SidebarFooter>
         <SidebarMenu>
