@@ -1,0 +1,23 @@
+name: sapere
+
+services:
+  postgres:
+    image: postgres:18-alpine
+    container_name: sapere-postgres
+    restart: unless-stopped
+    ports:
+      - "54562:5432"
+    environment:
+      POSTGRES_DB: sapere
+      POSTGRES_USER: sapere
+      POSTGRES_PASSWORD: sapere
+    volumes:
+      - sapere-postgres-data:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U sapere -d sapere"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  sapere-postgres-data:

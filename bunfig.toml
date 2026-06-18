@@ -1,0 +1,8 @@
+[install]
+minimumReleaseAge = 259200
+# These packages will bypass the 3-day minimum age requirement
+minimumReleaseAgeExcludes = ["@types/bun", "typescript"]
+
+[run]
+# equivalent to `bun --bun` for all `bun run` commands
+bun = true
