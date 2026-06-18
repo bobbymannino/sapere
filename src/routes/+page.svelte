@@ -4,14 +4,24 @@
     const session = authClient.useSession();
 
     const email = "manninobobby@icloud.com";
+    const username = "manninobobby";
     const password = "password";
 
     async function signUp() {
-        await authClient.signUp.email({ email, password, name: "bob" });
+        await authClient.signUp.email({
+            email,
+            username,
+            password,
+            name: "bob",
+        });
     }
 
     async function logIn() {
         await authClient.signIn.email({ email, password });
+    }
+
+    async function logInWithUsername() {
+        await authClient.signIn.username({ username, password });
     }
 
     async function signOut() {
@@ -53,6 +63,12 @@
             <button onclick={logIn} class="p-2 bg-mist-100 hover:bg-mist-200"
                 >Login</button
             >
+            <button
+                onclick={logInWithUsername}
+                class="p-2 bg-mist-100 hover:bg-mist-200"
+            >
+                Login with Username
+            </button>
             <button
                 onclick={logInWithPasskey}
                 class="p-2 bg-mist-100 hover:bg-mist-200"
