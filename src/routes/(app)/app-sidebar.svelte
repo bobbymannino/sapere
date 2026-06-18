@@ -1,4 +1,6 @@
 <script lang="ts">
+    import { goto } from "$app/navigation";
+    import { authClient } from "$lib/auth-client";
     import DropdownMenu from "$lib/components/ui/dropdown-menu/dropdown-menu.svelte";
     import DropdownMenuContent from "$lib/components/ui/dropdown-menu/dropdown-menu-content.svelte";
     import DropdownMenuTrigger from "$lib/components/ui/dropdown-menu/dropdown-menu-trigger.svelte";
@@ -11,10 +13,24 @@
     import SidebarMenu from "$lib/components/ui/sidebar/sidebar-menu.svelte";
     import SidebarMenuItem from "$lib/components/ui/sidebar/sidebar-menu-item.svelte";
     import SidebarMenuButton from "$lib/components/ui/sidebar/sidebar-menu-button.svelte";
+    import ExitIcon from "$lib/icons/exit-icon.svelte";
+    import SpinnerIcon from "$lib/icons/spinner-icon.svelte";
 
     type Props = { username: string };
 
     let { username }: Props = $props();
+
+    let pending = $state(false);
+
+    async function signOut() {
+        pending = true;
+        await authClient.signOut({
+            fetchOptions: {
+                onSuccess: () => goto("/login", { invalidateAll: true }),
+            },
+        });
+        pending = false;
+    }
 </script>
 
 <Sidebar>
@@ -39,7 +55,16 @@
                         side="top"
                         class="w-(--bits-dropdown-menu-anchor-width)"
                     >
-                        <DropdownMenuItem>
+                        <DropdownMenuItem
+                            onclick={signOut}
+                            variant="destructive"
+                            disabled={pending}
+                        >
+                            {#if pending}
+                                <SpinnerIcon class="animate-spin" />
+                            {:else}
+                                <ExitIcon />
+                            {/if}
                             <span>Sign out</span>
                         </DropdownMenuItem>
                     </DropdownMenuContent>
