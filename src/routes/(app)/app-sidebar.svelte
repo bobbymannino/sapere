@@ -1,6 +1,5 @@
 <script lang="ts">
     import { goto } from "$app/navigation";
-    import { resolve } from "$app/paths";
     import { APP_NAME } from "$app/env/public";
     import { authClient } from "$lib/auth-client";
     import DropdownMenu from "$lib/components/ui/dropdown-menu/dropdown-menu.svelte";
@@ -16,9 +15,12 @@
     import SidebarMenu from "$lib/components/ui/sidebar/sidebar-menu.svelte";
     import SidebarMenuItem from "$lib/components/ui/sidebar/sidebar-menu-item.svelte";
     import SidebarMenuButton from "$lib/components/ui/sidebar/sidebar-menu-button.svelte";
+    import SidebarGroup from "$lib/components/ui/sidebar/sidebar-group.svelte";
+    import SidebarGroupContent from "$lib/components/ui/sidebar/sidebar-group-content.svelte";
     import ExitIcon from "$lib/icons/exit-icon.svelte";
     import SpinnerIcon from "$lib/icons/spinner-icon.svelte";
     import UserIcon from "$lib/icons/user-icon.svelte";
+    import WorkspaceIcon from "$lib/icons/workspace-icon.svelte";
 
     type Props = { username: string };
 
@@ -41,7 +43,26 @@
     <SidebarHeader>
         <span class="font-heading px-3 py-2 text-lg font-bold">{APP_NAME}</span>
     </SidebarHeader>
-    <SidebarContent />
+
+    <SidebarContent>
+        <SidebarGroup>
+            <SidebarGroupContent>
+                <SidebarMenu>
+                    <SidebarMenuItem>
+                        <SidebarMenuButton>
+                            {#snippet child({ props })}
+                                <a {...props} href={"/"}>
+                                    <WorkspaceIcon />
+                                    <span>Workspaces</span>
+                                </a>
+                            {/snippet}
+                        </SidebarMenuButton>
+                    </SidebarMenuItem>
+                </SidebarMenu>
+            </SidebarGroupContent>
+        </SidebarGroup>
+    </SidebarContent>
+
     <SidebarFooter>
         <SidebarMenu>
             <SidebarMenuItem>
