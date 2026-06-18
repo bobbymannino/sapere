@@ -5,7 +5,7 @@ import { passkey } from "@better-auth/passkey";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { APIError, createAuthMiddleware } from "better-auth/api";
 import { betterAuth } from "better-auth/minimal";
-import { username } from "better-auth/plugins";
+import { lastLoginMethod, username } from "better-auth/plugins";
 import { sveltekitCookies } from "better-auth/svelte-kit";
 
 export const auth = betterAuth({
@@ -18,7 +18,19 @@ export const auth = betterAuth({
   emailAndPassword: {
     enabled: true,
   },
-  plugins: [username(), passkey(), sveltekitCookies(getRequestEvent)],
+  plugins: [
+    username(),
+    passkey(),
+    lastLoginMethod({
+      storeInDatabase: true,
+      customResolveMethod: (ctx) => {
+        if (ctx.path === "/sign-in/username") return "username";
+
+        return null;
+      },
+    }),
+    sveltekitCookies(getRequestEvent),
+  ],
   hooks: {
     before: createAuthMiddleware(async (ctx) => {
       if (ctx.path !== "/sign-up/email" && ctx.path !== "/update-user") return;
