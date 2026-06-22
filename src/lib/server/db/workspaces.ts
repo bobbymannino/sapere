@@ -1,5 +1,5 @@
 import { db as mdb } from "$db";
-import { and, asc, desc, eq, SQL } from "drizzle-orm";
+import { and, asc, desc, eq } from "drizzle-orm";
 import { BunSQLDatabase } from "drizzle-orm/bun-sql/postgres";
 
 import * as s from "./schema";

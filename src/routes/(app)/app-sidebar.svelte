@@ -51,7 +51,7 @@
                     <SidebarMenuItem>
                         <SidebarMenuButton>
                             {#snippet child({ props })}
-                                <a {...props} href={"/"}>
+                                <a {...props} href={"/workspaces"}>
                                     <WorkspaceIcon />
                                     <span>Workspaces</span>
                                 </a>
@@ -78,10 +78,7 @@
                             </SidebarMenuButton>
                         {/snippet}
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent
-                        side="top"
-                        class="w-(--bits-dropdown-menu-anchor-width)"
-                    >
+                    <DropdownMenuContent side="top" class="w-(--bits-dropdown-menu-anchor-width)">
                         <DropdownMenuGroup>
                             <DropdownMenuItem>
                                 {#snippet child({ props })}
@@ -91,11 +88,7 @@
                                     </a>
                                 {/snippet}
                             </DropdownMenuItem>
-                            <DropdownMenuItem
-                                onclick={signOut}
-                                variant="destructive"
-                                disabled={pending}
-                            >
+                            <DropdownMenuItem onclick={signOut} variant="destructive" disabled={pending}>
                                 {#if pending}
                                     <SpinnerIcon class="animate-spin" />
                                 {:else}
