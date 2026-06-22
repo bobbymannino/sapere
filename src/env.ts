@@ -5,7 +5,14 @@ const DatabaseUrlSchema = v.pipe(v.string(), v.url(), v.startsWith("postgres://"
 
 const BetterAuthSecretSchema = v.pipe(v.string(), v.minLength(32));
 
-const BetterAuthUrlSchema = v.pipe(v.string(), v.url());
+const BetterAuthUrlSchema = v.pipe(
+  v.string(),
+  v.check((v) => {
+    console.log(v);
+    return true;
+  }),
+  v.url(),
+);
 
 const AppNameSchema = v.pipe(v.string(), v.minLength(1));
 
