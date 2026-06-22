@@ -6,7 +6,7 @@
     let { children, data }: LayoutProps = $props();
 </script>
 
-<SidebarProvider>
+<SidebarProvider open={data.sidebarOpen}>
     <AppSidebar username={data.session.user.username} />
     <main class="w-full">
         {@render children?.()}
