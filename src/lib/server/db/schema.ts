@@ -1,5 +1,6 @@
+import { sql } from "drizzle-orm";
 import { relations } from "drizzle-orm/_relations";
-import { pgTable, text, timestamp, boolean, integer, index } from "drizzle-orm/pg-core";
+import { pgTable, text, timestamp, boolean, integer, index, varchar, check } from "drizzle-orm/pg-core";
 
 export const users = pgTable("users", {
   id: text("id").primaryKey(),
@@ -123,3 +124,31 @@ export const passkeysRelations = relations(passkeys, ({ one }) => ({
     references: [users.id],
   }),
 }));
+
+export const workspaces = pgTable(
+  "workspaces",
+  {
+    id: integer().generatedAlwaysAsIdentity().primaryKey(),
+
+    title: text().notNull(),
+    slug: text().notNull(),
+
+    ownerId: text()
+      .notNull()
+      .references(() => users.id),
+
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow()
+      .$onUpdate(() => sql`now()`),
+  },
+  (t) => [
+    index("workspaces_owner_created_at_idx").on(t.ownerId, t.createdAt),
+    index("workspaces_owner_updated_at_idx").on(t.ownerId, t.updatedAt),
+    index("workspaces_owner_title_idx").on(t.ownerId, t.title),
+    check(`chk_workspaces_slug_length`, sql`length(${t.slug}) > 0 and length(${t.slug}) <= 32`),
+    check(`chk_workspaces_slug_valid`, sql`${t.slug} ~ '^[a-z0-9_.]$'`),
+    check(`chk_workspaces_title_length`, sql`length(${t.title}) > 0 and length(${t.title}) <= 64`),
+  ],
+);
