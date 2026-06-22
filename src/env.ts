@@ -22,17 +22,6 @@ export const variables = defineEnvVars({
     schema: BetterAuthUrlSchema,
     description: "Base URL of your app",
   },
-  PUBLIC_BASE_URL: {
-    public: true,
-    schema: v.pipe(
-      v.string(),
-      v.check((v) => {
-        console.log("public base url:");
-        console.log(v);
-        return true;
-      }),
-    ),
-  },
   APP_NAME: {
     schema: AppNameSchema,
     description: "The name of the project",
