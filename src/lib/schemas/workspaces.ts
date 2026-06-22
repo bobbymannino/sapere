@@ -8,6 +8,13 @@ export const WorkspaceTitleSchema = v.pipe(
   v.maxLength(64, "Workspace title must be at most 64 characters long"),
 );
 
+export const WorkspaceDescriptionSchema = v.pipe(
+  v.string(),
+  v.trim(),
+  v.maxLength(1000, "Workspace description must be at most 1000 characters long"),
+  v.transform((description) => description || null),
+);
+
 const reservedSlugs = ["new"];
 
 export const WorkspaceSlugSchema = v.pipe(

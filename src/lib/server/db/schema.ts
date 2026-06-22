@@ -132,6 +132,7 @@ export const workspaces = pgTable(
 
     title: text().notNull(),
     slug: text().notNull(),
+    description: text(),
 
     ownerId: text("owner_id")
       .notNull()
@@ -150,6 +151,7 @@ export const workspaces = pgTable(
     index("workspaces_owner_title_idx").on(t.ownerId, t.title),
     check(`chk_workspaces_title_length`, sql`char_length(${t.title}) >= 3 and char_length(${t.title}) <= 64`),
     check(`chk_workspaces_slug_length`, sql`char_length(${t.slug}) >= 3 and char_length(${t.slug}) <= 32`),
+    check(`chk_workspaces_description_length`, sql`char_length(${t.description}) <= 1000`),
     check(`chk_workspaces_slug_valid`, sql`${t.slug} ~ '^[a-z0-9_\.-]+$'`),
   ],
 );

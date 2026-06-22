@@ -34,5 +34,8 @@
 
 <div class="p-5">
     <h1>{data.workspace.title}</h1>
+    {#if data.workspace.description}
+        <p class="whitespace-pre-wrap text-muted-foreground">{data.workspace.description}</p>
+    {/if}
     <p>Updated <time datetime={updatedAtIso}>{formattedUpdatedAt}</time></p>
 </div>

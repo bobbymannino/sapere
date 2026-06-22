@@ -1,5 +1,5 @@
 import { db as mdb } from "$db";
-import { and, asc, desc, DrizzleError, DrizzleQueryError, eq } from "drizzle-orm";
+import { and, asc, desc, DrizzleQueryError, eq } from "drizzle-orm";
 import { BunSQLDatabase } from "drizzle-orm/bun-sql/postgres";
 
 import * as s from "./schema";
@@ -15,6 +15,7 @@ const workspaceCardSelection = {
   id: s.workspaces.id,
   title: s.workspaces.title,
   slug: s.workspaces.slug,
+  description: s.workspaces.description,
   updatedAt: s.workspaces.updatedAt,
   createdAt: s.workspaces.createdAt,
 };
@@ -67,6 +68,7 @@ type CreateWorkspaceArgs = CommonArgs & {
   ownerId: typeof s.workspaces.$inferSelect.ownerId;
   title: typeof s.workspaces.$inferInsert.title;
   slug: typeof s.workspaces.$inferInsert.slug;
+  description: typeof s.workspaces.$inferInsert.description;
 };
 
 export class SlugUsedError extends Error {
@@ -86,6 +88,7 @@ export async function createWorkspace(args: CreateWorkspaceArgs) {
         ownerId: args.ownerId,
         title: args.title,
         slug: args.slug,
+        description: args.description,
       })
       .returning({ id: s.workspaces.id });
     return space;

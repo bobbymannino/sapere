@@ -10,7 +10,7 @@
 
     type Props = WorkspaceCardSelection;
 
-    let { title, slug, updatedAt }: Props = $props();
+    let { title, slug, description, updatedAt }: Props = $props();
     let formattedUpdatedAt = $derived(formatDateTime(updatedAt));
     let updatedAtIso = $derived(toIsoDate(updatedAt));
 </script>
@@ -22,6 +22,11 @@
     <Card class="group-hover/card:shadow-lg">
         <CardHeader>
             <CardTitle>{title}</CardTitle>
+            {#if description}
+                <CardDescription class="line-clamp-2 whitespace-pre-line">
+                    {description}
+                </CardDescription>
+            {/if}
         </CardHeader>
 
         <CardContent>

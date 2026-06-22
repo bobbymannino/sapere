@@ -11,6 +11,7 @@
     import { Button } from "$lib/components/ui/button";
     import { page } from "$app/state";
     import SpinnerIcon from "$lib/icons/spinner-icon.svelte";
+    import Textarea from "$lib/components/ui/textarea/textarea.svelte";
 
     let pending = $state(false);
     let slug = $state("");
@@ -46,7 +47,7 @@
             autocapitalize="words"
             oninput={(e) => (slug = slugify(e.currentTarget.value))}
         />
-        {#each page.form?.valiErrors?.nested?.title as error}
+        {#each page.form?.valiErrors?.nested?.title as error (error)}
             <Alert variant="destructive">
                 <ErrorIcon />
                 <AlertTitle>{error}</AlertTitle>
@@ -65,7 +66,27 @@
             required
             bind:value={() => slug, (v) => (slug = slugify(v))}
         />
-        {#each page.form?.valiErrors?.nested?.slug as error}
+        {#each page.form?.valiErrors?.nested?.slug as error (error)}
+            <Alert variant="destructive">
+                <ErrorIcon />
+                <AlertTitle>{error}</AlertTitle>
+            </Alert>
+        {/each}
+    </Field>
+
+    <Field>
+        <FieldLabel for="description">Description</FieldLabel>
+        <FieldDescription>
+            Optional context about this workspace
+        </FieldDescription>
+        <Textarea
+            disabled={pending}
+            placeholder="A place for product research and planning"
+            id="description"
+            name="description"
+            maxlength={1000}
+        />
+        {#each page.form?.valiErrors?.nested?.description as error (error)}
             <Alert variant="destructive">
                 <ErrorIcon />
                 <AlertTitle>{error}</AlertTitle>
