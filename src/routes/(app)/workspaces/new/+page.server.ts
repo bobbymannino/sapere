@@ -28,7 +28,7 @@ export const actions: Actions = {
     const { title, slug } = parsedResult.output;
     try {
       await createWorkspace({ slug, title, ownerId: user.id });
-      redirect(307, resolve("/(app)/workspaces/[slug]", { slug }));
+      redirect(303, resolve("/(app)/workspaces/[slug]", { slug }));
     } catch (error) {
       if (error instanceof SlugUsedError) {
         console.log("slug used");
