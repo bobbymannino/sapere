@@ -1,0 +1,1 @@
+ALTER TABLE "workspaces" RENAME COLUMN "ownerId" TO "owner_id";
