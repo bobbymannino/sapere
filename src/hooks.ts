@@ -1,5 +1,5 @@
 import type { Reroute } from "@sveltejs/kit";
 
 export const reroute: Reroute = ({ url }) => {
-  if ((url.pathname = "/workspaces")) return "/";
+  if (url.pathname === "/workspaces") return "/";
 };
