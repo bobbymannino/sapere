@@ -1,8 +1,8 @@
 import { db as mdb } from "$db";
+import * as s from "$lib/server/db/schema";
+import { files } from "$lib/server/files";
 import { and, asc, desc, DrizzleQueryError, eq } from "drizzle-orm";
 import { BunSQLDatabase } from "drizzle-orm/bun-sql/postgres";
-
-import * as s from "./schema";
 
 type CommonArgs = {
   db?: BunSQLDatabase;
@@ -70,6 +70,7 @@ type CreateWorkspaceArgs = CommonArgs & {
   title: typeof s.workspaces.$inferInsert.title;
   slug: typeof s.workspaces.$inferInsert.slug;
   description: typeof s.workspaces.$inferInsert.description;
+  image: File | null | undefined;
 };
 
 export class SlugUsedError extends Error {
@@ -83,16 +84,29 @@ export async function createWorkspace(args: CreateWorkspaceArgs) {
   const db = args.db ?? mdb;
 
   try {
-    const [space] = await db
-      .insert(s.workspaces)
-      .values({
-        ownerId: args.ownerId,
-        title: args.title,
-        slug: args.slug,
-        description: args.description,
-      })
-      .returning({ id: s.workspaces.id });
-    return space;
+    return await db.transaction(async (tx) => {
+      const [space] = await tx
+        .insert(s.workspaces)
+        .values({
+          ownerId: args.ownerId,
+          title: args.title,
+          slug: args.slug,
+          description: args.description,
+        })
+        .returning({ id: s.workspaces.id });
+      if (!space) throw new Error("Failed to create workspace");
+
+      if (args.image) {
+        const image = await files.upload(
+          `workspaces/${space.id}/image.${fileTypeToExtension(args.image.type)}`,
+          args.image,
+        );
+
+        await tx.update(s.workspaces).set({ image: image.key }).where(eq(s.workspaces.id, space.id));
+      }
+
+      return space;
+    });
   } catch (error) {
     if (error instanceof DrizzleQueryError) {
       if (error.cause instanceof Bun.SQL.PostgresError) {
@@ -112,3 +126,18 @@ const PostgresErrorCodes = {
   Check: "23514",
   NotNull: "23502",
 };
+
+function fileTypeToExtension(type: string) {
+  switch (type) {
+    case "image/png":
+      return "png";
+    case "image/jpeg":
+      return "jpg";
+    case "image/webp":
+      return "webp";
+    case "image/avif":
+      return "avif";
+    default:
+      return "bin";
+  }
+}
