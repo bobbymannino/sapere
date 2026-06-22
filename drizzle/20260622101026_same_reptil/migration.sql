@@ -1,0 +1,4 @@
+CREATE UNIQUE INDEX "workspaces_owner_slug_unique" ON "workspaces" ("ownerId","slug");--> statement-breakpoint
+ALTER TABLE "workspaces" DROP CONSTRAINT "chk_workspaces_slug_length", ADD CONSTRAINT "chk_workspaces_slug_length" CHECK (char_length("slug") >= 3 and char_length("slug") <= 32);--> statement-breakpoint
+ALTER TABLE "workspaces" DROP CONSTRAINT "chk_workspaces_slug_valid", ADD CONSTRAINT "chk_workspaces_slug_valid" CHECK ("slug" ~ '^[a-z0-9_.-]+$');--> statement-breakpoint
+ALTER TABLE "workspaces" DROP CONSTRAINT "chk_workspaces_title_length", ADD CONSTRAINT "chk_workspaces_title_length" CHECK (char_length("title") >= 3 and char_length("title") <= 64);
