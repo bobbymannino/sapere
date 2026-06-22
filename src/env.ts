@@ -13,7 +13,10 @@ const BetterAuthUrlSchema = v.pipe(
     console.log(v);
     console.log("coolify_url:");
     console.log(process.env.$COOLIFY_URL);
-    console.log(process.env.COOLIFY_URL);
+    console.log(process.env.COOLIFY_URL); // works
+
+    console.log("process.env");
+    console.log(process.env);
     return true;
   }),
   v.url(),
