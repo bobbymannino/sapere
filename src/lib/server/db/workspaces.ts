@@ -1,5 +1,5 @@
 import { db as mdb } from "$db";
-import { asc, desc, eq } from "drizzle-orm";
+import { and, asc, desc, eq, SQL } from "drizzle-orm";
 import { BunSQLDatabase } from "drizzle-orm/bun-sql/postgres";
 
 import * as s from "./schema";
@@ -40,4 +40,26 @@ export async function listWorkspaces(args: ListWorkspacesArgs) {
     .orderBy(orderBy);
 
   return spaces;
+}
+
+type FindWorkspaceBySlugArgs = CommonArgs & {
+  ownerId: typeof s.workspaces.$inferSelect.ownerId;
+  slug: typeof s.workspaces.$inferSelect.slug;
+};
+
+export async function findWorkspaceBySlug(args: FindWorkspaceBySlugArgs) {
+  const db = args.db ?? mdb;
+
+  const [space] = await db
+    .select({
+      id: s.workspaces.id,
+      title: s.workspaces.title,
+      slug: s.workspaces.slug,
+      updatedAt: s.workspaces.updatedAt,
+      createdAt: s.workspaces.createdAt,
+    })
+    .from(s.workspaces)
+    .where(and(eq(s.workspaces.ownerId, args.ownerId), eq(s.workspaces.slug, args.slug)))
+    .limit(1);
+  return space ?? null;
 }

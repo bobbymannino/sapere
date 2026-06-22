@@ -27,7 +27,7 @@
 <ul>
     {#each data.workspaces as w (w.id)}
         <li>
-            <a href="/workspaces/{w.slug}-{w.id}">
+            <a href="/workspaces/{w.slug}">
                 <h2>{w.title}</h2>
                 <p>{w.updatedAt}</p>
             </a>
