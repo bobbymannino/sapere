@@ -39,6 +39,7 @@
     <Field>
         <FieldLabel for="title">Title</FieldLabel>
         <Input
+            aria-invalid={page.form?.valiErrors?.nested?.title?.length > 0}
             disabled={pending}
             placeholder="Origin"
             id="title"
@@ -59,6 +60,7 @@
         <FieldLabel for="slug">Slug</FieldLabel>
         <FieldDescription>A unique slug for your workspace</FieldDescription>
         <Input
+            aria-invalid={page.form?.valiErrors?.nested?.slug?.length > 0}
             disabled={pending}
             placeholder="origin"
             id="slug"
@@ -80,6 +82,8 @@
             Optional context about this workspace
         </FieldDescription>
         <Textarea
+            aria-invalid={page.form?.valiErrors?.nested?.description?.length >
+                0}
             disabled={pending}
             placeholder="A place for product research and planning"
             id="description"
