@@ -6,6 +6,7 @@
     import Breadcrumb from "$lib/components/ui/breadcrumb/breadcrumb.svelte";
     import SidebarTrigger from "$lib/components/ui/sidebar/sidebar-trigger.svelte";
     import type { PageProps } from "./$types";
+    import WorkspaceCard from "./workspace-card.svelte";
 
     let { data }: PageProps = $props();
 </script>
@@ -24,13 +25,10 @@
     </Breadcrumb>
 </header>
 
-<ul>
+<ul class="p-5 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
     {#each data.workspaces as w (w.id)}
         <li>
-            <a href="/workspaces/{w.slug}">
-                <h2>{w.title}</h2>
-                <p>{w.updatedAt}</p>
-            </a>
+            <WorkspaceCard {...w} />
         </li>
     {/each}
 </ul>
