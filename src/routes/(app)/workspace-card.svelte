@@ -17,7 +17,7 @@
 
 <a
     href={resolve("/(app)/workspaces/[slug]", { slug })}
-    class="group/card block hover:scale-101 hover:transition-transform"
+    class="group/card block hover:scale-101 motion-safe:hover:transition-transform"
 >
     <Card class="group-hover/card:shadow-lg">
         <CardHeader>
@@ -26,7 +26,8 @@
 
         <CardContent>
             <CardDescription>
-                Updated <time datetime={updatedAtIso}>{formattedUpdatedAt}</time>
+                Updated <time datetime={updatedAtIso}>{formattedUpdatedAt}</time
+                >
             </CardDescription>
         </CardContent>
     </Card>
