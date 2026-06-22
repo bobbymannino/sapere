@@ -32,3 +32,19 @@ export const WorkspaceSlugSchema = v.pipe(
     `Workspace slug cannot be one of the reserved slugs: ${reservedSlugs.join(", ")}`,
   ),
 );
+
+export const WorkspaceImageSchema = v.union([
+  v.pipe(
+    v.file(),
+    v.size(0),
+    v.transform(() => null),
+  ),
+  v.pipe(
+    v.file(),
+    v.maxSize(1024 * 1024 * 5, "Image must be at most 5MB"),
+    v.mimeType(
+      ["image/png", "image/jpeg", "image/avif", "image/webp"],
+      "Invalid image type. Only PNG, JPEG, AVIF, and WebP are supported.",
+    ),
+  ),
+]);

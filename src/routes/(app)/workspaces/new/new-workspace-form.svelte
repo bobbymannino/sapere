@@ -15,6 +15,7 @@
 
     let pending = $state(false);
     let slug = $state("");
+    let image: File | null = $state(null);
 
     function slugify(value: string) {
         return value
@@ -25,6 +26,7 @@
 </script>
 
 <form
+    enctype="multipart/form-data"
     class="flex flex-col gap-5"
     use:enhance={() => {
         if (pending) return;
@@ -91,6 +93,35 @@
             maxlength={1000}
         />
         {#each page.form?.valiErrors?.nested?.description as error (error)}
+            <Alert variant="destructive">
+                <ErrorIcon />
+                <AlertTitle>{error}</AlertTitle>
+            </Alert>
+        {/each}
+    </Field>
+
+    <Field>
+        <FieldLabel for="image">Image</FieldLabel>
+        <FieldDescription>
+            An optional thumbnail for this workspace
+        </FieldDescription>
+        <Input
+            aria-invalid={page.form?.valiErrors?.nested?.image?.length > 0}
+            disabled={pending}
+            type="file"
+            id="image"
+            name="image"
+            accept="image/png, image/jpeg, image/avif, image/webp"
+            onchange={(e) => (image = e.currentTarget.files?.[0] ?? null)}
+        />
+        {#if image}
+            <img
+                src={URL.createObjectURL(image)}
+                alt="Preview"
+                class="rounded-3xl"
+            />
+        {/if}
+        {#each page.form?.valiErrors?.nested?.image as error (error)}
             <Alert variant="destructive">
                 <ErrorIcon />
                 <AlertTitle>{error}</AlertTitle>
