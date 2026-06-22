@@ -1,5 +1,5 @@
 import { db as mdb } from "$db";
-import { and, asc, desc, eq } from "drizzle-orm";
+import { and, asc, desc, DrizzleError, DrizzleQueryError, eq } from "drizzle-orm";
 import { BunSQLDatabase } from "drizzle-orm/bun-sql/postgres";
 
 import * as s from "./schema";
@@ -62,3 +62,49 @@ export async function findWorkspaceBySlug(args: FindWorkspaceBySlugArgs) {
     .limit(1);
   return space ?? null;
 }
+
+type CreateWorkspaceArgs = CommonArgs & {
+  ownerId: typeof s.workspaces.$inferSelect.ownerId;
+  title: typeof s.workspaces.$inferInsert.title;
+  slug: typeof s.workspaces.$inferInsert.slug;
+};
+
+export class SlugUsedError extends Error {
+  constructor(slug: string) {
+    super(`Slug "${slug}" is already in use`);
+    this.name = "SlugUsedError";
+  }
+}
+
+export async function createWorkspace(args: CreateWorkspaceArgs) {
+  const db = args.db ?? mdb;
+
+  try {
+    const [space] = await db
+      .insert(s.workspaces)
+      .values({
+        ownerId: args.ownerId,
+        title: args.title,
+        slug: args.slug,
+      })
+      .returning({ id: s.workspaces.id });
+    return space;
+  } catch (error) {
+    if (error instanceof DrizzleQueryError) {
+      if (error.cause instanceof Bun.SQL.PostgresError) {
+        if (error.cause.errno === PostgresErrorCodes.Unique) {
+          if (error.cause.constraint?.includes("slug")) {
+            throw new SlugUsedError(args.slug);
+          }
+        }
+      }
+    }
+    throw error;
+  }
+}
+
+const PostgresErrorCodes = {
+  Unique: "23505",
+  Check: "23514",
+  NotNull: "23502",
+};
