@@ -16,6 +16,7 @@ const workspaceCardSelection = {
   title: s.workspaces.title,
   slug: s.workspaces.slug,
   description: s.workspaces.description,
+  image: s.workspaces.image,
   updatedAt: s.workspaces.updatedAt,
   createdAt: s.workspaces.createdAt,
 };

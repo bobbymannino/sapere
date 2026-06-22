@@ -133,6 +133,7 @@ export const workspaces = pgTable(
     title: text().notNull(),
     slug: text().notNull(),
     description: text(),
+    image: text(),
 
     ownerId: text("owner_id")
       .notNull()
