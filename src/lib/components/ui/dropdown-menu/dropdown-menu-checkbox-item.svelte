@@ -3,6 +3,7 @@
     import { cn, type WithoutChildrenOrChild } from "$lib/utils.js";
     import type { Snippet } from "svelte";
     import CheckmarkIcon from "$lib/icons/checkmark-icon.svelte";
+    import MinusIcon from "$lib/icons/minus-icon.svelte";
 
     let {
         ref = $bindable(null),
