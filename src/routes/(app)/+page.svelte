@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { resolve } from "$app/paths";
     import BreadcrumbItem from "$lib/components/ui/breadcrumb/breadcrumb-item.svelte";
     import BreadcrumbList from "$lib/components/ui/breadcrumb/breadcrumb-list.svelte";
     import BreadcrumbPage from "$lib/components/ui/breadcrumb/breadcrumb-page.svelte";
@@ -43,7 +44,7 @@
             <EmptyDescription>You are not apart of any workspaces</EmptyDescription>
         </EmptyHeader>
         <EmptyContent>
-            <Button href="/workspaces/new">New Workspace</Button>
+            <Button href={resolve("/(app)/workspaces/new")}>New Workspace</Button>
         </EmptyContent>
     </Empty>
 {:else}
@@ -54,4 +55,7 @@
             </li>
         {/each}
     </ul>
+    <div class="p-5 flex-center">
+        <Button variant="outline" href={resolve("/(app)/workspaces/new")}>New Workspace</Button>
+    </div>
 {/if}
