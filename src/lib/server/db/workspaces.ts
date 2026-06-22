@@ -9,10 +9,21 @@ type CommonArgs = {
 };
 
 type LiteralUnion<T extends string> = T | (string & {});
+type Nullable<T> = T | null;
+
+const workspaceCardSelection = {
+  id: s.workspaces.id,
+  title: s.workspaces.title,
+  slug: s.workspaces.slug,
+  updatedAt: s.workspaces.updatedAt,
+  createdAt: s.workspaces.createdAt,
+};
+
+export type WorkspaceCardSelection = Pick<typeof s.workspaces.$inferSelect, keyof typeof workspaceCardSelection>;
 
 type ListWorkspacesArgs = CommonArgs & {
   /** @default -updatedAt */
-  orderBy?: null | LiteralUnion<"updatedAt" | "-updatedAt" | "createdAt" | "-createdAt" | "title" | "-title">;
+  orderBy?: Nullable<LiteralUnion<"updatedAt" | "-updatedAt" | "createdAt" | "-createdAt" | "title" | "-title">>;
   ownerId: typeof s.workspaces.$inferSelect.ownerId;
 };
 
@@ -28,13 +39,7 @@ export async function listWorkspaces(args: ListWorkspacesArgs) {
   }
 
   const spaces = await db
-    .select({
-      id: s.workspaces.id,
-      title: s.workspaces.title,
-      slug: s.workspaces.slug,
-      updatedAt: s.workspaces.updatedAt,
-      createdAt: s.workspaces.createdAt,
-    })
+    .select(workspaceCardSelection)
     .from(s.workspaces)
     .where(eq(s.workspaces.ownerId, args.ownerId))
     .orderBy(orderBy);
@@ -51,13 +56,7 @@ export async function findWorkspaceBySlug(args: FindWorkspaceBySlugArgs) {
   const db = args.db ?? mdb;
 
   const [space] = await db
-    .select({
-      id: s.workspaces.id,
-      title: s.workspaces.title,
-      slug: s.workspaces.slug,
-      updatedAt: s.workspaces.updatedAt,
-      createdAt: s.workspaces.createdAt,
-    })
+    .select(workspaceCardSelection)
     .from(s.workspaces)
     .where(and(eq(s.workspaces.ownerId, args.ownerId), eq(s.workspaces.slug, args.slug)))
     .limit(1);
