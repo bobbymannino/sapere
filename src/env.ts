@@ -5,22 +5,7 @@ const DatabaseUrlSchema = v.pipe(v.string(), v.url(), v.startsWith("postgres://"
 
 const BetterAuthSecretSchema = v.pipe(v.string(), v.minLength(32));
 
-const BetterAuthUrlSchema = v.pipe(
-  v.string(),
-  v.check((v) => {
-    console.log("better auth url:");
-    console.log(process.env.BETTER_AUTH_URL);
-    console.log(v);
-    console.log("coolify_url:");
-    console.log(process.env.$COOLIFY_URL);
-    console.log(process.env.COOLIFY_URL); // works
-
-    console.log("process.env");
-    console.log(process.env);
-    return true;
-  }),
-  v.url(),
-);
+const BetterAuthUrlSchema = v.pipe(v.string(), v.url());
 
 const AppNameSchema = v.pipe(v.string(), v.minLength(1));
 
