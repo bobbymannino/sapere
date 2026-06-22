@@ -133,7 +133,7 @@ export const workspaces = pgTable(
     title: text().notNull(),
     slug: text().notNull(),
 
-    ownerId: text()
+    ownerId: text("owner_id")
       .notNull()
       .references(() => users.id),
 
