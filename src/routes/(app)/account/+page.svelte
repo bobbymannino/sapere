@@ -4,20 +4,13 @@
     import CardDescription from "$lib/components/ui/card/card-description.svelte";
     import CardHeader from "$lib/components/ui/card/card-header.svelte";
     import CardTitle from "$lib/components/ui/card/card-title.svelte";
+    import { formatDate, toIsoDate } from "$lib/date-format";
     import type { PageProps } from "./$types";
 
     let { data }: PageProps = $props();
 
-    const dateFormatter = new Intl.DateTimeFormat(undefined, {
-        dateStyle: "long",
-        timeZone: "UTC",
-    });
-    let joinedAt = $derived(
-        dateFormatter.format(new Date(data.session.user.createdAt)),
-    );
-    let joinedAtIso = $derived(
-        new Date(data.session.user.createdAt).toISOString(),
-    );
+    let joinedAt = $derived(formatDate(data.session.user.createdAt));
+    let joinedAtIso = $derived(toIsoDate(data.session.user.createdAt));
 </script>
 
 <section class="flex-center p-5">

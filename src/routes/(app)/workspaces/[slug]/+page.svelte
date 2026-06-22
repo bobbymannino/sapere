@@ -6,9 +6,12 @@
     import BreadcrumbSeparator from "$lib/components/ui/breadcrumb/breadcrumb-separator.svelte";
     import Breadcrumb from "$lib/components/ui/breadcrumb/breadcrumb.svelte";
     import SidebarTrigger from "$lib/components/ui/sidebar/sidebar-trigger.svelte";
+    import { formatDateTime, toIsoDate } from "$lib/date-format";
     import type { PageProps } from "./$types";
 
-    let { data, form }: PageProps = $props();
+    let { data }: PageProps = $props();
+    let formattedUpdatedAt = $derived(formatDateTime(data.workspace.updatedAt));
+    let updatedAtIso = $derived(toIsoDate(data.workspace.updatedAt));
 </script>
 
 <header class="p-5">
@@ -31,5 +34,5 @@
 
 <div class="p-5">
     <h1>{data.workspace.title}</h1>
-    <p>{data.workspace.updatedAt}</p>
+    <p>Updated <time datetime={updatedAtIso}>{formattedUpdatedAt}</time></p>
 </div>
