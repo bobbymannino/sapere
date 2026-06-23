@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { resolve } from "$app/paths";
     import BreadcrumbItem from "$lib/components/ui/breadcrumb/breadcrumb-item.svelte";
     import BreadcrumbLink from "$lib/components/ui/breadcrumb/breadcrumb-link.svelte";
     import BreadcrumbList from "$lib/components/ui/breadcrumb/breadcrumb-list.svelte";
@@ -12,6 +13,7 @@
     let { data }: PageProps = $props();
     let formattedUpdatedAt = $derived(formatDateTime(data.workspace.updatedAt));
     let updatedAtIso = $derived(toIsoDate(data.workspace.updatedAt));
+    let imageUrl = $derived(resolve("/(app)/workspaces/[slug]/image", { slug: data.workspace.slug }));
 </script>
 
 <header class="p-5">
@@ -33,6 +35,13 @@
 </header>
 
 <div class="p-5">
+    {#if data.workspace.image}
+        <img
+            src={imageUrl}
+            alt=""
+            class="mb-5 aspect-video w-full max-w-4xl rounded-3xl object-cover"
+        />
+    {/if}
     <h1>{data.workspace.title}</h1>
     {#if data.workspace.description}
         <p class="whitespace-pre-wrap text-muted-foreground">{data.workspace.description}</p>

@@ -7,3 +7,9 @@ the amount of features or consistent activity.
 This project was created because I did not want to pay for the GitHub
 integration for that service. I do still love Plane and will continue to praise
 it.
+
+## Files
+
+In [files.ts](src/lib/server/files.ts), there is an adapter for managing file
+storage. I have used minio as that is how I host it but you can easily change
+this using [files-sdk](https://files-sdk.dev/).

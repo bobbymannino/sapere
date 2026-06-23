@@ -10,24 +10,39 @@
 
     type Props = WorkspaceCardSelection;
 
-    let { title, slug, description, updatedAt }: Props = $props();
+    let { title, slug, description, image, updatedAt }: Props = $props();
     let formattedUpdatedAt = $derived(formatDateTime(updatedAt));
     let updatedAtIso = $derived(toIsoDate(updatedAt));
+    let imageUrl = $derived(
+        resolve("/(app)/workspaces/[slug]/image", { slug }),
+    );
 </script>
 
 <a
     href={resolve("/(app)/workspaces/[slug]", { slug })}
     class="group/card block hover:scale-101 motion-safe:hover:transition-transform"
 >
-    <Card class="group-hover/card:shadow-lg">
-        <CardHeader>
+    <Card class="group-hover/card:shadow-lg pt-0">
+        <CardHeader class="px-0">
+            {#if image}
+                <img
+                    src={imageUrl}
+                    alt=""
+                    class="aspect-video w-full object-cover"
+                />
+            {:else}
+                <div class="aspect-video w-full bg-gray-100"></div>
+            {/if}
+        </CardHeader>
+
+        <CardContent>
             <CardTitle>{title}</CardTitle>
             {#if description}
                 <CardDescription class="line-clamp-2 whitespace-pre-line">
                     {description}
                 </CardDescription>
             {/if}
-        </CardHeader>
+        </CardContent>
 
         <CardContent>
             <CardDescription>

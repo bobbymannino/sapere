@@ -1,13 +1,17 @@
+import { dev } from "$app/env";
 import { defineEnvVars } from "@sveltejs/kit/hooks";
 import * as v from "valibot";
+
+const AppNameSchema = v.pipe(v.string(), v.minLength(1));
 
 const DatabaseUrlSchema = v.pipe(v.string(), v.url(), v.startsWith("postgres://"));
 
 const BetterAuthSecretSchema = v.pipe(v.string(), v.minLength(32));
-
 const BetterAuthUrlSchema = v.pipe(v.string(), v.url());
 
-const AppNameSchema = v.pipe(v.string(), v.minLength(1));
+const MinioEndpointUrlSchema = v.pipe(v.string(), v.minLength(32));
+const MinioAccessKeyIdSchema = v.pipe(v.string(), v.minLength(32));
+const MinioSecretAccessKeySchema = v.pipe(v.string(), v.minLength(32));
 
 export const variables = defineEnvVars({
   DATABASE_URL: {
@@ -27,5 +31,17 @@ export const variables = defineEnvVars({
     description: "The name of the project",
     public: true,
     static: true,
+  },
+  MINIO_ENDPOINT_URL: {
+    description: "The minio endpoint URL to use for file storage",
+    schema: dev ? v.optional(MinioEndpointUrlSchema) : MinioEndpointUrlSchema,
+  },
+  MINIO_ACCESS_KEY_ID: {
+    description: "The minio access key ID to use for file storage",
+    schema: dev ? v.optional(MinioAccessKeyIdSchema) : MinioAccessKeyIdSchema,
+  },
+  MINIO_SECRET_ACCESS_KEY: {
+    description: "The minio secret access key to use for file storage",
+    schema: dev ? v.optional(MinioSecretAccessKeySchema) : MinioSecretAccessKeySchema,
   },
 });
