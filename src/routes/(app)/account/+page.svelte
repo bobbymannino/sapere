@@ -6,12 +6,32 @@
     import CardTitle from "$lib/components/ui/card/card-title.svelte";
     import { formatDate, toIsoDate } from "$lib/date-format";
     import type { PageProps } from "./$types";
+    import Breadcrumb from "$lib/components/ui/breadcrumb/breadcrumb.svelte";
+    import BreadcrumbList from "$lib/components/ui/breadcrumb/breadcrumb-list.svelte";
+    import SidebarTrigger from "$lib/components/ui/sidebar/sidebar-trigger.svelte";
+    import BreadcrumbItem from "$lib/components/ui/breadcrumb/breadcrumb-item.svelte";
+    import BreadcrumbSeparator from "$lib/components/ui/breadcrumb/breadcrumb-separator.svelte";
+    import BreadcrumbPage from "$lib/components/ui/breadcrumb/breadcrumb-page.svelte";
 
     let { data }: PageProps = $props();
 
     let joinedAt = $derived(formatDate(data.session.user.createdAt));
     let joinedAtIso = $derived(toIsoDate(data.session.user.createdAt));
 </script>
+
+<header class="p-5">
+    <Breadcrumb>
+        <BreadcrumbList>
+            <BreadcrumbItem>
+                <SidebarTrigger />
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+                <BreadcrumbPage>Account</BreadcrumbPage>
+            </BreadcrumbItem>
+        </BreadcrumbList>
+    </Breadcrumb>
+</header>
 
 <section class="flex-center p-5">
     <Card class="max-w-lg w-full">
