@@ -43,7 +43,6 @@ export const actions: Actions = {
       redirect(303, resolve("/(app)/workspaces/[slug]", { slug }));
     } catch (error) {
       if (error instanceof SlugUsedError) {
-        console.log("slug used");
         return fail(400, { valiErrors: { nested: { slug: ["Slug is already taken"] } } });
       }
       throw error;
