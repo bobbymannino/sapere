@@ -18,7 +18,6 @@ export const GET: RequestHandler = async ({ params }) => {
   return new Response(image.stream(), {
     headers: {
       "cache-control": "private, max-age=3600",
-      "content-length": image.size.toString(),
       "content-type": image.type,
       ...(image.etag ? { etag: image.etag } : {}),
     },
