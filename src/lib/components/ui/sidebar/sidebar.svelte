@@ -4,6 +4,7 @@
     import type { HTMLAttributes } from "svelte/elements";
     import { SIDEBAR_WIDTH_MOBILE } from "./constants.js";
     import { useSidebar } from "./context.svelte.js";
+    import { navigating } from "$app/state";
 
     let {
         ref = $bindable(null),
@@ -20,6 +21,10 @@
     } = $props();
 
     const sidebar = useSidebar();
+
+    $effect(() => {
+        if (navigating.to) sidebar.setOpenMobile(false);
+    });
 </script>
 
 {#if collapsible === "none"}
