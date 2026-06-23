@@ -1,7 +1,6 @@
 import { dev } from "$app/env";
 import { MINIO_ACCESS_KEY_ID, MINIO_ENDPOINT_URL, MINIO_SECRET_ACCESS_KEY } from "$app/env/private";
 import { Files } from "files-sdk";
-import { compression } from "files-sdk/compression";
 import { fs } from "files-sdk/fs";
 import { minio } from "files-sdk/minio";
 
@@ -14,5 +13,4 @@ export const files = new Files({
         accessKeyId: MINIO_ACCESS_KEY_ID,
         secretAccessKey: MINIO_SECRET_ACCESS_KEY,
       }),
-  plugins: [compression()],
 });
