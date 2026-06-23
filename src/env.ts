@@ -9,9 +9,9 @@ const DatabaseUrlSchema = v.pipe(v.string(), v.url(), v.startsWith("postgres://"
 const BetterAuthSecretSchema = v.pipe(v.string(), v.minLength(32));
 const BetterAuthUrlSchema = v.pipe(v.string(), v.url());
 
-const MinioEndpointUrlSchema = v.pipe(v.string(), v.minLength(32));
-const MinioAccessKeyIdSchema = v.pipe(v.string(), v.minLength(32));
-const MinioSecretAccessKeySchema = v.pipe(v.string(), v.minLength(32));
+const MinioEndpointUrlSchema = v.pipe(v.string(), v.url());
+const MinioAccessKeyIdSchema = v.pipe(v.string(), v.minLength(16));
+const MinioSecretAccessKeySchema = v.pipe(v.string(), v.minLength(16));
 
 export const variables = defineEnvVars({
   DATABASE_URL: {
