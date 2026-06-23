@@ -20,6 +20,9 @@
     "fmt:check": "oxfmt --check"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.1073.0",
+    "@aws-sdk/s3-presigned-post": "^3.1073.0",
+    "@aws-sdk/s3-request-presigner": "^3.1073.0",
     "@better-auth/passkey": "^1.6.18",
     "better-auth": "^1.6.19",
     "drizzle-orm": "^1.0.0-rc.3",
