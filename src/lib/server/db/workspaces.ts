@@ -3,6 +3,7 @@ import * as s from "$lib/server/db/schema";
 import { files } from "$lib/server/files";
 import { and, asc, desc, DrizzleQueryError, eq } from "drizzle-orm";
 import { BunSQLDatabase } from "drizzle-orm/bun-sql/postgres";
+import type { PgColumn } from "drizzle-orm/pg-core";
 
 type CommonArgs = {
   db?: BunSQLDatabase;
@@ -10,6 +11,8 @@ type CommonArgs = {
 
 type LiteralUnion<T extends string> = T | (string & {});
 type Nullable<T> = T | null;
+type WorkspaceSortKey = LiteralUnion<"updatedAt" | "createdAt" | "title">;
+type WorkspaceSortOrder = LiteralUnion<"asc" | "desc">;
 
 const workspaceCardSelection = {
   id: s.workspaces.id,
@@ -24,27 +27,26 @@ const workspaceCardSelection = {
 export type WorkspaceCardSelection = Pick<typeof s.workspaces.$inferSelect, keyof typeof workspaceCardSelection>;
 
 type ListWorkspacesArgs = CommonArgs & {
-  /** @default -updatedAt */
-  orderBy?: Nullable<LiteralUnion<"updatedAt" | "-updatedAt" | "createdAt" | "-createdAt" | "title" | "-title">>;
   ownerId: typeof s.workspaces.$inferSelect.ownerId;
+  /** @default desc */
+  order?: Nullable<WorkspaceSortOrder>;
+  /** @default updatedAt */
+  sort?: Nullable<WorkspaceSortKey>;
 };
 
 export async function listWorkspaces(args: ListWorkspacesArgs) {
   const db = args.db ?? mdb;
-  let orderBy = desc(s.workspaces.updatedAt);
-  if (args.orderBy) {
-    if (args.orderBy === "title") orderBy = asc(s.workspaces.title);
-    else if (args.orderBy === "-title") orderBy = desc(s.workspaces.title);
-    else if (args.orderBy === "createdAt") orderBy = asc(s.workspaces.createdAt);
-    else if (args.orderBy === "-createdAt") orderBy = desc(s.workspaces.createdAt);
-    else if (args.orderBy === "updatedAt") orderBy = asc(s.workspaces.updatedAt);
-  }
+  const direction = args.order === "asc" ? asc : desc;
+
+  let sortKey: PgColumn = s.workspaces.updatedAt;
+  if (args.sort === "title") sortKey = s.workspaces.title;
+  else if (args.sort === "createdAt") sortKey = s.workspaces.createdAt;
 
   const spaces = await db
     .select(workspaceCardSelection)
     .from(s.workspaces)
     .where(eq(s.workspaces.ownerId, args.ownerId))
-    .orderBy(orderBy);
+    .orderBy(direction(sortKey));
 
   return spaces;
 }
