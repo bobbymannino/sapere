@@ -23,7 +23,7 @@
     import PaginationNext from "$lib/components/ui/pagination/pagination-next.svelte";
     import PaginationPrevious from "$lib/components/ui/pagination/pagination-previous.svelte";
     import PaginationEllipsis from "$lib/components/ui/pagination/pagination-ellipsis.svelte";
-    import { page } from "$app/state";
+    import { navigating, page } from "$app/state";
     import { goto } from "$app/navigation";
 
     let { data }: PageProps = $props();
@@ -78,11 +78,17 @@
             <Button variant="outline" href={resolve("/(app)/workspaces/new")}>New Workspace</Button>
         </div>
 
-        <Pagination count={workspaces.total} perPage={workspaces.perPage} {onPageChange} class="mbs-auto p-5">
+        <Pagination
+            count={workspaces.total}
+            perPage={workspaces.perPage}
+            page={workspaces.page}
+            {onPageChange}
+            class="mbs-auto p-5"
+        >
             {#snippet children({ pages, currentPage })}
                 <PaginationContent>
                     <PaginationItem>
-                        <PaginationPrevious />
+                        <PaginationPrevious disabled={Boolean(navigating.to)} />
                     </PaginationItem>
                     {#each pages as page (page.key)}
                         {#if page.type === "ellipsis"}
@@ -91,14 +97,18 @@
                             </PaginationItem>
                         {:else}
                             <PaginationItem>
-                                <PaginationLink {page} isActive={currentPage === page.value}>
+                                <PaginationLink
+                                    {page}
+                                    isActive={currentPage === page.value}
+                                    disabled={Boolean(navigating.to)}
+                                >
                                     {page.value}
                                 </PaginationLink>
                             </PaginationItem>
                         {/if}
                     {/each}
                     <PaginationItem>
-                        <PaginationNext />
+                        <PaginationNext disabled={Boolean(navigating.to)} />
                     </PaginationItem>
                 </PaginationContent>
             {/snippet}
