@@ -5,12 +5,22 @@
     import { cubicOut, sineInOut } from "svelte/easing";
     import type { AfterNavigate, BeforeNavigate } from "@sveltejs/kit";
 
+    const startDelay = 200;
     const resetDelay = 500;
 
     let progressX = new Tween(0);
     let progressY = new Tween(1);
     let navigationId = 0;
+    let progressVisible = false;
+    let startTimeout: ReturnType<typeof setTimeout> | undefined;
     let resetTimeout: ReturnType<typeof setTimeout> | undefined;
+
+    function clearStartTimeout() {
+        if (startTimeout) {
+            clearTimeout(startTimeout);
+            startTimeout = undefined;
+        }
+    }
 
     function clearResetTimeout() {
         if (resetTimeout) {
@@ -32,11 +42,23 @@
         return Boolean(navigation.from && navigation.to && navigation.from.url.href !== navigation.to.url.href);
     }
 
-    async function startProgress(id: number) {
+    function scheduleProgress(id: number) {
+        clearStartTimeout();
         clearResetTimeout();
-        await progressY.set(1, { duration: 0 });
+        progressX.set(0, { duration: 0 });
+        startTimeout = setTimeout(() => {
+            startTimeout = undefined;
+            if (id !== navigationId) return;
+            void startProgress(id);
+        }, startDelay);
+    }
+
+    async function startProgress(id: number) {
         if (id !== navigationId) return;
+        progressVisible = true;
         await progressX.set(0, { duration: 0 });
+        if (id !== navigationId) return;
+        await progressY.set(1, { duration: 0 });
         if (id !== navigationId) return;
         await progressX.set(0.41, { duration: 1333, easing: sineInOut });
         if (id !== navigationId) return;
@@ -44,16 +66,21 @@
     }
 
     async function finishProgress(id: number) {
+        clearStartTimeout();
+        if (!progressVisible) return;
         await Promise.all([progressX.set(1, { duration: 200 }), progressY.set(0, { duration: 200 })]);
         if (id !== navigationId) return;
+        progressVisible = false;
         resetProgress(id);
     }
 
     beforeNavigate((navigation) => {
         const id = ++navigationId;
+        progressVisible = false;
         if (shouldShowProgress(navigation)) {
-            void startProgress(id);
+            scheduleProgress(id);
         } else {
+            clearStartTimeout();
             clearResetTimeout();
             progressX.set(0, { duration: 0 });
         }
@@ -61,11 +88,17 @@
 
     afterNavigate((navigation) => {
         if (!shouldShowProgress(navigation)) return;
-        void finishProgress(++navigationId);
+        const id = ++navigationId;
+        if (!progressVisible) {
+            clearStartTimeout();
+            return;
+        }
+        void finishProgress(id);
     });
 
     onDestroy(() => {
         navigationId += 1;
+        clearStartTimeout();
         clearResetTimeout();
     });
 </script>
