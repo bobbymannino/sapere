@@ -12,6 +12,7 @@
     import BreadcrumbItem from "$lib/components/ui/breadcrumb/breadcrumb-item.svelte";
     import BreadcrumbSeparator from "$lib/components/ui/breadcrumb/breadcrumb-separator.svelte";
     import BreadcrumbPage from "$lib/components/ui/breadcrumb/breadcrumb-page.svelte";
+    import Passkeys from "./passkeys.svelte";
 
     let { data }: PageProps = $props();
 
@@ -59,4 +60,8 @@
             </dl>
         </CardContent>
     </Card>
+</section>
+
+<section class="p-5 flex-center">
+    <Passkeys />
 </section>
