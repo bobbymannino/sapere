@@ -19,5 +19,15 @@ services:
       timeout: 5s
       retries: 10
 
+  dragonfly:
+    image: docker.dragonflydb.io/dragonflydb/dragonfly:latest
+    container_name: sapere-dragonfly
+    restart: unless-stopped
+    ports:
+      - "64702:6379"
+    volumes:
+      - sapere-dragonfly-data:/data
+
 volumes:
   sapere-postgres-data:
+  sapere-dragonfly-data:
