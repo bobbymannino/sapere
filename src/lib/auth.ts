@@ -16,7 +16,7 @@ export const auth = betterAuth({
     usePlural: true,
     schema,
   }),
-  secondaryStorage: redisSecondaryStorage,
+  // secondaryStorage: redisSecondaryStorage,
   emailAndPassword: {
     enabled: true,
   },
