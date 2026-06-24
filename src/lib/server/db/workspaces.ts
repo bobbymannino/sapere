@@ -1,4 +1,4 @@
-import { db as mdb } from "$db";
+import { db as mdb, PostgresErrorCodes } from "$db";
 import * as s from "$lib/server/db/schema";
 import { files } from "$lib/server/files";
 import { and, asc, desc, DrizzleQueryError, eq } from "drizzle-orm";
@@ -9,8 +9,6 @@ type CommonArgs = {
   db?: BunSQLDatabase;
 };
 
-type LiteralUnion<T extends string> = T | (string & {});
-type Nullable<T> = T | null;
 type WorkspaceSortKey = LiteralUnion<"updatedAt" | "createdAt" | "title">;
 type WorkspaceSortOrder = LiteralUnion<"asc" | "desc">;
 
@@ -34,7 +32,7 @@ type ListWorkspacesArgs = CommonArgs & {
   sort?: Nullable<WorkspaceSortKey>;
 };
 
-export async function listWorkspaces(args: ListWorkspacesArgs) {
+export async function listWorkspaces(args: Prettify<ListWorkspacesArgs>) {
   const db = args.db ?? mdb;
   const direction = args.order === "asc" ? asc : desc;
 
@@ -56,7 +54,7 @@ type FindWorkspaceBySlugArgs = CommonArgs & {
   slug: typeof s.workspaces.$inferSelect.slug;
 };
 
-export async function findWorkspaceBySlug(args: FindWorkspaceBySlugArgs) {
+export async function findWorkspaceBySlug(args: Prettify<FindWorkspaceBySlugArgs>) {
   const db = args.db ?? mdb;
 
   const [space] = await db
@@ -82,7 +80,7 @@ export class SlugUsedError extends Error {
   }
 }
 
-export async function createWorkspace(args: CreateWorkspaceArgs) {
+export async function createWorkspace(args: Prettify<CreateWorkspaceArgs>) {
   const db = args.db ?? mdb;
 
   try {
@@ -122,12 +120,6 @@ export async function createWorkspace(args: CreateWorkspaceArgs) {
     throw error;
   }
 }
-
-const PostgresErrorCodes = {
-  Unique: "23505",
-  Check: "23514",
-  NotNull: "23502",
-};
 
 function fileTypeToExtension(type: string) {
   switch (type) {
