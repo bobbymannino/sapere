@@ -8,8 +8,8 @@ export const load: PageServerLoad = async ({ url }) => {
 
   const workspaces = await listWorkspaces({
     ownerId: user.id,
-    order: url.searchParams.get("order"),
-    sort: url.searchParams.get("sort"),
+    sortBy: url.searchParams.get("sortBy"),
+    sortDir: url.searchParams.get("sortDir"),
     page: url.searchParams.get("page"),
     perPage: url.searchParams.get("perPage"),
   });

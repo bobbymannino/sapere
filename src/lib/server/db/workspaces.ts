@@ -40,8 +40,8 @@ export async function listWorkspaces(args: Prettify<ListWorkspacesArgs>): Promis
   const db = args.db ?? mdb;
   const orderBy = buildOrderClause(args, {
     columns: workspaceOrderColumns,
-    defaultOrder: "desc",
-    defaultSort: "updatedAt",
+    defaultSortBy: "updatedAt",
+    defaultSortDir: "desc",
   });
   const pagination = buildPagination(args);
   const where = eq(s.workspaces.ownerId, args.ownerId);

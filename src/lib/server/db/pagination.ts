@@ -1,34 +1,34 @@
 import { asc, desc } from "drizzle-orm";
 import type { AnyColumn, SQL, SQLWrapper } from "drizzle-orm";
 
-export type OrderDirection = "asc" | "desc";
+export type SortDirection = "asc" | "desc";
 
 export type Ordered<TSort extends string> = {
-  order?: Nullable<LiteralUnion<OrderDirection>>;
-  sort?: Nullable<LiteralUnion<TSort>>;
+  sortBy?: Nullable<LiteralUnion<TSort>>;
+  sortDir?: Nullable<LiteralUnion<SortDirection>>;
 };
 
 export type OrderByTarget = AnyColumn | SQLWrapper;
 
 type BuildOrderClauseOptions<TSort extends string> = {
   columns: Record<TSort, OrderByTarget>;
-  defaultOrder: OrderDirection;
-  defaultSort: TSort;
+  defaultSortBy: TSort;
+  defaultSortDir: SortDirection;
 };
 
 export function buildOrderClause<TSort extends string>(
   ordered: Ordered<TSort>,
   options: BuildOrderClauseOptions<TSort>,
 ): SQL {
-  const order = isOrderDirection(ordered.order) ? ordered.order : options.defaultOrder;
-  const sort = isSortKey(ordered.sort, options.columns) ? ordered.sort : options.defaultSort;
+  const sortDir = isSortDirection(ordered.sortDir) ? ordered.sortDir : options.defaultSortDir;
+  const sortBy = isSortKey(ordered.sortBy, options.columns) ? ordered.sortBy : options.defaultSortBy;
 
-  const column = options.columns[sort];
-  return order === "asc" ? asc(column) : desc(column);
+  const column = options.columns[sortBy];
+  return sortDir === "asc" ? asc(column) : desc(column);
 }
 
-function isOrderDirection(order: Nullable<string> | undefined): order is OrderDirection {
-  return order === "asc" || order === "desc";
+function isSortDirection(sortDir: Nullable<string> | undefined): sortDir is SortDirection {
+  return sortDir === "asc" || sortDir === "desc";
 }
 
 function isSortKey<TSort extends string>(
