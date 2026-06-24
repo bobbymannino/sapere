@@ -1,7 +1,6 @@
 import { getRequestEvent } from "$app/server";
 import { db } from "$db";
 import * as schema from "$db/schema";
-import { redisSecondaryStorage } from "$lib/auth-redis";
 import { passkey } from "@better-auth/passkey";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { APIError, createAuthMiddleware } from "better-auth/api";
@@ -16,7 +15,6 @@ export const auth = betterAuth({
     usePlural: true,
     schema,
   }),
-  secondaryStorage: redisSecondaryStorage,
   emailAndPassword: {
     enabled: true,
   },
