@@ -66,17 +66,19 @@
             </EmptyContent>
         </Empty>
     {:else}
-        <ul class="p-5 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
-            {#each workspaces.results as w (w.id)}
-                <li>
-                    <WorkspaceCard {...w} />
-                </li>
-            {/each}
-        </ul>
+        <section class="@container">
+            <ul class="p-5 grid gap-5 @md:grid-cols-2 @lg:grid-cols-3 @xl:grid-cols-4">
+                {#each workspaces.results as w (w.id)}
+                    <li>
+                        <WorkspaceCard {...w} />
+                    </li>
+                {/each}
+            </ul>
 
-        <div class="p-5 flex-center">
-            <Button variant="outline" href={resolve("/(app)/workspaces/new")}>New Workspace</Button>
-        </div>
+            <div class="p-5 flex-center">
+                <Button variant="outline" href={resolve("/(app)/workspaces/new")}>New Workspace</Button>
+            </div>
+        </section>
 
         <Pagination
             count={workspaces.total}
