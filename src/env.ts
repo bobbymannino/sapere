@@ -5,6 +5,7 @@ import * as v from "valibot";
 const AppNameSchema = v.pipe(v.string(), v.minLength(1));
 
 const DatabaseUrlSchema = v.pipe(v.string(), v.url(), v.startsWith("postgres://"));
+const RedisUrlSchema = v.pipe(v.string(), v.url(), v.startsWith("redis://"));
 
 const BetterAuthSecretSchema = v.pipe(v.string(), v.minLength(32));
 const BetterAuthUrlSchema = v.pipe(v.string(), v.url());
@@ -17,6 +18,10 @@ export const variables = defineEnvVars({
   DATABASE_URL: {
     schema: DatabaseUrlSchema,
     description: "Postgres database connection URL",
+  },
+  REDIS_URL: {
+    schema: RedisUrlSchema,
+    description: "Redis-compatible Dragonfly connection URL",
   },
   BETTER_AUTH_SECRET: {
     schema: BetterAuthSecretSchema,
