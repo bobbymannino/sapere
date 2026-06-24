@@ -1,8 +1,9 @@
 import { db as mdb, PostgresErrorCodes } from "$db";
-import { buildOrderClause, type OrderByTarget, type Ordered } from "$db/pagination";
+import type { OrderByTarget, Ordered, PaginationArgs, Paginated } from "$db/pagination";
+import { buildOrderClause, buildPaginatedResult, buildPagination } from "$db/pagination";
 import * as s from "$lib/server/db/schema";
 import { files } from "$lib/server/files";
-import { and, DrizzleQueryError, eq, sql } from "drizzle-orm";
+import { and, count, DrizzleQueryError, eq, sql } from "drizzle-orm";
 import { BunSQLDatabase } from "drizzle-orm/bun-sql/postgres";
 
 type CommonArgs = {
@@ -30,25 +31,33 @@ const workspaceOrderColumns = {
 export type WorkspaceCardSelection = Pick<typeof s.workspaces.$inferSelect, keyof typeof workspaceCardSelection>;
 
 type ListWorkspacesArgs = CommonArgs &
-  Ordered<WorkspaceSortKey> & {
+  Ordered<WorkspaceSortKey> &
+  PaginationArgs & {
     ownerId: typeof s.workspaces.$inferSelect.ownerId;
   };
 
-export async function listWorkspaces(args: Prettify<ListWorkspacesArgs>) {
+export async function listWorkspaces(args: Prettify<ListWorkspacesArgs>): Promise<Paginated<WorkspaceCardSelection>> {
   const db = args.db ?? mdb;
   const orderBy = buildOrderClause(args, {
     columns: workspaceOrderColumns,
     defaultOrder: "desc",
     defaultSort: "updatedAt",
   });
+  const pagination = buildPagination(args);
+  const where = eq(s.workspaces.ownerId, args.ownerId);
 
-  const spaces = await db
-    .select(workspaceCardSelection)
-    .from(s.workspaces)
-    .where(eq(s.workspaces.ownerId, args.ownerId))
-    .orderBy(orderBy);
+  const [spaces, totalRows] = await Promise.all([
+    db
+      .select(workspaceCardSelection)
+      .from(s.workspaces)
+      .where(where)
+      .orderBy(orderBy)
+      .limit(pagination.limit)
+      .offset(pagination.offset),
+    db.select({ total: count() }).from(s.workspaces).where(where),
+  ]);
 
-  return spaces;
+  return buildPaginatedResult(spaces, totalRows[0]?.total ?? 0, pagination);
 }
 
 type FindWorkspaceBySlugArgs = CommonArgs & {

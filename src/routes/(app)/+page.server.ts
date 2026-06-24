@@ -10,6 +10,8 @@ export const load: PageServerLoad = async ({ url }) => {
     ownerId: user.id,
     order: url.searchParams.get("order"),
     sort: url.searchParams.get("sort"),
+    page: url.searchParams.get("page"),
+    perPage: url.searchParams.get("perPage"),
   });
   return { workspaces };
 };
