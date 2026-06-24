@@ -1,5 +1,7 @@
+import { REDIS_URL } from "$app/env/private";
 import type { SecondaryStorage } from "better-auth";
-import { redis } from "bun";
+
+const redis = new Bun.RedisClient(REDIS_URL);
 
 export const redisSecondaryStorage: SecondaryStorage = {
   async get(key: string) {
