@@ -1,7 +1,7 @@
 <script lang="ts">
     import { DropdownMenu as DropdownMenuPrimitive } from "bits-ui";
     import { cn, type WithoutChild } from "$lib/utils.js";
-    import CheckmarkIcon from "$lib/icons/checkmark-icon.svelte";
+    import { CheckmarkIcon } from "$lib/icons";
 
     let {
         ref = $bindable(null),

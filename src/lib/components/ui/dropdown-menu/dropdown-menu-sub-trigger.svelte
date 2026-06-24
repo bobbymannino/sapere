@@ -1,7 +1,7 @@
 <script lang="ts">
     import { DropdownMenu as DropdownMenuPrimitive } from "bits-ui";
     import { cn } from "$lib/utils.js";
-    import ChevronRightIcon from "$lib/icons/chevron-right-icon.svelte";
+    import { ChevronRightIcon } from "$lib/icons";
 
     let {
         ref = $bindable(null),

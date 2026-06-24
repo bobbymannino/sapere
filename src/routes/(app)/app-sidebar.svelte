@@ -7,7 +7,6 @@
     import DropdownMenuTrigger from "$lib/components/ui/dropdown-menu/dropdown-menu-trigger.svelte";
     import DropdownMenuItem from "$lib/components/ui/dropdown-menu/dropdown-menu-item.svelte";
     import DropdownMenuGroup from "$lib/components/ui/dropdown-menu/dropdown-menu-group.svelte";
-    import ChevronUpIcon from "$lib/icons/chevron-up-icon.svelte";
     import SidebarHeader from "$lib/components/ui/sidebar/sidebar-header.svelte";
     import SidebarContent from "$lib/components/ui/sidebar/sidebar-content.svelte";
     import Sidebar from "$lib/components/ui/sidebar/sidebar.svelte";
@@ -17,9 +16,13 @@
     import SidebarMenuButton from "$lib/components/ui/sidebar/sidebar-menu-button.svelte";
     import SidebarGroup from "$lib/components/ui/sidebar/sidebar-group.svelte";
     import SidebarGroupContent from "$lib/components/ui/sidebar/sidebar-group-content.svelte";
-    import SpinnerIcon from "$lib/icons/spinner-icon.svelte";
-    import UserIcon from "$lib/icons/user-icon.svelte";
-    import { WorkspaceIcon, ExitIcon } from "$lib/icons";
+    import {
+        ChevronUpIcon,
+        ExitIcon,
+        SpinnerIcon,
+        UserIcon,
+        WorkspaceIcon,
+    } from "$lib/icons";
 
     type Props = { username: string };
 

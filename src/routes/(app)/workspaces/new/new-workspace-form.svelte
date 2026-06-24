@@ -6,11 +6,10 @@
     import { applyAction, enhance } from "$app/forms";
     import { resolve } from "$app/paths";
     import Alert from "$lib/components/ui/alert/alert.svelte";
-    import ErrorIcon from "$lib/icons/error-icon.svelte";
+    import { ErrorIcon, SpinnerIcon } from "$lib/icons";
     import AlertTitle from "$lib/components/ui/alert/alert-title.svelte";
     import { Button } from "$lib/components/ui/button";
     import { page } from "$app/state";
-    import SpinnerIcon from "$lib/icons/spinner-icon.svelte";
     import Textarea from "$lib/components/ui/textarea/textarea.svelte";
     import Cropper, { type CropArea } from "svelte-easy-crop";
     import Slider from "$lib/components/ui/slider/slider.svelte";

@@ -1,5 +1,5 @@
 <script lang="ts">
-    import ErrorIcon from "$lib/icons/error-icon.svelte";
+    import { ErrorIcon } from "$lib/icons";
     import AlertTitle from "$lib/components/ui/alert/alert-title.svelte";
     import Alert from "$lib/components/ui/alert/alert.svelte";
     import Label from "$lib/components/ui/label/label.svelte";

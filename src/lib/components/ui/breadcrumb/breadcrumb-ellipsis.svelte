@@ -5,7 +5,7 @@
         type WithElementRef,
         type WithoutChildren,
     } from "$lib/utils.js";
-    import ElipsisIcon from "$lib/icons/elipsis-icon.svelte";
+    import { EllipsisIcon } from "$lib/icons";
 
     let {
         ref = $bindable(null),
@@ -27,6 +27,6 @@
     )}
     {...restProps}
 >
-    <ElipsisIcon />
+    <EllipsisIcon />
     <span class="sr-only">More</span>
 </span>

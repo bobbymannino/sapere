@@ -1,7 +1,7 @@
 <script lang="ts">
     import type { HTMLAttributes } from "svelte/elements";
     import { cn, type WithElementRef, type WithoutChildren } from "$lib/utils.js";
-    import ElipsisIcon from "$lib/icons/elipsis-icon.svelte";
+    import { EllipsisIcon } from "$lib/icons";
 
     let {
         ref = $bindable(null),
@@ -17,6 +17,6 @@
     class={cn("size-9 [&_svg:not([class*='size-'])]:size-4 flex items-center justify-center", className)}
     {...restProps}
 >
-    <ElipsisIcon />
+    <EllipsisIcon />
     <span class="sr-only">More pages</span>
 </span>

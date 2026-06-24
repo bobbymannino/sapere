@@ -3,7 +3,7 @@
     import { cn } from "$lib/utils.js";
     import type { ComponentProps } from "svelte";
     import { useSidebar } from "./context.svelte.js";
-    import SidebarLeftIcon from "$lib/icons/sidebar-left-icon.svelte";
+    import { SidebarLeftIcon } from "$lib/icons";
 
     let {
         ref = $bindable(null),

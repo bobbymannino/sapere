@@ -2,7 +2,7 @@
     import { authClient } from "$lib/auth-client";
     import Button from "$lib/components/ui/button/button.svelte";
     import Input from "$lib/components/ui/input/input.svelte";
-    import SpinnerIcon from "$lib/icons/spinner-icon.svelte";
+    import { SpinnerIcon } from "$lib/icons";
     import * as v from "valibot";
     import { EmailSchema, PasswordSchema, UsernameSchema } from "$lib/schemas/auth";
     import { goto } from "$app/navigation";

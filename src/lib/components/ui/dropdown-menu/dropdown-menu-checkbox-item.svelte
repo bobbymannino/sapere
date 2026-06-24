@@ -2,8 +2,7 @@
     import { DropdownMenu as DropdownMenuPrimitive } from "bits-ui";
     import { cn, type WithoutChildrenOrChild } from "$lib/utils.js";
     import type { Snippet } from "svelte";
-    import CheckmarkIcon from "$lib/icons/checkmark-icon.svelte";
-    import MinusIcon from "$lib/icons/minus-icon.svelte";
+    import { CheckmarkIcon, MinusIcon } from "$lib/icons";
 
     let {
         ref = $bindable(null),
