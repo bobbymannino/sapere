@@ -1,4 +1,4 @@
-import { dev } from "$app/env";
+import { dev, building } from "$app/env";
 import { defineEnvVars } from "@sveltejs/kit/hooks";
 import * as v from "valibot";
 
@@ -28,7 +28,7 @@ export const variables = defineEnvVars({
     description: "Secret value used for encryption and hashing",
   },
   BETTER_AUTH_URL: {
-    schema: BetterAuthUrlSchema,
+    schema: building ? v.optional(BetterAuthUrlSchema) : BetterAuthUrlSchema,
     description: "Base URL of your app",
   },
   APP_NAME: {
