@@ -57,4 +57,19 @@ export const redisSecondaryStorage: SecondaryStorage = {
       throw error;
     }
   },
+
+  async increment(key: string, ttl: number) {
+    try {
+      const value = await redis.incr(key);
+      await redis.expire(key, ttl);
+      return value;
+    } catch (error) {
+      console.error("Redis increment error:", error);
+      throw error;
+    }
+  },
+
+  async getAndDelete(key: string) {
+    return await redis.getdel(key);
+  },
 };
