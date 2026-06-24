@@ -1,15 +1,14 @@
-import { db as mdb } from "$db";
+import { db as mdb, PostgresErrorCodes } from "$db";
+import type { OrderByTarget, Ordered, PaginationArgs, Paginated } from "$db/pagination";
+import { buildOrderClause, buildPaginatedResult, buildPagination } from "$db/pagination";
 import * as s from "$lib/server/db/schema";
 import { files } from "$lib/server/files";
-import { and, asc, desc, DrizzleQueryError, eq } from "drizzle-orm";
+import { and, count, DrizzleQueryError, eq, sql } from "drizzle-orm";
 import { BunSQLDatabase } from "drizzle-orm/bun-sql/postgres";
 
 type CommonArgs = {
   db?: BunSQLDatabase;
 };
-
-type LiteralUnion<T extends string> = T | (string & {});
-type Nullable<T> = T | null;
 
 const workspaceCardSelection = {
   id: s.workspaces.id,
@@ -21,32 +20,44 @@ const workspaceCardSelection = {
   createdAt: s.workspaces.createdAt,
 };
 
+type WorkspaceSortKey = "updatedAt" | "createdAt" | "title";
+
+const workspaceOrderColumns = {
+  createdAt: s.workspaces.createdAt,
+  title: sql<string>`lower(${s.workspaces.title})`,
+  updatedAt: s.workspaces.updatedAt,
+} satisfies Record<WorkspaceSortKey, OrderByTarget>;
+
 export type WorkspaceCardSelection = Pick<typeof s.workspaces.$inferSelect, keyof typeof workspaceCardSelection>;
 
-type ListWorkspacesArgs = CommonArgs & {
-  /** @default -updatedAt */
-  orderBy?: Nullable<LiteralUnion<"updatedAt" | "-updatedAt" | "createdAt" | "-createdAt" | "title" | "-title">>;
-  ownerId: typeof s.workspaces.$inferSelect.ownerId;
-};
+type ListWorkspacesArgs = CommonArgs &
+  Ordered<WorkspaceSortKey> &
+  PaginationArgs & {
+    ownerId: typeof s.workspaces.$inferSelect.ownerId;
+  };
 
-export async function listWorkspaces(args: ListWorkspacesArgs) {
+export async function listWorkspaces(args: Prettify<ListWorkspacesArgs>): Promise<Paginated<WorkspaceCardSelection>> {
   const db = args.db ?? mdb;
-  let orderBy = desc(s.workspaces.updatedAt);
-  if (args.orderBy) {
-    if (args.orderBy === "title") orderBy = asc(s.workspaces.title);
-    else if (args.orderBy === "-title") orderBy = desc(s.workspaces.title);
-    else if (args.orderBy === "createdAt") orderBy = asc(s.workspaces.createdAt);
-    else if (args.orderBy === "-createdAt") orderBy = desc(s.workspaces.createdAt);
-    else if (args.orderBy === "updatedAt") orderBy = asc(s.workspaces.updatedAt);
-  }
+  const orderBy = buildOrderClause(args, {
+    columns: workspaceOrderColumns,
+    defaultSortBy: "updatedAt",
+    defaultSortDir: "desc",
+  });
+  const pagination = buildPagination(args);
+  const where = eq(s.workspaces.ownerId, args.ownerId);
 
-  const spaces = await db
-    .select(workspaceCardSelection)
-    .from(s.workspaces)
-    .where(eq(s.workspaces.ownerId, args.ownerId))
-    .orderBy(orderBy);
+  const [spaces, totalRows] = await Promise.all([
+    db
+      .select(workspaceCardSelection)
+      .from(s.workspaces)
+      .where(where)
+      .orderBy(orderBy)
+      .limit(pagination.limit)
+      .offset(pagination.offset),
+    db.select({ total: count() }).from(s.workspaces).where(where),
+  ]);
 
-  return spaces;
+  return buildPaginatedResult(spaces, totalRows[0]?.total ?? 0, pagination);
 }
 
 type FindWorkspaceBySlugArgs = CommonArgs & {
@@ -54,7 +65,7 @@ type FindWorkspaceBySlugArgs = CommonArgs & {
   slug: typeof s.workspaces.$inferSelect.slug;
 };
 
-export async function findWorkspaceBySlug(args: FindWorkspaceBySlugArgs) {
+export async function findWorkspaceBySlug(args: Prettify<FindWorkspaceBySlugArgs>) {
   const db = args.db ?? mdb;
 
   const [space] = await db
@@ -80,7 +91,7 @@ export class SlugUsedError extends Error {
   }
 }
 
-export async function createWorkspace(args: CreateWorkspaceArgs) {
+export async function createWorkspace(args: Prettify<CreateWorkspaceArgs>) {
   const db = args.db ?? mdb;
 
   try {
@@ -120,12 +131,6 @@ export async function createWorkspace(args: CreateWorkspaceArgs) {
     throw error;
   }
 }
-
-const PostgresErrorCodes = {
-  Unique: "23505",
-  Check: "23514",
-  NotNull: "23502",
-};
 
 function fileTypeToExtension(type: string) {
   switch (type) {

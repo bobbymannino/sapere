@@ -16,6 +16,12 @@ declare global {
     // interface PageState {}
     // interface Platform {}
   }
+
+  type LiteralUnion<T extends string> = T | (string & {});
+  type Nullable<T> = T | null;
+  type Prettify<T> = {
+    [K in keyof T]: T[K];
+  } & {};
 }
 
 export {};
