@@ -17,10 +17,9 @@
     import SidebarMenuButton from "$lib/components/ui/sidebar/sidebar-menu-button.svelte";
     import SidebarGroup from "$lib/components/ui/sidebar/sidebar-group.svelte";
     import SidebarGroupContent from "$lib/components/ui/sidebar/sidebar-group-content.svelte";
-    import ExitIcon from "$lib/icons/exit-icon.svelte";
     import SpinnerIcon from "$lib/icons/spinner-icon.svelte";
     import UserIcon from "$lib/icons/user-icon.svelte";
-    import WorkspaceIcon from "$lib/icons/workspace-icon.svelte";
+    import { WorkspaceIcon, ExitIcon } from "$lib/icons";
 
     type Props = { username: string };
 
@@ -78,7 +77,10 @@
                             </SidebarMenuButton>
                         {/snippet}
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent side="top" class="w-(--bits-dropdown-menu-anchor-width)">
+                    <DropdownMenuContent
+                        side="top"
+                        class="w-(--bits-dropdown-menu-anchor-width)"
+                    >
                         <DropdownMenuGroup>
                             <DropdownMenuItem>
                                 {#snippet child({ props })}
@@ -88,7 +90,11 @@
                                     </a>
                                 {/snippet}
                             </DropdownMenuItem>
-                            <DropdownMenuItem onclick={signOut} variant="destructive" disabled={pending}>
+                            <DropdownMenuItem
+                                onclick={signOut}
+                                variant="destructive"
+                                disabled={pending}
+                            >
                                 {#if pending}
                                     <SpinnerIcon class="animate-spin" />
                                 {:else}

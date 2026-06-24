@@ -13,7 +13,6 @@
     import EmptyTitle from "$lib/components/ui/empty/empty-title.svelte";
     import Empty from "$lib/components/ui/empty/empty.svelte";
     import SidebarTrigger from "$lib/components/ui/sidebar/sidebar-trigger.svelte";
-    import WorkspaceIcon from "$lib/icons/workspace-icon.svelte";
     import Pagination from "$lib/components/ui/pagination/pagination.svelte";
     import type { PageProps } from "./$types";
     import WorkspaceCard from "./workspace-card.svelte";
@@ -25,6 +24,7 @@
     import PaginationEllipsis from "$lib/components/ui/pagination/pagination-ellipsis.svelte";
     import { navigating, page } from "$app/state";
     import { goto } from "$app/navigation";
+    import { WorkspaceIcon } from "$lib/icons";
 
     let { data }: PageProps = $props();
     let workspaces = $derived(data.workspaces);
@@ -59,15 +59,21 @@
                     <WorkspaceIcon />
                 </EmptyMedia>
                 <EmptyTitle>No workspaces</EmptyTitle>
-                <EmptyDescription>You are not apart of any workspaces</EmptyDescription>
+                <EmptyDescription
+                    >You are not apart of any workspaces</EmptyDescription
+                >
             </EmptyHeader>
             <EmptyContent>
-                <Button href={resolve("/(app)/workspaces/new")}>New Workspace</Button>
+                <Button href={resolve("/(app)/workspaces/new")}
+                    >New Workspace</Button
+                >
             </EmptyContent>
         </Empty>
     {:else}
         <section class="@container">
-            <ul class="p-5 grid gap-5 @md:grid-cols-2 @lg:grid-cols-3 @xl:grid-cols-4">
+            <ul
+                class="p-5 grid gap-5 @md:grid-cols-2 @lg:grid-cols-3 @xl:grid-cols-4"
+            >
                 {#each workspaces.results as w (w.id)}
                     <li>
                         <WorkspaceCard {...w} />
@@ -76,7 +82,11 @@
             </ul>
 
             <div class="p-5 flex-center">
-                <Button variant="outline" href={resolve("/(app)/workspaces/new")}>New Workspace</Button>
+                <Button
+                    variant="outline"
+                    href={resolve("/(app)/workspaces/new")}
+                    >New Workspace</Button
+                >
             </div>
         </section>
 
