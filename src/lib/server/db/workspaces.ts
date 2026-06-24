@@ -1,16 +1,13 @@
 import { db as mdb, PostgresErrorCodes } from "$db";
+import { buildOrderClause, type OrderByTarget, type Ordered } from "$db/pagination";
 import * as s from "$lib/server/db/schema";
 import { files } from "$lib/server/files";
-import { and, asc, desc, DrizzleQueryError, eq } from "drizzle-orm";
+import { and, DrizzleQueryError, eq, sql } from "drizzle-orm";
 import { BunSQLDatabase } from "drizzle-orm/bun-sql/postgres";
-import type { PgColumn } from "drizzle-orm/pg-core";
 
 type CommonArgs = {
   db?: BunSQLDatabase;
 };
-
-type WorkspaceSortKey = LiteralUnion<"updatedAt" | "createdAt" | "title">;
-type WorkspaceSortOrder = LiteralUnion<"asc" | "desc">;
 
 const workspaceCardSelection = {
   id: s.workspaces.id,
@@ -22,29 +19,34 @@ const workspaceCardSelection = {
   createdAt: s.workspaces.createdAt,
 };
 
+type WorkspaceSortKey = "updatedAt" | "createdAt" | "title";
+
+const workspaceOrderColumns = {
+  createdAt: s.workspaces.createdAt,
+  title: sql<string>`lower(${s.workspaces.title})`,
+  updatedAt: s.workspaces.updatedAt,
+} satisfies Record<WorkspaceSortKey, OrderByTarget>;
+
 export type WorkspaceCardSelection = Pick<typeof s.workspaces.$inferSelect, keyof typeof workspaceCardSelection>;
 
-type ListWorkspacesArgs = CommonArgs & {
-  ownerId: typeof s.workspaces.$inferSelect.ownerId;
-  /** @default desc */
-  order?: Nullable<WorkspaceSortOrder>;
-  /** @default updatedAt */
-  sort?: Nullable<WorkspaceSortKey>;
-};
+type ListWorkspacesArgs = CommonArgs &
+  Ordered<WorkspaceSortKey> & {
+    ownerId: typeof s.workspaces.$inferSelect.ownerId;
+  };
 
 export async function listWorkspaces(args: Prettify<ListWorkspacesArgs>) {
   const db = args.db ?? mdb;
-  const direction = args.order === "asc" ? asc : desc;
-
-  let sortKey: PgColumn = s.workspaces.updatedAt;
-  if (args.sort === "title") sortKey = s.workspaces.title;
-  else if (args.sort === "createdAt") sortKey = s.workspaces.createdAt;
+  const orderBy = buildOrderClause(args, {
+    columns: workspaceOrderColumns,
+    defaultOrder: "desc",
+    defaultSort: "updatedAt",
+  });
 
   const spaces = await db
     .select(workspaceCardSelection)
     .from(s.workspaces)
     .where(eq(s.workspaces.ownerId, args.ownerId))
-    .orderBy(direction(sortKey));
+    .orderBy(orderBy);
 
   return spaces;
 }
