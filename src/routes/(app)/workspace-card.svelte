@@ -1,12 +1,17 @@
 <script lang="ts">
+    import { refreshAll } from "$app/navigation";
     import { resolve } from "$app/paths";
-    import { buttonVariants } from "$lib/components/ui/button";
-    import Button from "$lib/components/ui/button/button.svelte";
+    import { Button, buttonVariants } from "$lib/components/ui/button";
     import CardContent from "$lib/components/ui/card/card-content.svelte";
     import CardDescription from "$lib/components/ui/card/card-description.svelte";
     import CardHeader from "$lib/components/ui/card/card-header.svelte";
     import CardTitle from "$lib/components/ui/card/card-title.svelte";
     import Card from "$lib/components/ui/card/card.svelte";
+    import DialogContent from "$lib/components/ui/dialog/dialog-content.svelte";
+    import DialogDescription from "$lib/components/ui/dialog/dialog-description.svelte";
+    import DialogFooter from "$lib/components/ui/dialog/dialog-footer.svelte";
+    import DialogHeader from "$lib/components/ui/dialog/dialog-header.svelte";
+    import DialogTitle from "$lib/components/ui/dialog/dialog-title.svelte";
     import Dialog from "$lib/components/ui/dialog/dialog.svelte";
     import DropdownMenuContent from "$lib/components/ui/dropdown-menu/dropdown-menu-content.svelte";
     import DropdownMenuGroup from "$lib/components/ui/dropdown-menu/dropdown-menu-group.svelte";
@@ -15,27 +20,45 @@
     import DropdownMenuTrigger from "$lib/components/ui/dropdown-menu/dropdown-menu-trigger.svelte";
     import DropdownMenu from "$lib/components/ui/dropdown-menu/dropdown-menu.svelte";
     import { formatDateTime, toIsoDate } from "$lib/date-format";
-    import { EllipsisIcon } from "$lib/icons";
+    import { EllipsisIcon, SpinnerIcon, TrashIcon } from "$lib/icons";
     import type { WorkspaceCardSelection } from "$lib/server/db/workspaces";
+    import { deleteWorkspaceCommand } from "$lib/workspaces.remote";
 
     type Props = WorkspaceCardSelection;
 
-    let { title, slug, description, image, updatedAt }: Props = $props();
+    let { id, title, slug, description, image, updatedAt }: Props = $props();
+    let deleteOpen = $state(false);
+    let deleteError = $state(null as string | null);
+    let deleting = $derived(deleteWorkspaceCommand.pending > 0);
     let formattedUpdatedAt = $derived(formatDateTime(updatedAt));
     let updatedAtIso = $derived(toIsoDate(updatedAt));
     let imageUrl = $derived(resolve("/(app)/workspaces/[slug]/image", { slug }));
+
+    function openDeleteDialog() {
+        deleteError = null;
+        deleteOpen = true;
+    }
+
+    async function confirmDelete() {
+        deleteError = null;
+
+        try {
+            await deleteWorkspaceCommand(id);
+            deleteOpen = false;
+            await refreshAll({ includeLoadFunctions: true });
+        } catch (error) {
+            deleteError = error instanceof Error ? error.message : "Failed to delete workspace";
+        }
+    }
 </script>
 
-<a
-    href={resolve("/(app)/workspaces/[slug]", { slug })}
-    class="group/card block hover:scale-101 motion-safe:hover:transition-transform"
->
-    <Card class="group-hover/card:shadow-lg pt-0">
+<Card class="group/card pt-0 hover:scale-101 motion-safe:hover:transition-transform hover:shadow-lg">
+    <a href={resolve("/(app)/workspaces/[slug]", { slug })} class="block">
         <CardHeader class="px-0">
             {#if image}
                 <img src={imageUrl} alt="" class="aspect-video w-full object-cover" />
             {:else}
-                <div class="aspect-video w-full bg-gray-100"></div>
+                <div class="bg-muted aspect-video w-full"></div>
             {/if}
         </CardHeader>
 
@@ -47,32 +70,61 @@
                 </CardDescription>
             {/if}
         </CardContent>
+    </a>
 
-        <CardContent>
-            <CardDescription>
-                Updated <time datetime={updatedAtIso}>{formattedUpdatedAt}</time>
-            </CardDescription>
+    <CardContent class="flex items-center justify-between gap-3">
+        <CardDescription>
+            Updated <time datetime={updatedAtIso}>{formattedUpdatedAt}</time>
+        </CardDescription>
 
-            <div class="ml-auto flex justify-end">
-                <DropdownMenu>
-                    <DropdownMenuTrigger class={buttonVariants({ variant: "ghost", size: "icon-sm" })}>
-                        <EllipsisIcon />
-                    </DropdownMenuTrigger>
+        <Dialog bind:open={deleteOpen}>
+            <DropdownMenu>
+                <DropdownMenuTrigger
+                    class={buttonVariants({ variant: "ghost", size: "icon-sm" })}
+                    aria-label={`Open actions for ${title}`}
+                >
+                    <EllipsisIcon />
+                </DropdownMenuTrigger>
 
-                    <DropdownMenuContent align="end" side="top">
-                        <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                        <DropdownMenuGroup>
-                            <DropdownMenuItem>
-                                {#snippet child()}
-                                    <Button href="/workspaces/{slug}/edit" class="w-full justify-start" variant="ghost">
-                                        Edit
-                                    </Button>
-                                {/snippet}
-                            </DropdownMenuItem>
-                        </DropdownMenuGroup>
-                    </DropdownMenuContent>
-                </DropdownMenu>
-            </div>
-        </CardContent>
-    </Card>
-</a>
+                <DropdownMenuContent align="end" side="top">
+                    <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                    <DropdownMenuGroup>
+                        <DropdownMenuItem>
+                            {#snippet child({ props })}
+                                <a {...props} href={resolve("/(app)/workspaces/[slug]/edit", { slug })}>Edit</a>
+                            {/snippet}
+                        </DropdownMenuItem>
+                        <DropdownMenuItem variant="destructive" onclick={openDeleteDialog}>Delete</DropdownMenuItem>
+                    </DropdownMenuGroup>
+                </DropdownMenuContent>
+            </DropdownMenu>
+
+            <DialogContent>
+                <DialogHeader>
+                    <DialogTitle>Delete workspace?</DialogTitle>
+                    <DialogDescription>
+                        This will permanently delete {title}. This action cannot be undone.
+                    </DialogDescription>
+                </DialogHeader>
+
+                {#if deleteError}
+                    <p class="text-destructive text-sm">{deleteError}</p>
+                {/if}
+
+                <DialogFooter>
+                    <Button type="button" variant="outline" disabled={deleting} onclick={() => (deleteOpen = false)}>
+                        Cancel
+                    </Button>
+                    <Button type="button" variant="destructive" disabled={deleting} onclick={confirmDelete}>
+                        {#if deleting}
+                            <SpinnerIcon class="animate-spin" />
+                        {:else}
+                            <TrashIcon />
+                        {/if}
+                        Delete
+                    </Button>
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
+    </CardContent>
+</Card>
