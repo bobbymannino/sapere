@@ -2,7 +2,7 @@ import { db as mdb, PostgresErrorCodes } from "$db";
 import type { OrderByTarget, Ordered, PaginationArgs, Paginated } from "$db/pagination";
 import { buildOrderClause, buildPaginatedResult, buildPagination } from "$db/pagination";
 import * as s from "$lib/server/db/schema";
-import { files } from "$lib/server/files";
+import { files, deleteFileIfExists, fileTypeToExtension } from "$lib/server/files";
 import { and, count, DrizzleQueryError, eq, sql } from "drizzle-orm";
 import { BunSQLDatabase } from "drizzle-orm/bun-sql/postgres";
 
@@ -132,17 +132,4 @@ export async function createWorkspace(args: Prettify<CreateWorkspaceArgs>) {
   }
 }
 
-function fileTypeToExtension(type: string) {
-  switch (type) {
-    case "image/png":
-      return "png";
-    case "image/jpeg":
-      return "jpg";
-    case "image/webp":
-      return "webp";
-    case "image/avif":
-      return "avif";
-    default:
-      return "bin";
-  }
 }
