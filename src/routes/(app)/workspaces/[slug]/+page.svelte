@@ -9,6 +9,7 @@
     import SidebarTrigger from "$lib/components/ui/sidebar/sidebar-trigger.svelte";
     import { formatDateTime, toIsoDate } from "$lib/date-format";
     import type { PageProps } from "./$types";
+    import Button from "$lib/components/ui/button/button.svelte";
 
     let { data }: PageProps = $props();
     let formattedUpdatedAt = $derived(formatDateTime(data.workspace.updatedAt));
@@ -36,15 +37,12 @@
 
 <div class="p-5">
     {#if data.workspace.image}
-        <img
-            src={imageUrl}
-            alt=""
-            class="mb-5 aspect-video w-full max-w-4xl rounded-3xl object-cover"
-        />
+        <img src={imageUrl} alt="" class="mb-5 aspect-video w-full max-w-4xl rounded-3xl object-cover" />
     {/if}
     <h1>{data.workspace.title}</h1>
     {#if data.workspace.description}
         <p class="whitespace-pre-wrap text-muted-foreground">{data.workspace.description}</p>
     {/if}
     <p>Updated <time datetime={updatedAtIso}>{formattedUpdatedAt}</time></p>
+    <Button href="/workspaces/{data.workspace.slug}/edit">Edit</Button>
 </div>

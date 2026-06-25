@@ -27,14 +27,12 @@
     async function cropImageFile(file: File, area: CropArea): Promise<File> {
         const url = URL.createObjectURL(file);
         try {
-            const img = await new Promise<HTMLImageElement>(
-                (resolve, reject) => {
-                    const el = document.createElement("img");
-                    el.onload = () => resolve(el);
-                    el.onerror = reject;
-                    el.src = url;
-                },
-            );
+            const img = await new Promise<HTMLImageElement>((resolve, reject) => {
+                const el = document.createElement("img");
+                el.onload = () => resolve(el);
+                el.onerror = reject;
+                el.src = url;
+            });
 
             const canvas = document.createElement("canvas");
             canvas.width = area.width;
@@ -43,30 +41,14 @@
             const ctx = canvas.getContext("2d");
             if (!ctx) throw new Error("Canvas 2D context unavailable");
 
-            ctx.drawImage(
-                img,
-                area.x,
-                area.y,
-                area.width,
-                area.height,
-                0,
-                0,
-                area.width,
-                area.height,
-            );
+            ctx.drawImage(img, area.x, area.y, area.width, area.height, 0, 0, area.width, area.height);
 
             // canvas.toBlob does not support avif encoding in most browsers
-            const mimeType =
-                file.type === "image/avif" ? "image/webp" : file.type;
+            const mimeType = file.type === "image/avif" ? "image/webp" : file.type;
 
             const blob = await new Promise<Blob>((resolve, reject) => {
                 canvas.toBlob(
-                    (b) =>
-                        b
-                            ? resolve(b)
-                            : reject(
-                                  new Error("Failed to encode cropped image"),
-                              ),
+                    (b) => (b ? resolve(b) : reject(new Error("Failed to encode cropped image"))),
                     mimeType,
                     0.9,
                 );
@@ -150,12 +132,9 @@
 
     <Field>
         <FieldLabel for="description">Description</FieldLabel>
-        <FieldDescription>
-            Optional context about this workspace
-        </FieldDescription>
+        <FieldDescription>Optional context about this workspace</FieldDescription>
         <Textarea
-            aria-invalid={page.form?.valiErrors?.nested?.description?.length >
-                0}
+            aria-invalid={page.form?.valiErrors?.nested?.description?.length > 0}
             disabled={pending}
             placeholder="A place for product research and planning"
             id="description"
@@ -172,9 +151,7 @@
 
     <Field>
         <FieldLabel for="image">Image</FieldLabel>
-        <FieldDescription>
-            An optional thumbnail for this workspace
-        </FieldDescription>
+        <FieldDescription>An optional thumbnail for this workspace</FieldDescription>
         <Input
             aria-invalid={page.form?.valiErrors?.nested?.image?.length > 0}
             disabled={pending}
@@ -193,13 +170,7 @@
                     oncropcomplete={(e) => (crop = e.pixels)}
                 />
             </div>
-            <Slider
-                bind:value={zoom}
-                type="single"
-                min={1}
-                step={0.1}
-                max={5}
-            />
+            <Slider bind:value={zoom} type="single" min={1} step={0.1} max={5} />
         {/if}
         {#each page.form?.valiErrors?.nested?.image as error (error)}
             <Alert variant="destructive">
@@ -209,9 +180,11 @@
         {/each}
     </Field>
 
-    <Button type="submit" disabled={pending}>
-        {#if pending}<SpinnerIcon class="animate-spin" />{/if}
-        Create
-    </Button>
-    <Button variant="ghost" href={resolve("/(app)/workspaces")}>Cancel</Button>
+    <div class="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+        <Button variant="ghost" href={resolve("/(app)/workspaces")} aria-disabled={pending}>Cancel</Button>
+        <Button type="submit" disabled={pending}>
+            {#if pending}<SpinnerIcon class="animate-spin" />{/if}
+            Create
+        </Button>
+    </div>
 </form>

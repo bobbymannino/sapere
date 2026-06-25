@@ -2,7 +2,7 @@ import { db as mdb, PostgresErrorCodes } from "$db";
 import type { OrderByTarget, Ordered, PaginationArgs, Paginated } from "$db/pagination";
 import { buildOrderClause, buildPaginatedResult, buildPagination } from "$db/pagination";
 import * as s from "$lib/server/db/schema";
-import { files } from "$lib/server/files";
+import { files, deleteFileIfExists, fileTypeToExtension } from "$lib/server/files";
 import { and, count, DrizzleQueryError, eq, sql } from "drizzle-orm";
 import { BunSQLDatabase } from "drizzle-orm/bun-sql/postgres";
 
@@ -119,30 +119,75 @@ export async function createWorkspace(args: Prettify<CreateWorkspaceArgs>) {
       return space;
     });
   } catch (error) {
-    if (error instanceof DrizzleQueryError) {
-      if (error.cause instanceof Bun.SQL.PostgresError) {
-        if (error.cause.errno === PostgresErrorCodes.Unique) {
-          if (error.cause.constraint?.includes("slug")) {
-            throw new SlugUsedError(args.slug);
-          }
-        }
-      }
-    }
+    if (isWorkspaceSlugUniqueError(error)) throw new SlugUsedError(args.slug);
     throw error;
   }
 }
 
-function fileTypeToExtension(type: string) {
-  switch (type) {
-    case "image/png":
-      return "png";
-    case "image/jpeg":
-      return "jpg";
-    case "image/webp":
-      return "webp";
-    case "image/avif":
-      return "avif";
-    default:
-      return "bin";
+type UpdateWorkspaceArgs = CommonArgs & {
+  ownerId: typeof s.workspaces.$inferSelect.ownerId;
+  currentSlug: typeof s.workspaces.$inferSelect.slug;
+  title: typeof s.workspaces.$inferInsert.title;
+  slug: typeof s.workspaces.$inferInsert.slug;
+  description: typeof s.workspaces.$inferInsert.description;
+  image: File | null | undefined;
+  removeImage: boolean;
+};
+
+export async function updateWorkspace(args: Prettify<UpdateWorkspaceArgs>) {
+  const db = args.db ?? mdb;
+
+  try {
+    const result = await db.transaction(async (tx) => {
+      const [updated] = await tx
+        .update(s.workspaces)
+        .set({ title: args.title, slug: args.slug, description: args.description })
+        .where(and(eq(s.workspaces.ownerId, args.ownerId), eq(s.workspaces.slug, args.currentSlug)))
+        .returning({ id: s.workspaces.id, slug: s.workspaces.slug, image: s.workspaces.image });
+      if (!updated) return null;
+
+      let newImage = updated.image;
+      let imageChanged = false;
+
+      if (args.image) {
+        const image = await files.upload(
+          `workspaces/${updated.id}/image.${fileTypeToExtension(args.image.type)}`,
+          args.image,
+        );
+
+        newImage = image.key;
+        imageChanged = true;
+        await tx.update(s.workspaces).set({ image: newImage }).where(eq(s.workspaces.id, updated.id));
+      } else if (args.removeImage) {
+        newImage = null;
+        imageChanged = true;
+        await tx.update(s.workspaces).set({ image: null }).where(eq(s.workspaces.id, updated.id));
+      }
+
+      return {
+        imageChanged,
+        oldImage: updated.image,
+        workspace: { id: updated.id, slug: updated.slug, image: newImage },
+      };
+    });
+
+    if (result?.imageChanged && result.oldImage && result.oldImage !== result.workspace.image) {
+      await deleteFileIfExists(result.oldImage);
+    }
+
+    return result?.workspace ?? null;
+  } catch (error) {
+    if (isWorkspaceSlugUniqueError(error)) throw new SlugUsedError(args.slug);
+    throw error;
   }
+}
+
+function isWorkspaceSlugUniqueError(error: unknown) {
+  return (
+    (error instanceof DrizzleQueryError &&
+      error.cause instanceof Bun.SQL.PostgresError &&
+      error.cause.errno === PostgresErrorCodes.Unique &&
+      error.cause.constraint?.includes("slug")) ??
+    false
+  );
 }
