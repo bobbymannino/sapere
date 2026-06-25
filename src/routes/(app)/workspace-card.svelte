@@ -53,7 +53,9 @@
     }
 </script>
 
-<Card class="group/card relative pt-0 hover:scale-101 motion-safe:hover:transition-transform hover:shadow-lg">
+<Card
+    class="group/card relative pt-0 hover:scale-101 motion-safe:hover:transition-transform hover:shadow-lg focus-within:ring-3 focus-within:border-ring focus-within:ring-ring/30"
+>
     <a href={resolve("/(app)/workspaces/[slug]", { slug })} class="absolute inset-0 rounded-inherit">
         <span class="sr-only">Open {title} workspace</span>
     </a>
