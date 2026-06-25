@@ -182,6 +182,23 @@ export async function updateWorkspace(args: Prettify<UpdateWorkspaceArgs>) {
   }
 }
 
+type DeleteWorkspaceArgs = CommonArgs & {
+  ownerId: typeof s.workspaces.$inferSelect.ownerId;
+  workspaceId: typeof s.workspaces.$inferSelect.id;
+};
+
+export async function deleteWorkspace(args: Prettify<DeleteWorkspaceArgs>) {
+  const db = args.db ?? mdb;
+
+  const [workspace] = await db
+    .delete(s.workspaces)
+    .where(and(eq(s.workspaces.ownerId, args.ownerId), eq(s.workspaces.id, args.workspaceId)))
+    .returning({ id: s.workspaces.id, image: s.workspaces.image });
+  if (!workspace) return null;
+  if (workspace.image) void deleteFileIfExists(workspace.image);
+  return workspace;
+}
+
 function isWorkspaceSlugUniqueError(error: unknown) {
   return (
     (error instanceof DrizzleQueryError &&

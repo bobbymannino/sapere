@@ -41,9 +41,7 @@
     <Card.Root class="w-full max-w-lg">
         <Card.Header>
             <Card.Title>Edit Workspace</Card.Title>
-            <Card.Description>
-                Update workspace details and thumbnail.
-            </Card.Description>
+            <Card.Description>Update workspace details and thumbnail.</Card.Description>
         </Card.Header>
 
         <Card.Content>
