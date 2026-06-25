@@ -58,26 +58,27 @@
         <span class="sr-only">Open {title} workspace</span>
     </a>
 
-    <CardHeader class="px-0">
-        {#if image}
-            <img src={imageUrl} alt="" class="aspect-video w-full object-cover" />
-        {:else}
-            <div class="bg-muted aspect-video flex-center">
-                <PictureIcon class="text-muted-foreground" />
-            </div>
-        {/if}
+    {#if image}
+        <img src={imageUrl} alt="" class="aspect-video w-full object-cover" />
+    {:else}
+        <div class="bg-muted aspect-video flex-center">
+            <PictureIcon class="text-muted-foreground" />
+        </div>
+    {/if}
+
+    <CardHeader>
+        <CardTitle>{title}</CardTitle>
     </CardHeader>
 
-    <CardContent>
-        <CardTitle>{title}</CardTitle>
-        {#if description}
+    {#if description}
+        <CardContent>
             <CardDescription class="line-clamp-2 whitespace-pre-line">
                 {description}
             </CardDescription>
-        {/if}
-    </CardContent>
+        </CardContent>
+    {/if}
 
-    <CardFooter class="flex items-center justify-between gap-3">
+    <CardFooter class="flex items-center justify-between">
         <CardDescription>
             Updated <time datetime={updatedAtIso}>{formattedUpdatedAt}</time>
         </CardDescription>
