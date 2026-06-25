@@ -20,7 +20,7 @@
     import DropdownMenuTrigger from "$lib/components/ui/dropdown-menu/dropdown-menu-trigger.svelte";
     import DropdownMenu from "$lib/components/ui/dropdown-menu/dropdown-menu.svelte";
     import { formatDateTime, toIsoDate } from "$lib/date-format";
-    import { EllipsisIcon, SpinnerIcon, TrashIcon } from "$lib/icons";
+    import { EllipsisIcon, PictureIcon, SpinnerIcon, TrashIcon } from "$lib/icons";
     import type { WorkspaceCardSelection } from "$lib/server/db/workspaces";
     import { deleteWorkspaceCommand } from "$lib/workspaces.remote";
 
@@ -58,7 +58,9 @@
             {#if image}
                 <img src={imageUrl} alt="" class="aspect-video w-full object-cover" />
             {:else}
-                <div class="bg-muted aspect-video w-full"></div>
+                <div class="bg-muted aspect-video flex-center">
+                    <PictureIcon class="text-muted-foreground" />
+                </div>
             {/if}
         </CardHeader>
 
