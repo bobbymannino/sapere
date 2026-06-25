@@ -16,13 +16,7 @@
     import SidebarMenuButton from "$lib/components/ui/sidebar/sidebar-menu-button.svelte";
     import SidebarGroup from "$lib/components/ui/sidebar/sidebar-group.svelte";
     import SidebarGroupContent from "$lib/components/ui/sidebar/sidebar-group-content.svelte";
-    import {
-        ChevronUpIcon,
-        ExitIcon,
-        SpinnerIcon,
-        UserIcon,
-        WorkspaceIcon,
-    } from "$lib/icons";
+    import { ChevronUpIcon, ExitIcon, SpinnerIcon, UserIcon, WorkspaceIcon } from "$lib/icons";
 
     type Props = { username: string };
 
@@ -80,24 +74,17 @@
                             </SidebarMenuButton>
                         {/snippet}
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent
-                        side="top"
-                        class="w-(--bits-dropdown-menu-anchor-width)"
-                    >
+                    <DropdownMenuContent side="top" class="w-(--bits-dropdown-menu-anchor-width)">
                         <DropdownMenuGroup>
                             <DropdownMenuItem>
                                 {#snippet child({ props })}
-                                    <a {...props} href={"/account"}>
+                                    <a {...props} href="/account" class={[props.class, "cursor-pointer"]}>
                                         <UserIcon />
                                         Account
                                     </a>
                                 {/snippet}
                             </DropdownMenuItem>
-                            <DropdownMenuItem
-                                onclick={signOut}
-                                variant="destructive"
-                                disabled={pending}
-                            >
+                            <DropdownMenuItem onclick={signOut} variant="destructive" disabled={pending}>
                                 {#if pending}
                                     <SpinnerIcon class="animate-spin" />
                                 {:else}
