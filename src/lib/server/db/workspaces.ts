@@ -119,17 +119,20 @@ export async function createWorkspace(args: Prettify<CreateWorkspaceArgs>) {
       return space;
     });
   } catch (error) {
-    if (error instanceof DrizzleQueryError) {
-      if (error.cause instanceof Bun.SQL.PostgresError) {
-        if (error.cause.errno === PostgresErrorCodes.Unique) {
-          if (error.cause.constraint?.includes("slug")) {
-            throw new SlugUsedError(args.slug);
-          }
-        }
-      }
-    }
+    if (isWorkspaceSlugUniqueError(error)) throw new SlugUsedError(args.slug);
     throw error;
   }
 }
+      }
 
+
+
+function isWorkspaceSlugUniqueError(error: unknown) {
+  return (
+    (error instanceof DrizzleQueryError &&
+      error.cause instanceof Bun.SQL.PostgresError &&
+      error.cause.errno === PostgresErrorCodes.Unique &&
+      error.cause.constraint?.includes("slug")) ??
+    false
+  );
 }
