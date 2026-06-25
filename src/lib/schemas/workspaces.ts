@@ -48,3 +48,8 @@ export const WorkspaceImageSchema = v.union([
     ),
   ),
 ]);
+
+export const WorkspaceRemoveImageSchema = v.pipe(
+  v.picklist(["true", "false"]),
+  v.transform((v) => v === "true"),
+);
