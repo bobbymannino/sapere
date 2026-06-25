@@ -52,8 +52,8 @@
     }
 </script>
 
-<Card class="group/card pt-0 hover:scale-101 motion-safe:hover:transition-transform hover:shadow-lg">
-    <a href={resolve("/(app)/workspaces/[slug]", { slug })} class="block">
+<a href={resolve("/(app)/workspaces/[slug]", { slug })} class="block">
+    <Card class="group/card pt-0 hover:scale-101 motion-safe:hover:transition-transform hover:shadow-lg">
         <CardHeader class="px-0">
             {#if image}
                 <img src={imageUrl} alt="" class="aspect-video w-full object-cover" />
@@ -71,62 +71,73 @@
                     {description}
                 </CardDescription>
             {/if}
-        </CardContent>
-    </a>
 
-    <CardContent class="flex items-center justify-between gap-3">
-        <CardDescription>
-            Updated <time datetime={updatedAtIso}>{formattedUpdatedAt}</time>
-        </CardDescription>
+            <div class="flex items-center justify-between gap-3">
+                <CardDescription>
+                    Updated <time datetime={updatedAtIso}>{formattedUpdatedAt}</time>
+                </CardDescription>
 
-        <Dialog bind:open={deleteOpen}>
-            <DropdownMenu>
-                <DropdownMenuTrigger
-                    class={buttonVariants({ variant: "ghost", size: "icon-sm" })}
-                    aria-label={`Open actions for ${title}`}
-                >
-                    <EllipsisIcon />
-                </DropdownMenuTrigger>
+                <Dialog bind:open={deleteOpen}>
+                    <DropdownMenu>
+                        <DropdownMenuTrigger
+                            class={buttonVariants({ variant: "ghost", size: "icon-sm" })}
+                            aria-label={`Open actions for ${title}`}
+                        >
+                            <EllipsisIcon />
+                        </DropdownMenuTrigger>
 
-                <DropdownMenuContent align="end" side="top">
-                    <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                    <DropdownMenuGroup>
-                        <DropdownMenuItem>
-                            {#snippet child({ props })}
-                                <a {...props} href={resolve("/(app)/workspaces/[slug]/edit", { slug })}>Edit</a>
-                            {/snippet}
-                        </DropdownMenuItem>
-                        <DropdownMenuItem variant="destructive" onclick={openDeleteDialog}>Delete</DropdownMenuItem>
-                    </DropdownMenuGroup>
-                </DropdownMenuContent>
-            </DropdownMenu>
+                        <DropdownMenuContent align="end" side="top">
+                            <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                            <DropdownMenuGroup>
+                                <DropdownMenuItem>
+                                    {#snippet child({ props })}
+                                        <a
+                                            {...props}
+                                            href={resolve("/(app)/workspaces/[slug]/edit", { slug })}
+                                            class={[props.class, "cursor-pointer"]}>Edit</a
+                                        >
+                                    {/snippet}
+                                </DropdownMenuItem>
+                                <DropdownMenuItem variant="destructive" onclick={openDeleteDialog}
+                                    >Delete</DropdownMenuItem
+                                >
+                            </DropdownMenuGroup>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
 
-            <DialogContent>
-                <DialogHeader>
-                    <DialogTitle>Delete workspace?</DialogTitle>
-                    <DialogDescription>
-                        This will permanently delete {title}. This action cannot be undone.
-                    </DialogDescription>
-                </DialogHeader>
+                    <DialogContent>
+                        <DialogHeader>
+                            <DialogTitle>Delete workspace?</DialogTitle>
+                            <DialogDescription>
+                                This will permanently delete {title}. This action cannot be undone.
+                            </DialogDescription>
+                        </DialogHeader>
 
-                {#if deleteError}
-                    <p class="text-destructive text-sm">{deleteError}</p>
-                {/if}
-
-                <DialogFooter>
-                    <Button type="button" variant="outline" disabled={deleting} onclick={() => (deleteOpen = false)}>
-                        Cancel
-                    </Button>
-                    <Button type="button" variant="destructive" disabled={deleting} onclick={confirmDelete}>
-                        {#if deleting}
-                            <SpinnerIcon class="animate-spin" />
-                        {:else}
-                            <TrashIcon />
+                        {#if deleteError}
+                            <p class="text-destructive text-sm">{deleteError}</p>
                         {/if}
-                        Delete
-                    </Button>
-                </DialogFooter>
-            </DialogContent>
-        </Dialog>
-    </CardContent>
-</Card>
+
+                        <DialogFooter>
+                            <Button
+                                type="button"
+                                variant="outline"
+                                disabled={deleting}
+                                onclick={() => (deleteOpen = false)}
+                            >
+                                Cancel
+                            </Button>
+                            <Button type="button" variant="destructive" disabled={deleting} onclick={confirmDelete}>
+                                {#if deleting}
+                                    <SpinnerIcon class="animate-spin" />
+                                {:else}
+                                    <TrashIcon />
+                                {/if}
+                                Delete
+                            </Button>
+                        </DialogFooter>
+                    </DialogContent>
+                </Dialog>
+            </div>
+        </CardContent>
+    </Card>
+</a>
