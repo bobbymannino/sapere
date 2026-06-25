@@ -4,6 +4,7 @@
     import { Button, buttonVariants } from "$lib/components/ui/button";
     import CardContent from "$lib/components/ui/card/card-content.svelte";
     import CardDescription from "$lib/components/ui/card/card-description.svelte";
+    import CardFooter from "$lib/components/ui/card/card-footer.svelte";
     import CardHeader from "$lib/components/ui/card/card-header.svelte";
     import CardTitle from "$lib/components/ui/card/card-title.svelte";
     import Card from "$lib/components/ui/card/card.svelte";
@@ -52,92 +53,89 @@
     }
 </script>
 
-<a href={resolve("/(app)/workspaces/[slug]", { slug })} class="block">
-    <Card class="group/card pt-0 hover:scale-101 motion-safe:hover:transition-transform hover:shadow-lg">
-        <CardHeader class="px-0">
-            {#if image}
-                <img src={imageUrl} alt="" class="aspect-video w-full object-cover" />
-            {:else}
-                <div class="bg-muted aspect-video flex-center">
-                    <PictureIcon class="text-muted-foreground" />
-                </div>
-            {/if}
-        </CardHeader>
+<Card class="group/card relative pt-0 hover:scale-101 motion-safe:hover:transition-transform hover:shadow-lg">
+    <a href={resolve("/(app)/workspaces/[slug]", { slug })} class="absolute inset-0 rounded-inherit">
+        <span class="sr-only">Open {title} workspace</span>
+    </a>
 
-        <CardContent>
-            <CardTitle>{title}</CardTitle>
-            {#if description}
-                <CardDescription class="line-clamp-2 whitespace-pre-line">
-                    {description}
-                </CardDescription>
-            {/if}
-
-            <div class="flex items-center justify-between gap-3">
-                <CardDescription>
-                    Updated <time datetime={updatedAtIso}>{formattedUpdatedAt}</time>
-                </CardDescription>
-
-                <Dialog bind:open={deleteOpen}>
-                    <DropdownMenu>
-                        <DropdownMenuTrigger
-                            class={buttonVariants({ variant: "ghost", size: "icon-sm" })}
-                            aria-label={`Open actions for ${title}`}
-                        >
-                            <EllipsisIcon />
-                        </DropdownMenuTrigger>
-
-                        <DropdownMenuContent align="end" side="top">
-                            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                            <DropdownMenuGroup>
-                                <DropdownMenuItem>
-                                    {#snippet child({ props })}
-                                        <a
-                                            {...props}
-                                            href={resolve("/(app)/workspaces/[slug]/edit", { slug })}
-                                            class={[props.class, "cursor-pointer"]}>Edit</a
-                                        >
-                                    {/snippet}
-                                </DropdownMenuItem>
-                                <DropdownMenuItem variant="destructive" onclick={openDeleteDialog}
-                                    >Delete</DropdownMenuItem
-                                >
-                            </DropdownMenuGroup>
-                        </DropdownMenuContent>
-                    </DropdownMenu>
-
-                    <DialogContent>
-                        <DialogHeader>
-                            <DialogTitle>Delete workspace?</DialogTitle>
-                            <DialogDescription>
-                                This will permanently delete {title}. This action cannot be undone.
-                            </DialogDescription>
-                        </DialogHeader>
-
-                        {#if deleteError}
-                            <p class="text-destructive text-sm">{deleteError}</p>
-                        {/if}
-
-                        <DialogFooter>
-                            <Button
-                                type="button"
-                                variant="outline"
-                                disabled={deleting}
-                                onclick={() => (deleteOpen = false)}
-                            >
-                                Cancel
-                            </Button>
-                            <Button type="button" variant="destructive" disabled={deleting} onclick={confirmDelete}>
-                                {#if deleting}
-                                    <SpinnerIcon class="animate-spin" />
-                                {:else}
-                                    <TrashIcon />
-                                {/if}
-                                Delete
-                            </Button>
-                        </DialogFooter>
-                    </DialogContent>
-                </Dialog>
+    <CardHeader class="px-0">
+        {#if image}
+            <img src={imageUrl} alt="" class="aspect-video w-full object-cover" />
+        {:else}
+            <div class="bg-muted aspect-video flex-center">
+                <PictureIcon class="text-muted-foreground" />
             </div>
-        </CardContent>
-    </Card>
-</a>
+        {/if}
+    </CardHeader>
+
+    <CardContent>
+        <CardTitle>{title}</CardTitle>
+        {#if description}
+            <CardDescription class="line-clamp-2 whitespace-pre-line">
+                {description}
+            </CardDescription>
+        {/if}
+    </CardContent>
+
+    <CardFooter class="flex items-center justify-between gap-3">
+        <CardDescription>
+            Updated <time datetime={updatedAtIso}>{formattedUpdatedAt}</time>
+        </CardDescription>
+
+        <DropdownMenu>
+            <DropdownMenuTrigger
+                class={buttonVariants({ variant: "ghost", size: "icon-sm", class: "z-10" })}
+                aria-label={`Open actions for ${title}`}
+            >
+                <EllipsisIcon />
+            </DropdownMenuTrigger>
+
+            <DropdownMenuContent align="end" side="top">
+                <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                <DropdownMenuGroup>
+                    <DropdownMenuItem>
+                        {#snippet child({ props })}
+                            <a
+                                {...props}
+                                href={resolve("/(app)/workspaces/[slug]/edit", { slug })}
+                                class={[props.class, "cursor-pointer"]}
+                            >
+                                Edit
+                            </a>
+                        {/snippet}
+                    </DropdownMenuItem>
+                    <DropdownMenuItem variant="destructive" onclick={openDeleteDialog}>Delete</DropdownMenuItem>
+                </DropdownMenuGroup>
+            </DropdownMenuContent>
+        </DropdownMenu>
+
+        <Dialog bind:open={deleteOpen}>
+            <DialogContent>
+                <DialogHeader>
+                    <DialogTitle>Delete workspace?</DialogTitle>
+                    <DialogDescription>
+                        This will permanently delete {title}. This action cannot be undone.
+                    </DialogDescription>
+                </DialogHeader>
+
+                {#if deleteError}
+                    <p class="text-destructive text-sm">{deleteError}</p>
+                {/if}
+
+                <DialogFooter>
+                    <Button type="button" variant="outline" disabled={deleting} onclick={() => (deleteOpen = false)}>
+                        Cancel
+                    </Button>
+                    <Button type="button" variant="destructive" disabled={deleting} onclick={confirmDelete}>
+                        {#if deleting}
+                            <SpinnerIcon class="animate-spin" />
+                        {:else}
+                            <TrashIcon />
+                        {/if}
+                        Delete
+                    </Button>
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
+    </CardFooter>
+</Card>
