@@ -30,7 +30,9 @@
         ),
     });
 
-    let pending = $state(true);
+    type Status = "deleting" | "adding" | "loading" | false;
+
+    let status: Status = $state("loading");
     let deletingId: string | null = $state(null);
     let passkeyToDelete: Passkey | null = $state(null);
     let deleteOpen = $state(false);
@@ -41,46 +43,45 @@
     });
     let passkeys: Passkey[] = $state([]);
 
-    async function loadPasskeys() {
-        pending = true;
+    async function loadPasskeys(previousStatus: Status) {
+        status = "loading";
         const { data } = await authClient.passkey.listUserPasskeys();
         if (data) passkeys = data;
-        pending = false;
+        status = previousStatus;
     }
 
     async function addPasskey(e: SubmitEvent & { currentTarget: HTMLFormElement }) {
         e.preventDefault();
-        pending = true;
+        status = "adding";
         error = "";
         valiErrors = {};
 
         const parsedResult = v.safeParse(Schema, formData);
         if (!parsedResult.success) {
             valiErrors = v.flatten(parsedResult.issues);
-            pending = false;
+            status = false;
             return;
         }
 
         const { name } = parsedResult.output;
         const newPasskey = await authClient.passkey.addPasskey(name ? { name } : undefined);
-        if (newPasskey.data) await loadPasskeys();
+        if (newPasskey.data) await loadPasskeys(status);
         else error = newPasskey.error.message ?? "Failed to add passkey";
         if (newPasskey.data) formData.name = "";
-        pending = false;
+        status = false;
     }
 
     async function deletePasskey(id: string) {
         deletingId = id;
-        pending = true;
+        status = "deleting";
         error = "";
         const deletedPasskey = await authClient.passkey.deletePasskey({ id });
         if (deletedPasskey.data) {
-            await loadPasskeys();
+            await loadPasskeys(status);
             deleteOpen = false;
             passkeyToDelete = null;
-        }
-        else error = deletedPasskey.error.message ?? "Failed to delete passkey";
-        pending = false;
+        } else error = deletedPasskey.error.message ?? "Failed to delete passkey";
+        status = false;
         deletingId = null;
     }
 
@@ -90,13 +91,20 @@
         deleteOpen = true;
     }
 
-    onMount(loadPasskeys);
+    onMount(() => loadPasskeys(false));
 </script>
 
 <Card class="max-w-lg w-full">
     <CardHeader>
         <CardTitle>Passkeys</CardTitle>
     </CardHeader>
+
+    {#if status === "loading"}
+        <CardContent>
+            <span class="sr-only">Loading</span>
+            <SpinnerIcon class="animate-spin mx-auto" aria-hidden="true" />
+        </CardContent>
+    {/if}
 
     {#if passkeys.length}
         <CardContent>
@@ -111,7 +119,7 @@
                         <Button
                             variant="destructive"
                             size="icon"
-                            disabled={pending}
+                            disabled={!!status}
                             onclick={() => openDeleteDialog(p)}
                         >
                             <span class="sr-only">Delete passkey</span>
@@ -136,14 +144,14 @@
                     type="text"
                     autocomplete="off"
                     maxlength={50}
-                    disabled={pending}
+                    disabled={!!status}
                     bind:value={formData.name}
                     placeholder="Name this passkey"
                 />
             </FormInput>
 
-            <Button type="submit" class="w-full" disabled={pending}>
-                {#if pending}<SpinnerIcon class="animate-spin" />{/if}
+            <Button type="submit" class="w-full" disabled={!!status}>
+                {#if status === "adding"}<SpinnerIcon class="animate-spin" />{/if}
                 Add Passkey
             </Button>
         </form>
@@ -156,12 +164,12 @@
     </CardFooter>
 
     <Dialog bind:open={deleteOpen}>
-        <DialogContent showCloseButton={!pending}>
+        <DialogContent showCloseButton={!status}>
             <DialogHeader>
                 <DialogTitle>Delete passkey?</DialogTitle>
                 <DialogDescription>
-                    This will remove {passkeyToDelete?.name || "this passkey"} from your account.
-                    You will need to register it again to use it for sign in.
+                    This will remove {passkeyToDelete?.name || "this passkey"} from your account. You will need to register
+                    it again to use it for sign in.
                 </DialogDescription>
             </DialogHeader>
 
@@ -173,13 +181,13 @@
             {/if}
 
             <DialogFooter>
-                <Button type="button" variant="outline" disabled={pending} onclick={() => (deleteOpen = false)}>
+                <Button type="button" variant="outline" disabled={!!status} onclick={() => (deleteOpen = false)}>
                     Cancel
                 </Button>
                 <Button
                     type="button"
                     variant="destructive"
-                    disabled={pending || !passkeyToDelete}
+                    disabled={!!status || !passkeyToDelete}
                     onclick={() => passkeyToDelete && deletePasskey(passkeyToDelete.id)}
                 >
                     {#if deletingId === passkeyToDelete?.id}
