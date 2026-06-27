@@ -14,34 +14,36 @@
     let joinedAtIso = $derived(toIsoDate(data.session.user.createdAt));
 </script>
 
-<section class="flex-center p-5">
-    <Card class="max-w-lg w-full">
-        <CardHeader>
-            <CardTitle>Account</CardTitle>
-            <CardDescription>Your account details.</CardDescription>
-        </CardHeader>
+<div>
+    <section class="flex-center p-5">
+        <Card class="max-w-lg w-full">
+            <CardHeader>
+                <CardTitle>Account</CardTitle>
+                <CardDescription>Your account details.</CardDescription>
+            </CardHeader>
 
-        <CardContent>
-            <dl class="flex flex-col gap-4">
-                <div class="grid gap-1">
-                    <dt class="text-muted-foreground text-sm">Email</dt>
-                    <dd class="font-medium">{data.session.user.email}</dd>
-                </div>
-                <div class="grid gap-1">
-                    <dt class="text-muted-foreground text-sm">Username</dt>
-                    <dd class="font-medium">{data.session.user.username}</dd>
-                </div>
-                <div class="grid gap-1">
-                    <dt class="text-muted-foreground text-sm">Joined at</dt>
-                    <dd class="font-medium">
-                        <time datetime={joinedAtIso}>{joinedAt}</time>
-                    </dd>
-                </div>
-            </dl>
-        </CardContent>
-    </Card>
-</section>
+            <CardContent>
+                <dl class="flex flex-col gap-4">
+                    <div class="grid gap-1">
+                        <dt class="text-muted-foreground text-sm">Email</dt>
+                        <dd class="font-medium">{data.session.user.email}</dd>
+                    </div>
+                    <div class="grid gap-1">
+                        <dt class="text-muted-foreground text-sm">Username</dt>
+                        <dd class="font-medium">{data.session.user.username}</dd>
+                    </div>
+                    <div class="grid gap-1">
+                        <dt class="text-muted-foreground text-sm">Joined at</dt>
+                        <dd class="font-medium">
+                            <time datetime={joinedAtIso}>{joinedAt}</time>
+                        </dd>
+                    </div>
+                </dl>
+            </CardContent>
+        </Card>
+    </section>
 
-<section class="p-5 flex-center">
-    <Passkeys />
-</section>
+    <section class="p-5 pbs-0 flex-center">
+        <Passkeys />
+    </section>
+</div>
