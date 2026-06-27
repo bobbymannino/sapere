@@ -8,14 +8,29 @@
     import CardHeader from "$lib/components/ui/card/card-header.svelte";
     import CardTitle from "$lib/components/ui/card/card-title.svelte";
     import Card from "$lib/components/ui/card/card.svelte";
+    import FormInput from "$lib/components/form-input.svelte";
+    import Input from "$lib/components/ui/input/input.svelte";
     import { formatDateTime } from "$lib/date-format";
     import { ErrorIcon, SpinnerIcon, TrashIcon } from "$lib/icons";
     import type { Passkey } from "@better-auth/passkey";
     import { onMount } from "svelte";
+    import * as v from "valibot";
+
+    const Schema = v.object({
+        name: v.pipe(
+            v.string("Passkey name must be a string"),
+            v.trim(),
+            v.maxLength(50, "Passkey name must be 50 or less characters"),
+        ),
+    });
 
     let pending = $state(true);
     let deletingId: string | null = $state(null);
     let error = $state("");
+    let valiErrors: v.FlatErrors<typeof Schema> = $state({});
+    let formData = $state({
+        name: "",
+    });
     let passkeys: Passkey[] = $state([]);
 
     async function loadPasskeys() {
@@ -25,12 +40,24 @@
         pending = false;
     }
 
-    async function addPasskey() {
+    async function addPasskey(e: SubmitEvent & { currentTarget: HTMLFormElement }) {
+        e.preventDefault();
         pending = true;
         error = "";
-        const newPasskey = await authClient.passkey.addPasskey();
+        valiErrors = {};
+
+        const parsedResult = v.safeParse(Schema, formData);
+        if (!parsedResult.success) {
+            valiErrors = v.flatten(parsedResult.issues);
+            pending = false;
+            return;
+        }
+
+        const { name } = parsedResult.output;
+        const newPasskey = await authClient.passkey.addPasskey(name ? { name } : undefined);
         if (newPasskey.data) await loadPasskeys();
         else error = newPasskey.error.message ?? "Failed to add passkey";
+        if (newPasskey.data) formData.name = "";
         pending = false;
     }
 
@@ -83,10 +110,25 @@
     {/if}
 
     <CardFooter class="flex-col gap-5">
-        <Button onclick={addPasskey} class="w-full" disabled={pending}>
-            {#if pending}<SpinnerIcon class="animate-spin" />{/if}
-            Add Passkey
-        </Button>
+        <form class="flex w-full flex-col gap-5" onsubmit={addPasskey}>
+            <FormInput inputId="passkey-name" label="Passkey name" errors={valiErrors?.nested?.name}>
+                <Input
+                    id="passkey-name"
+                    name="name"
+                    type="text"
+                    autocomplete="off"
+                    maxlength={50}
+                    disabled={pending}
+                    bind:value={formData.name}
+                    placeholder="Name this passkey"
+                />
+            </FormInput>
+
+            <Button type="submit" class="w-full" disabled={pending}>
+                {#if pending}<SpinnerIcon class="animate-spin" />{/if}
+                Add Passkey
+            </Button>
+        </form>
         {#if error}
             <Alert variant="destructive">
                 <ErrorIcon />
