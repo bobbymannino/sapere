@@ -4,12 +4,8 @@
     import Input from "$lib/components/ui/input/input.svelte";
     import { SpinnerIcon } from "$lib/icons";
     import * as v from "valibot";
-    import {
-        EmailSchema,
-        PasswordSchema,
-        UsernameSchema,
-    } from "$lib/schemas/auth";
-    import { goto, invalidateAll } from "$app/navigation";
+    import { EmailSchema, PasswordSchema, UsernameSchema } from "$lib/schemas/auth";
+    import { goto } from "$app/navigation";
     import { page } from "$app/state";
     import FormInput from "$lib/components/form-input.svelte";
 
@@ -39,9 +35,7 @@
         pending = false;
     }
 
-    async function handleSubmit(
-        e: SubmitEvent & { currentTarget: HTMLFormElement },
-    ) {
+    async function handleSubmit(e: SubmitEvent & { currentTarget: HTMLFormElement }) {
         e.preventDefault();
         pending = "email";
         valiErrors = {};
@@ -59,12 +53,7 @@
             ? await authClient.signIn.email({ email, password })
             : await authClient.signIn.username({ username: email, password });
         if (error) {
-            if (
-                [
-                    "INVALID_EMAIL_OR_PASSWORD",
-                    "INVALID_USERNAME_OR_PASSWORD",
-                ].includes(error.code ?? "")
-            ) {
+            if (["INVALID_EMAIL_OR_PASSWORD", "INVALID_USERNAME_OR_PASSWORD"].includes(error.code ?? "")) {
                 valiErrors = { nested: { password: ["Invalid credentials"] } };
             }
             formData.password = "";
@@ -79,17 +68,15 @@
 </script>
 
 <form class="flex flex-col gap-5" onsubmit={handleSubmit}>
-    <FormInput
-        inputId="email"
-        label="Email or Username"
-        errors={valiErrors?.nested?.email}
-    >
+    <FormInput inputId="email" label="Email or Username" errors={valiErrors?.nested?.email}>
         <Input
             id="email"
             name="email"
             type="text"
             inputmode="email"
             autocomplete="email"
+            spellcheck="false"
+            autocapitalize="off"
             required
             disabled={!!pending}
             bind:value={formData.email}
@@ -97,11 +84,7 @@
         />
     </FormInput>
 
-    <FormInput
-        inputId="password"
-        label="Password"
-        errors={valiErrors?.nested?.password}
-    >
+    <FormInput inputId="password" label="Password" errors={valiErrors?.nested?.password}>
         <Input
             id="password"
             name="password"
@@ -118,12 +101,7 @@
         Log In
     </Button>
 
-    <Button
-        type="button"
-        variant="outline"
-        disabled={!!pending}
-        onclick={logInWithPasskey}
-    >
+    <Button type="button" variant="outline" disabled={!!pending} onclick={logInWithPasskey}>
         {#if pending === "passkey"}<SpinnerIcon class="animate-spin" />{/if}
         Log In with Passkey
     </Button>
