@@ -7,7 +7,9 @@
     let { data }: PageProps = $props();
     let formattedUpdatedAt = $derived(formatDateTime(data.workspace.updatedAt));
     let updatedAtIso = $derived(toIsoDate(data.workspace.updatedAt));
-    let imageUrl = $derived(resolve("/(app)/workspaces/[slug]/image", { slug: data.workspace.slug }));
+    let imageUrl = $derived(
+        `${resolve("/(app)/workspaces/[slug]/image", { slug: data.workspace.slug })}?v=${data.workspace.updatedAt.getTime()}`,
+    );
 </script>
 
 <div class="p-5">

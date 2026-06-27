@@ -16,6 +16,7 @@
         slug: string;
         description: string | null;
         image: string | null;
+        updatedAt: Date;
     };
 
     type FieldName = "title" | "slug" | "description" | "image";
@@ -34,9 +35,9 @@
 
     let currentImageUrl = $derived(
         workspace.image && !image && !removeImage
-            ? resolve("/(app)/workspaces/[slug]/image", {
+            ? `${resolve("/(app)/workspaces/[slug]/image", {
                   slug: workspace.slug,
-              })
+              })}?v=${workspace.updatedAt.getTime()}`
             : null,
     );
 

@@ -33,7 +33,7 @@
     let deleting = $derived(deleteWorkspaceCommand.pending > 0);
     let formattedUpdatedAt = $derived(formatDateTime(updatedAt));
     let updatedAtIso = $derived(toIsoDate(updatedAt));
-    let imageUrl = $derived(resolve("/(app)/workspaces/[slug]/image", { slug }));
+    let imageUrl = $derived(`${resolve("/(app)/workspaces/[slug]/image", { slug })}?v=${updatedAt.getTime()}`);
 
     function openDeleteDialog() {
         deleteError = null;
