@@ -47,7 +47,7 @@
         </Empty>
     {:else}
         <section class="@container">
-            <ul class="p-5 grid gap-5 @md:grid-cols-2 @lg:grid-cols-3 @xl:grid-cols-4">
+            <ul class="p-5 grid gap-5 @xl:grid-cols-2 @3xl:grid-cols-3 @5xl:grid-cols-4">
                 {#each workspaces.results as w (w.id)}
                     <li>
                         <WorkspaceCard {...w} />
