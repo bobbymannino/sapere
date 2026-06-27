@@ -8,6 +8,12 @@
     import CardHeader from "$lib/components/ui/card/card-header.svelte";
     import CardTitle from "$lib/components/ui/card/card-title.svelte";
     import Card from "$lib/components/ui/card/card.svelte";
+    import DialogContent from "$lib/components/ui/dialog/dialog-content.svelte";
+    import DialogDescription from "$lib/components/ui/dialog/dialog-description.svelte";
+    import DialogFooter from "$lib/components/ui/dialog/dialog-footer.svelte";
+    import DialogHeader from "$lib/components/ui/dialog/dialog-header.svelte";
+    import DialogTitle from "$lib/components/ui/dialog/dialog-title.svelte";
+    import Dialog from "$lib/components/ui/dialog/dialog.svelte";
     import FormInput from "$lib/components/form-input.svelte";
     import Input from "$lib/components/ui/input/input.svelte";
     import { formatDateTime } from "$lib/date-format";
@@ -26,6 +32,8 @@
 
     let pending = $state(true);
     let deletingId: string | null = $state(null);
+    let passkeyToDelete: Passkey | null = $state(null);
+    let deleteOpen = $state(false);
     let error = $state("");
     let valiErrors: v.FlatErrors<typeof Schema> = $state({});
     let formData = $state({
@@ -66,10 +74,20 @@
         pending = true;
         error = "";
         const deletedPasskey = await authClient.passkey.deletePasskey({ id });
-        if (deletedPasskey.data) await loadPasskeys();
+        if (deletedPasskey.data) {
+            await loadPasskeys();
+            deleteOpen = false;
+            passkeyToDelete = null;
+        }
         else error = deletedPasskey.error.message ?? "Failed to delete passkey";
         pending = false;
         deletingId = null;
+    }
+
+    function openDeleteDialog(passkey: Passkey) {
+        error = "";
+        passkeyToDelete = passkey;
+        deleteOpen = true;
     }
 
     onMount(loadPasskeys);
@@ -94,7 +112,7 @@
                             variant="destructive"
                             size="icon"
                             disabled={pending}
-                            onclick={() => deletePasskey(p.id)}
+                            onclick={() => openDeleteDialog(p)}
                         >
                             <span class="sr-only">Delete passkey</span>
                             {#if deletingId === p.id}
@@ -136,4 +154,42 @@
             </Alert>
         {/if}
     </CardFooter>
+
+    <Dialog bind:open={deleteOpen}>
+        <DialogContent showCloseButton={!pending}>
+            <DialogHeader>
+                <DialogTitle>Delete passkey?</DialogTitle>
+                <DialogDescription>
+                    This will remove {passkeyToDelete?.name || "this passkey"} from your account.
+                    You will need to register it again to use it for sign in.
+                </DialogDescription>
+            </DialogHeader>
+
+            {#if error}
+                <Alert variant="destructive">
+                    <ErrorIcon />
+                    <AlertTitle>{error}</AlertTitle>
+                </Alert>
+            {/if}
+
+            <DialogFooter>
+                <Button type="button" variant="outline" disabled={pending} onclick={() => (deleteOpen = false)}>
+                    Cancel
+                </Button>
+                <Button
+                    type="button"
+                    variant="destructive"
+                    disabled={pending || !passkeyToDelete}
+                    onclick={() => passkeyToDelete && deletePasskey(passkeyToDelete.id)}
+                >
+                    {#if deletingId === passkeyToDelete?.id}
+                        <SpinnerIcon class="animate-spin" />
+                    {:else}
+                        <TrashIcon />
+                    {/if}
+                    Delete
+                </Button>
+            </DialogFooter>
+        </DialogContent>
+    </Dialog>
 </Card>
