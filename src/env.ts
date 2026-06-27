@@ -9,6 +9,10 @@ const RedisUrlSchema = v.pipe(v.string(), v.url(), v.startsWith("redis://"));
 
 const BetterAuthSecretSchema = v.pipe(v.string(), v.minLength(32));
 const BetterAuthUrlSchema = v.pipe(v.string(), v.url());
+const BodySizeLimitSchema = v.pipe(
+  v.string(),
+  v.regex(/^(?:Infinity|\d+(?:\.\d+)?[KMGkmg]?)$/, "Use bytes or a K, M, or G suffix, e.g. 6M"),
+);
 
 const MinioEndpointUrlSchema = v.pipe(v.string(), v.url());
 const MinioAccessKeyIdSchema = v.pipe(v.string(), v.minLength(16));
@@ -36,6 +40,10 @@ export const variables = defineEnvVars({
     description: "The name of the project",
     public: true,
     static: true,
+  },
+  BODY_SIZE_LIMIT: {
+    schema: v.optional(BodySizeLimitSchema, "10M"),
+    description: "Node adapter request body limit. Keep this above the 5MB workspace image validation limit.",
   },
   MINIO_ENDPOINT_URL: {
     description: "The minio endpoint URL to use for file storage",

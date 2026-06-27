@@ -49,7 +49,6 @@ export const actions: Actions = {
       removeImage: formData.get("removeImage") ?? "false",
     });
     if (!parsedResult.success) return fail(400, { valiErrors: v.flatten(parsedResult.issues) });
-    console.log(parsedResult.output);
 
     const { title, slug, description, image, removeImage } = parsedResult.output;
     try {
