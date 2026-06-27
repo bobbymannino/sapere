@@ -11,7 +11,7 @@
 <NavigationProgressBar />
 <SidebarProvider open={data.sidebarOpen}>
     <AppSidebar username={data.session.user.username} />
-    <main class="w-full">
+    <main class="w-full grid grid-rows-[auto_1fr]">
         <AppBreadcrumbs />
         {@render children?.()}
     </main>

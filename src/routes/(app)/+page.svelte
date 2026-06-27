@@ -31,7 +31,7 @@
     }
 </script>
 
-<div class="flex min-h-svh flex-col">
+<div class="flex flex-col">
     {#if workspaces.results.length === 0}
         <Empty>
             <EmptyHeader>
