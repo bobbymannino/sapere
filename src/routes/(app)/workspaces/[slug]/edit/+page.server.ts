@@ -8,6 +8,7 @@ import {
   WorkspaceTitleSchema,
 } from "$lib/schemas/workspaces";
 import { requireUser } from "$lib/server/auth-utils";
+import { isBodySizeLimitError } from "$lib/utils";
 import { error, fail, redirect } from "@sveltejs/kit";
 import * as v from "valibot";
 
@@ -40,7 +41,18 @@ export const actions: Actions = {
   default: async ({ params, request }) => {
     const { user } = requireUser();
 
-    const formData = await request.formData();
+    let formData;
+    try {
+      formData = await request.formData();
+    } catch (error) {
+      if (isBodySizeLimitError(error)) {
+        return fail(400, {
+          valiErrors: { nested: { image: ["Form reached max body size, please upload a smaller image"] } },
+        });
+      }
+      throw error;
+    }
+
     const parsedResult = v.safeParse(Schema, {
       title: formData.get("title"),
       slug: formData.get("slug"),
