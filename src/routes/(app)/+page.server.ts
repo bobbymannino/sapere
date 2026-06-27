@@ -6,12 +6,19 @@ import type { PageServerLoad } from "./$types";
 export const load: PageServerLoad = async ({ url }) => {
   const { user } = requireUser();
 
+  const sortBy = url.searchParams.get("sortBy");
+  const sortDir = url.searchParams.get("sortDir");
   const workspaces = await listWorkspaces({
     ownerId: user.id,
-    sortBy: url.searchParams.get("sortBy"),
-    sortDir: url.searchParams.get("sortDir"),
+    sortBy,
+    sortDir,
     page: url.searchParams.get("page"),
     perPage: url.searchParams.get("perPage"),
   });
-  return { workspaces, breadcrumbs: [{ label: "Workspaces" }] };
+  return {
+    sortBy,
+    sortDir,
+    workspaces,
+    breadcrumbs: [{ label: "Workspaces" }],
+  };
 };
