@@ -25,7 +25,7 @@ type IconProps = SVGAttributes<any> & {
   size?: string | number;
 };
 
-type IconComponent = Component<IconProps>;
+export type IconComponent = Component<IconProps>;
 
 function asIcon(component: unknown): IconComponent {
   return component as IconComponent;

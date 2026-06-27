@@ -9,12 +9,7 @@
     import DropdownMenuRadioItem from "$lib/components/ui/dropdown-menu/dropdown-menu-radio-item.svelte";
     import DropdownMenuTrigger from "$lib/components/ui/dropdown-menu/dropdown-menu-trigger.svelte";
     import DropdownMenu from "$lib/components/ui/dropdown-menu/dropdown-menu.svelte";
-    import EmptyContent from "$lib/components/ui/empty/empty-content.svelte";
-    import EmptyDescription from "$lib/components/ui/empty/empty-description.svelte";
-    import EmptyHeader from "$lib/components/ui/empty/empty-header.svelte";
-    import EmptyMedia from "$lib/components/ui/empty/empty-media.svelte";
-    import EmptyTitle from "$lib/components/ui/empty/empty-title.svelte";
-    import Empty from "$lib/components/ui/empty/empty.svelte";
+    import Empty from "$lib/components/empty.svelte";
     import Pagination from "$lib/components/ui/pagination/pagination.svelte";
     import type { PageProps } from "./$types";
     import WorkspaceCard from "./workspace-card.svelte";
@@ -64,17 +59,8 @@
 
 <div class="flex flex-col">
     {#if workspaces.results.length === 0}
-        <Empty>
-            <EmptyHeader>
-                <EmptyMedia variant="icon">
-                    <WorkspaceIcon />
-                </EmptyMedia>
-                <EmptyTitle>No workspaces</EmptyTitle>
-                <EmptyDescription>You are not apart of any workspaces</EmptyDescription>
-            </EmptyHeader>
-            <EmptyContent>
-                <Button href={resolve("/(app)/workspaces/new")}>New Workspace</Button>
-            </EmptyContent>
+        <Empty title="No Workspaces" description="You are not apart of any workspaces" icon={WorkspaceIcon}>
+            <Button href={resolve("/(app)/workspaces/new")}>New Workspace</Button>
         </Empty>
     {:else}
         <section class="@container">
