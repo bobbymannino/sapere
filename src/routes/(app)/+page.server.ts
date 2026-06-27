@@ -13,5 +13,5 @@ export const load: PageServerLoad = async ({ url }) => {
     page: url.searchParams.get("page"),
     perPage: url.searchParams.get("perPage"),
   });
-  return { workspaces };
+  return { workspaces, breadcrumbs: [{ label: "Workspaces" }] };
 };

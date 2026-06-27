@@ -15,6 +15,7 @@ import type { Actions } from "./$types";
 
 export const load: PageServerLoad = () => {
   requireUser();
+  return { breadcrumbs: [{ label: "Workspaces", href: "/workspaces" }, { label: "New" }] };
 };
 
 const Schema = v.object({

@@ -1,10 +1,5 @@
 <script lang="ts">
     import { resolve } from "$app/paths";
-    import BreadcrumbItem from "$lib/components/ui/breadcrumb/breadcrumb-item.svelte";
-    import BreadcrumbList from "$lib/components/ui/breadcrumb/breadcrumb-list.svelte";
-    import BreadcrumbPage from "$lib/components/ui/breadcrumb/breadcrumb-page.svelte";
-    import BreadcrumbSeparator from "$lib/components/ui/breadcrumb/breadcrumb-separator.svelte";
-    import Breadcrumb from "$lib/components/ui/breadcrumb/breadcrumb.svelte";
     import Button from "$lib/components/ui/button/button.svelte";
     import EmptyContent from "$lib/components/ui/empty/empty-content.svelte";
     import EmptyDescription from "$lib/components/ui/empty/empty-description.svelte";
@@ -12,7 +7,6 @@
     import EmptyMedia from "$lib/components/ui/empty/empty-media.svelte";
     import EmptyTitle from "$lib/components/ui/empty/empty-title.svelte";
     import Empty from "$lib/components/ui/empty/empty.svelte";
-    import SidebarTrigger from "$lib/components/ui/sidebar/sidebar-trigger.svelte";
     import Pagination from "$lib/components/ui/pagination/pagination.svelte";
     import type { PageProps } from "./$types";
     import WorkspaceCard from "./workspace-card.svelte";
@@ -38,20 +32,6 @@
 </script>
 
 <div class="flex min-h-svh flex-col">
-    <header class="p-5">
-        <Breadcrumb>
-            <BreadcrumbList>
-                <BreadcrumbItem>
-                    <SidebarTrigger />
-                </BreadcrumbItem>
-                <BreadcrumbSeparator />
-                <BreadcrumbItem>
-                    <BreadcrumbPage>Workspaces</BreadcrumbPage>
-                </BreadcrumbItem>
-            </BreadcrumbList>
-        </Breadcrumb>
-    </header>
-
     {#if workspaces.results.length === 0}
         <Empty>
             <EmptyHeader>
@@ -59,21 +39,15 @@
                     <WorkspaceIcon />
                 </EmptyMedia>
                 <EmptyTitle>No workspaces</EmptyTitle>
-                <EmptyDescription
-                    >You are not apart of any workspaces</EmptyDescription
-                >
+                <EmptyDescription>You are not apart of any workspaces</EmptyDescription>
             </EmptyHeader>
             <EmptyContent>
-                <Button href={resolve("/(app)/workspaces/new")}
-                    >New Workspace</Button
-                >
+                <Button href={resolve("/(app)/workspaces/new")}>New Workspace</Button>
             </EmptyContent>
         </Empty>
     {:else}
         <section class="@container">
-            <ul
-                class="p-5 grid gap-5 @md:grid-cols-2 @lg:grid-cols-3 @xl:grid-cols-4"
-            >
+            <ul class="p-5 grid gap-5 @md:grid-cols-2 @lg:grid-cols-3 @xl:grid-cols-4">
                 {#each workspaces.results as w (w.id)}
                     <li>
                         <WorkspaceCard {...w} />
@@ -82,11 +56,7 @@
             </ul>
 
             <div class="p-5 flex-center">
-                <Button
-                    variant="outline"
-                    href={resolve("/(app)/workspaces/new")}
-                    >New Workspace</Button
-                >
+                <Button variant="outline" href={resolve("/(app)/workspaces/new")}>New Workspace</Button>
             </div>
         </section>
 

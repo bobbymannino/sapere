@@ -9,5 +9,8 @@ export const load: PageServerLoad = async ({ params }) => {
 
   const workspace = await findWorkspaceBySlug({ ownerId: user.id, slug: params.slug });
   if (!workspace) error(404, "Workspace not found");
-  return { workspace };
+  return {
+    workspace,
+    breadcrumbs: [{ label: "Workspaces", href: "/workspaces" }, { label: workspace.title }],
+  };
 };
