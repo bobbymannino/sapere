@@ -1,13 +1,13 @@
 <script lang="ts">
     import { resolve } from "$app/paths";
     import Meta from "$lib/components/meta.svelte";
-    import { Button } from "$lib/components/ui/button";
     import Empty from "$lib/components/empty.svelte";
-    import type { PageProps } from "./$types";
-    import WorkspaceCard from "./workspace-card.svelte";
+    import { Button } from "$lib/components/ui/button";
     import { WorkspaceIcon } from "$lib/icons";
+    import type { PageProps } from "./$types";
     import Filters from "./filters.svelte";
     import Pagination from "./pagination.svelte";
+    import WorkspaceCard from "$lib/components/workspace-card.svelte";
 
     let { data }: PageProps = $props();
     let workspaces = $derived(data.workspaces);

@@ -1,5 +1,6 @@
 <script lang="ts">
     import { goto } from "$app/navigation";
+    import { resolve } from "$app/paths";
     import { APP_NAME } from "$app/env/public";
     import { authClient } from "$lib/auth-client";
     import DropdownMenu from "$lib/components/ui/dropdown-menu/dropdown-menu.svelte";
@@ -29,7 +30,7 @@
         pending = true;
         await authClient.signOut({
             fetchOptions: {
-                onSuccess: () => goto("/login", { invalidateAll: true }),
+                onSuccess: () => goto(resolve("/(auth)/login"), { invalidateAll: true }),
             },
         });
         pending = false;
@@ -51,7 +52,7 @@
                     <SidebarMenuItem>
                         <SidebarMenuButton>
                             {#snippet child({ props })}
-                                <a {...props} href={"/workspaces"}>
+                                <a {...props} href={resolve("/(app)/workspaces")}>
                                     <WorkspaceIcon />
                                     <span>Workspaces</span>
                                 </a>
@@ -82,7 +83,11 @@
                         <DropdownMenuGroup>
                             <DropdownMenuItem>
                                 {#snippet child({ props })}
-                                    <a {...props} href="/account" class={[props.class, "cursor-pointer"]}>
+                                    <a
+                                        {...props}
+                                        href={resolve("/(app)/account")}
+                                        class={[props.class, "cursor-pointer"]}
+                                    >
                                         <UserIcon />
                                         Account
                                     </a>

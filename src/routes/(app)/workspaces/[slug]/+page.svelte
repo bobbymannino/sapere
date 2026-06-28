@@ -43,5 +43,5 @@
         <p class="whitespace-pre-wrap text-muted-foreground">{data.workspace.description}</p>
     {/if}
     <p>Updated <time datetime={updatedAtIso}>{formattedUpdatedAt}</time></p>
-    <Button href="/workspaces/{data.workspace.slug}/edit">Edit</Button>
+    <Button href={resolve("/(app)/workspaces/[slug]/edit", { slug: data.workspace.slug })}>Edit</Button>
 </div>
