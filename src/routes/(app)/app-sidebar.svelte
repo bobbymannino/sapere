@@ -17,6 +17,7 @@
     import SidebarGroup from "$lib/components/ui/sidebar/sidebar-group.svelte";
     import SidebarGroupContent from "$lib/components/ui/sidebar/sidebar-group-content.svelte";
     import { ChevronUpIcon, ExitIcon, SpinnerIcon, UserIcon, WorkspaceIcon } from "$lib/icons";
+    import Logo from "$lib/components/logo.svelte";
 
     type Props = { username: string };
 
@@ -36,8 +37,11 @@
 </script>
 
 <Sidebar>
-    <SidebarHeader>
-        <span class="font-heading px-3 py-2 text-lg font-bold">{APP_NAME}</span>
+    <SidebarHeader class="flex-row items-center py-3 px-5">
+        <Logo class="w-5" />
+        <span class="font-heading text-lg font-bold">
+            {APP_NAME}
+        </span>
     </SidebarHeader>
 
     <SidebarContent>
