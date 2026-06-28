@@ -55,7 +55,7 @@
 </script>
 
 <Card
-    class="group/card relative pt-0 hover:scale-101 motion-safe:hover:transition-transform hover:shadow-lg focus-within:ring-3 focus-within:border-ring focus-within:ring-ring/30"
+    class="group/card h-full relative pt-0 hover:scale-101 motion-safe:hover:transition-transform hover:shadow-lg focus-within:ring-3 focus-within:border-ring focus-within:ring-ring/30"
 >
     <a href={resolve("/(app)/workspaces/[slug]", { slug })} class="absolute inset-0 rounded-inherit z-10">
         <span class="sr-only">Open {title} workspace</span>
@@ -81,8 +81,8 @@
         </CardContent>
     {/if}
 
-    <CardFooter class="flex items-center justify-between">
-        <CardDescription>
+    <CardFooter class="flex items-center justify-between mbs-auto">
+        <CardDescription class="text-xs">
             Updated <time datetime={updatedAtIso}>{formattedUpdatedAt}</time>
         </CardDescription>
 
