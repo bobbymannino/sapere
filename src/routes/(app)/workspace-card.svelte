@@ -20,6 +20,7 @@
     import DropdownMenuLabel from "$lib/components/ui/dropdown-menu/dropdown-menu-label.svelte";
     import DropdownMenuTrigger from "$lib/components/ui/dropdown-menu/dropdown-menu-trigger.svelte";
     import DropdownMenu from "$lib/components/ui/dropdown-menu/dropdown-menu.svelte";
+    import OptimizedImage from "$lib/components/optimized-image.svelte";
     import { formatDateTime, toIsoDate } from "$lib/date-format";
     import { EllipsisIcon, PictureIcon, SpinnerIcon, TrashIcon } from "$lib/icons";
     import type { WorkspaceCardSelection } from "$lib/server/db/workspaces";
@@ -61,7 +62,7 @@
     </a>
 
     {#if image}
-        <img src={imageUrl} alt="" class="aspect-video w-full object-cover" />
+        <OptimizedImage src={imageUrl} alt="{title} thumbnail" class="aspect-video w-full" />
     {:else}
         <div class="bg-muted aspect-video flex-center">
             <PictureIcon class="text-muted-foreground" />

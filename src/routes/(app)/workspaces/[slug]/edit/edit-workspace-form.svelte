@@ -1,6 +1,7 @@
 <script lang="ts">
     import { applyAction, enhance } from "$app/forms";
     import { resolve } from "$app/paths";
+    import OptimizedImage from "$lib/components/optimized-image.svelte";
     import { page } from "$app/state";
     import { Button } from "$lib/components/ui/button";
     import * as Field from "$lib/components/ui/field";
@@ -223,7 +224,7 @@
             <Field.FieldDescription>Upload a new thumbnail or remove the current one.</Field.FieldDescription>
 
             {#if currentImageUrl}
-                <img src={currentImageUrl} alt="" class="aspect-video w-full rounded-3xl object-cover" />
+                <OptimizedImage src={currentImageUrl} alt="" class="aspect-video w-full rounded-3xl" />
                 <div>
                     <Button type="button" variant="destructive" disabled={pending} onclick={removeCurrentImage}>
                         <TrashIcon data-icon="inline-start" />

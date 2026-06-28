@@ -1,5 +1,6 @@
 <script lang="ts">
     import { resolve } from "$app/paths";
+    import OptimizedImage from "$lib/components/optimized-image.svelte";
     import { formatDateTime, toIsoDate } from "$lib/date-format";
     import type { PageProps } from "./$types";
     import Button from "$lib/components/ui/button/button.svelte";
@@ -14,7 +15,7 @@
 
 <div class="p-5">
     {#if data.workspace.image}
-        <img src={imageUrl} alt="" class="mb-5 aspect-video w-full max-w-4xl rounded-3xl object-cover" />
+        <OptimizedImage src={imageUrl} alt="" class="mb-5 aspect-video w-full max-w-4xl rounded-3xl" />
     {/if}
     <h1>{data.workspace.title}</h1>
     {#if data.workspace.description}
