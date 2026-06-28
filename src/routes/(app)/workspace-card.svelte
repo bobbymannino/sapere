@@ -57,7 +57,7 @@
 <Card
     class="group/card relative pt-0 hover:scale-101 motion-safe:hover:transition-transform hover:shadow-lg focus-within:ring-3 focus-within:border-ring focus-within:ring-ring/30"
 >
-    <a href={resolve("/(app)/workspaces/[slug]", { slug })} class="absolute inset-0 rounded-inherit">
+    <a href={resolve("/(app)/workspaces/[slug]", { slug })} class="absolute inset-0 rounded-inherit z-10">
         <span class="sr-only">Open {title} workspace</span>
     </a>
 
@@ -88,7 +88,7 @@
 
         <DropdownMenu>
             <DropdownMenuTrigger
-                class={buttonVariants({ variant: "ghost", size: "icon-sm", class: "z-10" })}
+                class={buttonVariants({ variant: "ghost", size: "icon-sm", class: "z-20" })}
                 aria-label={`Open actions for ${title}`}
             >
                 <EllipsisIcon />

@@ -2,7 +2,7 @@
     import { ErrorIcon, PictureIcon, SpinnerIcon } from "$lib/icons";
     import { cn, type WithElementRef, type WithoutChildren } from "$lib/utils";
     import { onMount } from "svelte";
-    import type { HTMLImgAttributes } from "svelte/elements";
+    import type { ClassValue, HTMLImgAttributes } from "svelte/elements";
 
     type ImageEvent = Event & { currentTarget: EventTarget & Element };
     type ImageProps = Omit<
@@ -13,7 +13,7 @@
     type Props = ImageProps & {
         src?: string | null;
         alt?: string;
-        imageClass?: string;
+        imageClass?: ClassValue;
         emptyLabel?: string;
         loadingLabel?: string;
         errorLabel?: string;
