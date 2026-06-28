@@ -1,5 +1,6 @@
 <script lang="ts">
     import { resolve } from "$app/paths";
+    import Meta from "$lib/components/meta.svelte";
     import { Button } from "$lib/components/ui/button";
     import Empty from "$lib/components/empty.svelte";
     import type { PageProps } from "./$types";
@@ -11,6 +12,13 @@
     let { data }: PageProps = $props();
     let workspaces = $derived(data.workspaces);
 </script>
+
+<Meta
+    title="Workspaces"
+    description="View and manage your workspaces."
+    tags={["workspaces", "projects"]}
+    robots="noindex,nofollow"
+/>
 
 <div class="flex flex-col">
     {#if workspaces.results.length === 0}

@@ -1,11 +1,15 @@
 <script lang="ts">
+    import { resolve } from "$app/paths";
     import { page } from "$app/state";
+    import Meta from "$lib/components/meta.svelte";
     import CardContent from "$lib/components/ui/card/card-content.svelte";
     import CardFooter from "$lib/components/ui/card/card-footer.svelte";
     import CardHeader from "$lib/components/ui/card/card-header.svelte";
     import CardTitle from "$lib/components/ui/card/card-title.svelte";
     import SignupForm from "./signup-form.svelte";
 </script>
+
+<Meta title="Signup" description="Create an account to start managing workspaces." robots="noindex,nofollow" />
 
 <CardHeader>
     <CardTitle>Signup</CardTitle>
@@ -19,7 +23,7 @@
     <p class="text-center">
         Already got an account? <a
             class="hover:text-primary underline"
-            href="/login?{page.url.searchParams.toString()}"
+            href="{resolve('/(auth)/login')}?{page.url.searchParams.toString()}"
         >
             Login
         </a>

@@ -1,4 +1,5 @@
 <script lang="ts">
+    import Meta from "$lib/components/meta.svelte";
     import Card from "$lib/components/ui/card/card.svelte";
     import CardContent from "$lib/components/ui/card/card-content.svelte";
     import CardDescription from "$lib/components/ui/card/card-description.svelte";
@@ -13,6 +14,8 @@
     let joinedAt = $derived(formatDate(data.session.user.createdAt));
     let joinedAtIso = $derived(toIsoDate(data.session.user.createdAt));
 </script>
+
+<Meta title="Account" description="Manage your account details and passkeys." robots="noindex,nofollow" />
 
 <div>
     <section class="flex-center p-5">
