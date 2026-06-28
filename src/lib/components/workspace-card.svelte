@@ -26,15 +26,18 @@
     import type { WorkspaceCardSelection } from "$lib/server/db/workspaces";
     import { deleteWorkspaceCommand } from "$lib/workspaces.remote";
 
-    type Props = WorkspaceCardSelection;
+    type Props = WorkspaceCardSelection & {
+        onEdit?: (workspace: WorkspaceCardSelection) => void;
+    };
 
-    let { id, title, slug, description, image, updatedAt }: Props = $props();
+    let { id, title, slug, description, image, updatedAt, createdAt, onEdit }: Props = $props();
     let deleteOpen = $state(false);
     let deleteError = $state(null as string | null);
     let deleting = $derived(deleteWorkspaceCommand.pending > 0);
     let formattedUpdatedAt = $derived(formatDateTime(updatedAt));
     let updatedAtIso = $derived(toIsoDate(updatedAt));
     let imageUrl = $derived(`${resolve("/(app)/workspaces/[slug]/image", { slug })}?v=${updatedAt.getTime()}`);
+    let workspace = $derived({ id, title, slug, description, image, updatedAt, createdAt });
 
     function openDeleteDialog() {
         deleteError = null;
@@ -51,6 +54,21 @@
         } catch (error) {
             deleteError = error instanceof Error ? error.message : "Failed to delete workspace";
         }
+    }
+
+    function onEditClick(e: MouseEvent & { currentTarget: HTMLAnchorElement }) {
+        if (
+            !onEdit ||
+            innerWidth < 640 || // bail if the screen is too small
+            e.shiftKey || // or the link is opened in a new window
+            e.metaKey ||
+            e.ctrlKey || // or a new tab (mac: metaKey, win/linux: ctrlKey)
+            e.button === 1 // mouse wheel
+        )
+            return;
+
+        e.preventDefault();
+        onEdit(workspace);
     }
 </script>
 
@@ -103,6 +121,7 @@
                                 {...props}
                                 href={resolve("/(app)/workspaces/[slug]/edit", { slug })}
                                 class={[props.class, "cursor-pointer"]}
+                                onclick={onEditClick}
                             >
                                 Edit
                             </a>

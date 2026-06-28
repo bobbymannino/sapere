@@ -9,20 +9,18 @@
     import { Slider } from "$lib/components/ui/slider";
     import { Textarea } from "$lib/components/ui/textarea";
     import { SpinnerIcon, TrashIcon } from "$lib/icons";
+    import type { WorkspaceCardSelection } from "$lib/server/db/workspaces";
     import { onDestroy } from "svelte";
     import Cropper, { type CropArea } from "svelte-easy-crop";
 
-    type Workspace = {
-        title: string;
-        slug: string;
-        description: string | null;
-        image: string | null;
-        updatedAt: Date;
+    type FieldName = "title" | "slug" | "description" | "image";
+    type Props = {
+        workspace: WorkspaceCardSelection;
+        onSuccess?: () => void | Promise<void>;
+        onCancel?: () => void;
     };
 
-    type FieldName = "title" | "slug" | "description" | "image";
-
-    let { workspace }: { workspace: Workspace } = $props();
+    let { workspace, onSuccess, onCancel }: Props = $props();
     let pending = $state(false);
     let title = $derived(workspace.title);
     let slug = $derived(workspace.slug);
@@ -156,6 +154,11 @@
 
         return async ({ result }) => {
             try {
+                if ((result.type === "redirect" || result.type === "success") && onSuccess) {
+                    await onSuccess();
+                    return;
+                }
+
                 await applyAction(result);
             } finally {
                 pending = false;
@@ -275,13 +278,17 @@
     </Field.FieldGroup>
 
     <div class="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
-        <Button
-            variant="ghost"
-            href={resolve("/(app)/workspaces/[slug]", { slug: workspace.slug })}
-            aria-disabled={pending}
-        >
-            Cancel
-        </Button>
+        {#if onCancel}
+            <Button type="button" variant="ghost" disabled={pending} onclick={onCancel}>Cancel</Button>
+        {:else}
+            <Button
+                variant="ghost"
+                href={resolve("/(app)/workspaces/[slug]", { slug: workspace.slug })}
+                aria-disabled={pending}
+            >
+                Cancel
+            </Button>
+        {/if}
         <Button type="submit" disabled={pending}>
             {#if pending}<SpinnerIcon data-icon="inline-start" class="animate-spin" />{/if}
             Save changes

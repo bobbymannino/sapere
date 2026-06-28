@@ -1,4 +1,5 @@
 import type { auth } from "$lib/auth";
+import type { WorkspaceCardSelection } from "$lib/server/db/workspaces";
 
 type Session = typeof auth.$Infer.Session & { user: { username: string } };
 
@@ -16,7 +17,9 @@ declare global {
       session: null | Session;
       breadcrumbs?: BreadcrumbItem[];
     }
-    // interface PageState {}
+    interface PageState {
+      editWorkspace?: WorkspaceCardSelection;
+    }
     // interface Platform {}
   }
 
