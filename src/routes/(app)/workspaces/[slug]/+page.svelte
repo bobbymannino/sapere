@@ -1,5 +1,6 @@
 <script lang="ts">
     import { resolve } from "$app/paths";
+    import { page } from "$app/state";
     import Meta from "$lib/components/meta.svelte";
     import OptimizedImage from "$lib/components/optimized-image.svelte";
     import { formatDateTime, toIsoDate } from "$lib/date-format";
@@ -13,15 +14,21 @@
         `${resolve("/(app)/workspaces/[slug]/image", { slug: data.workspace.slug })}?v=${data.workspace.updatedAt.getTime()}`,
     );
     let description = $derived(data.workspace.description ?? "View workspace details.");
-    let metaImage = $derived(data.workspace.image ? imageUrl : null);
-    let metaImageAlt = $derived(data.workspace.image ? `${data.workspace.title} workspace thumbnail` : null);
+    let metaImageUrl = $derived(new URL(imageUrl, page.url.origin).toString());
+    let metaImage = $derived(
+        data.workspace.image
+            ? {
+                  url: metaImageUrl,
+                  alt: `${data.workspace.title} workspace thumbnail`,
+              }
+            : null,
+    );
 </script>
 
 <Meta
     title={data.workspace.title}
     {description}
     image={metaImage}
-    imageAlt={metaImageAlt}
     tags={["workspace", data.workspace.slug]}
     modifiedTime={data.workspace.updatedAt}
     robots="noindex,nofollow"

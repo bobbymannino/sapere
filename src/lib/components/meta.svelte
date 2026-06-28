@@ -1,13 +1,17 @@
 <script module lang="ts">
     export type MetaDate = Date | string;
 
+    export type MetaImage = {
+        url: string;
+        alt?: string | null;
+        width?: number | string | null;
+        height?: number | string | null;
+    };
+
     export type MetaProps = {
         title?: string | null;
         description?: string | null;
-        image?: string | null;
-        imageAlt?: string | null;
-        imageWidth?: number | string | null;
-        imageHeight?: number | string | null;
+        image?: MetaImage | null;
         url?: string | null;
         canonical?: string | null;
         type?: string;
@@ -27,9 +31,6 @@
         title,
         description,
         image,
-        imageAlt,
-        imageWidth,
-        imageHeight,
         url,
         canonical,
         type = "website",
@@ -43,12 +44,11 @@
     let pageTitle = $derived(title ? `${title} | ${APP_NAME}` : APP_NAME);
     let pageUrl = $derived(`${page.url.origin}${page.url.pathname}`);
     let canonicalUrl = $derived(normalizeUrl(firstNonEmpty(canonical, url, pageUrl)));
-    let imageUrl = $derived(normalizeUrl(image));
     let pageTags = $derived(tags.map((tag) => tag.trim()).filter(Boolean));
     let publishedTimeContent = $derived(formatMetaDate(publishedTime));
     let modifiedTimeContent = $derived(formatMetaDate(modifiedTime));
-    let imageWidthContent = $derived(formatMetaNumber(imageWidth));
-    let imageHeightContent = $derived(formatMetaNumber(imageHeight));
+    let imageWidthContent = $derived(formatMetaNumber(image?.width));
+    let imageHeightContent = $derived(formatMetaNumber(image?.height));
 
     function formatMetaDate(value: MetaDate | null | undefined) {
         if (!value) return null;
@@ -99,14 +99,14 @@
         <meta name="robots" content={robots} />
     {/if}
 
-    {#if imageUrl}
-        <meta property="og:image" content={imageUrl} />
-        <meta name="twitter:image" content={imageUrl} />
+    {#if image?.url}
+        <meta property="og:image" content={image.url} />
+        <meta name="twitter:image" content={image.url} />
     {/if}
 
-    {#if imageAlt}
-        <meta property="og:image:alt" content={imageAlt} />
-        <meta name="twitter:image:alt" content={imageAlt} />
+    {#if image?.alt}
+        <meta property="og:image:alt" content={image.alt} />
+        <meta name="twitter:image:alt" content={image.alt} />
     {/if}
 
     {#if imageWidthContent}
