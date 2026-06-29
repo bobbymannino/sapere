@@ -8,6 +8,7 @@
     import { goto } from "$app/navigation";
     import { page } from "$app/state";
     import FormInput from "$lib/components/form-input.svelte";
+    import PasswordInput from "$lib/components/password-input.svelte";
 
     let formData = $state({
         name: "",
@@ -109,10 +110,9 @@
     </FormInput>
 
     <FormInput inputId="password" label="Password" errors={valiErrors?.nested?.password}>
-        <Input
+        <PasswordInput
             id="password"
             name="password"
-            type="password"
             required
             disabled={pending}
             bind:value={formData.password}
@@ -121,10 +121,9 @@
     </FormInput>
 
     <FormInput inputId="confirm-password" label="Confirm Password" errors={valiErrors?.nested?.confirmPassword}>
-        <Input
+        <PasswordInput
             id="confirm-password"
             name="confirmPassword"
-            type="password"
             required
             disabled={pending}
             bind:value={formData.confirmPassword}
