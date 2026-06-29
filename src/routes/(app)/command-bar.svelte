@@ -8,6 +8,7 @@
     import * as Command from "$lib/components/ui/command";
     import * as Kbd from "$lib/components/ui/kbd";
     import { SearchIcon, SpinnerIcon } from "$lib/icons";
+    import { flushSync } from "svelte";
 
     type Props = {
         workspaces: WorkspaceCommandSelection[];
@@ -15,11 +16,15 @@
 
     let { workspaces }: Props = $props();
 
+    let input: null | HTMLInputElement = $state(null);
     let open = $state(false);
     let signingOut = $state(false);
 
     function openCommandBar() {
-        open = true;
+        flushSync(() => {
+            open = true;
+        });
+        input?.focus({ preventScroll: true });
     }
 
     function closeCommandBar() {
@@ -65,7 +70,7 @@
 </Button.Root>
 
 <Command.Dialog bind:open>
-    <Command.Input placeholder="Type a command or search..." autofocus />
+    <Command.Input placeholder="Type a command or search..." bind:ref={input} autofocus />
     <Command.List>
         <Command.Empty>No results found.</Command.Empty>
         <Command.Group heading="Workspaces">
