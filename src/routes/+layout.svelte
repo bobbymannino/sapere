@@ -1,9 +1,12 @@
 <script lang="ts">
-	import './layout.css';
-	import Meta from './meta.svelte';
+    import Analytics from "./analytics.svelte";
+    import "./layout.css";
+    import Meta from "./meta.svelte";
 
-	let { children } = $props();
+    let { children } = $props();
 </script>
 
 <Meta />
+<Analytics />
+
 {@render children()}
