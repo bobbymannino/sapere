@@ -1,3 +1,7 @@
+<p style='text-align: center'>
+    <img src='src/lib/assets/favicon.svg' width='200' />
+</p>
+
 # Sapere
 
 Sapere (_sa-pay-ree_) is a completely free and open source software. It is
