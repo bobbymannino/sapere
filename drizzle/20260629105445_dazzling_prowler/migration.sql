@@ -1,0 +1,1 @@
+CREATE INDEX "workspaces_owner_orderable_title_idx" ON "workspaces" ("owner_id","orderable_title");

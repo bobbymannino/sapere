@@ -1,0 +1,1 @@
+ALTER TABLE "workspaces" RENAME COLUMN "normalized_title" TO "orderable_title";

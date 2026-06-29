@@ -1,4 +1,4 @@
-import { sql } from "drizzle-orm";
+import { SQL, sql } from "drizzle-orm";
 import { relations } from "drizzle-orm/_relations";
 import { pgTable, text, timestamp, boolean, integer, index, check, uniqueIndex } from "drizzle-orm/pg-core";
 
@@ -131,6 +131,9 @@ export const workspaces = pgTable(
     id: integer().generatedAlwaysAsIdentity().primaryKey(),
 
     title: text().notNull(),
+    orderableTitle: text("orderable_title").generatedAlwaysAs(
+      (): SQL => sql`regexp_replace(lower(${workspaces.title}), '[^a-z0-9]', '', 'g')`,
+    ),
     slug: text().notNull(),
     description: text(),
     image: text(),
@@ -149,6 +152,7 @@ export const workspaces = pgTable(
     uniqueIndex("workspaces_owner_slug_unique").on(t.ownerId, t.slug),
     index("workspaces_owner_created_at_idx").on(t.ownerId, t.createdAt),
     index("workspaces_owner_updated_at_idx").on(t.ownerId, t.updatedAt),
+    index("workspaces_owner_orderable_title_idx").on(t.ownerId, t.orderableTitle),
     index("workspaces_owner_title_idx").on(t.ownerId, t.title),
     check(`chk_workspaces_title_length`, sql`char_length(${t.title}) >= 3 and char_length(${t.title}) <= 64`),
     check(`chk_workspaces_slug_length`, sql`char_length(${t.slug}) >= 3 and char_length(${t.slug}) <= 32`),

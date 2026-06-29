@@ -3,7 +3,7 @@ import type { OrderByTarget, Ordered, PaginationArgs, Paginated } from "$db/pagi
 import { buildOrderClause, buildPaginatedResult, buildPagination } from "$db/pagination";
 import * as s from "$lib/server/db/schema";
 import { files, deleteFileIfExists, fileTypeToExtension } from "$lib/server/files";
-import { and, count, DrizzleQueryError, eq, sql } from "drizzle-orm";
+import { and, count, DrizzleQueryError, eq, sql, asc } from "drizzle-orm";
 import { BunSQLDatabase } from "drizzle-orm/bun-sql/postgres";
 
 type CommonArgs = {
@@ -24,9 +24,9 @@ type WorkspaceSortKey = "updatedAt" | "createdAt" | "title";
 
 const workspaceOrderColumns = {
   createdAt: s.workspaces.createdAt,
-  title: sql<string>`lower(${s.workspaces.title})`,
+  title: [s.workspaces.orderableTitle, s.workspaces.id],
   updatedAt: s.workspaces.updatedAt,
-} satisfies Record<WorkspaceSortKey, OrderByTarget>;
+} satisfies Record<WorkspaceSortKey, OrderByTarget | OrderByTarget[]>;
 
 export type WorkspaceCardSelection = Pick<typeof s.workspaces.$inferSelect, keyof typeof workspaceCardSelection>;
 
@@ -59,7 +59,7 @@ export async function listWorkspaces(args: Prettify<ListWorkspacesArgs>): Promis
       .select(workspaceCardSelection)
       .from(s.workspaces)
       .where(where)
-      .orderBy(orderBy)
+      .orderBy(...orderBy)
       .limit(pagination.limit)
       .offset(pagination.offset),
     db.select({ total: count() }).from(s.workspaces).where(where),

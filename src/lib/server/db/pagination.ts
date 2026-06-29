@@ -11,7 +11,7 @@ export type Ordered<TSort extends string> = {
 export type OrderByTarget = AnyColumn | SQLWrapper;
 
 type BuildOrderClauseOptions<TSort extends string> = {
-  columns: Record<TSort, OrderByTarget>;
+  columns: Record<TSort, OrderByTarget | OrderByTarget[]>;
   defaultSortBy: TSort;
   defaultSortDir: SortDirection;
 };
@@ -19,12 +19,13 @@ type BuildOrderClauseOptions<TSort extends string> = {
 export function buildOrderClause<TSort extends string>(
   ordered: Ordered<TSort>,
   options: BuildOrderClauseOptions<TSort>,
-): SQL {
+): SQL[] {
   const sortDir = isSortDirection(ordered.sortDir) ? ordered.sortDir : options.defaultSortDir;
   const sortBy = isSortKey(ordered.sortBy, options.columns) ? ordered.sortBy : options.defaultSortBy;
 
   const column = options.columns[sortBy];
-  return sortDir === "asc" ? asc(column) : desc(column);
+  if (Array.isArray(column)) return sortDir === "asc" ? column.map((c) => asc(c)) : column.map((c) => desc(c));
+  return sortDir === "asc" ? [asc(column)] : [desc(column)];
 }
 
 function isSortDirection(sortDir: Nullable<string> | undefined): sortDir is SortDirection {
@@ -33,7 +34,7 @@ function isSortDirection(sortDir: Nullable<string> | undefined): sortDir is Sort
 
 function isSortKey<TSort extends string>(
   sort: Nullable<string> | undefined,
-  columns: Record<TSort, OrderByTarget>,
+  columns: Record<TSort, OrderByTarget | OrderByTarget[]>,
 ): sort is TSort {
   return typeof sort === "string" && Object.hasOwn(columns, sort);
 }

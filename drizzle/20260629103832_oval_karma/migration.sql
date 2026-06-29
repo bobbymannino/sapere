@@ -1,0 +1,1 @@
+ALTER TABLE "workspaces" ADD COLUMN "normalized_title" text GENERATED ALWAYS AS (regexp_replace(lower("workspaces"."title"), '[^a-z0-9]', '', 'g')) STORED;
