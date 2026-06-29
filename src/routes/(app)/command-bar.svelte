@@ -1,12 +1,13 @@
 <script lang="ts">
-    import { onNavigate } from "$app/navigation";
+    import { invalidateAll, onNavigate } from "$app/navigation";
     import { resolve } from "$app/paths";
     import { page } from "$app/state";
     import type { WorkspaceCommandSelection } from "$db/workspaces";
+    import { authClient } from "$lib/auth-client";
     import * as Button from "$lib/components/ui/button";
     import * as Command from "$lib/components/ui/command";
     import * as Kbd from "$lib/components/ui/kbd";
-    import { SearchIcon } from "$lib/icons";
+    import { SearchIcon, SpinnerIcon } from "$lib/icons";
 
     type Props = {
         workspaces: WorkspaceCommandSelection[];
@@ -15,6 +16,7 @@
     let { workspaces }: Props = $props();
 
     let open = $state(false);
+    let signingOut = $state(false);
 
     function openCommandBar() {
         open = true;
@@ -28,6 +30,16 @@
         if (e.metaKey && e.key === "k") {
             e.preventDefault();
             open = !open;
+        }
+    }
+
+    async function signOut() {
+        signingOut = true;
+        try {
+            await authClient.signOut();
+            await invalidateAll();
+        } finally {
+            signingOut = false;
         }
     }
 
@@ -75,6 +87,10 @@
                 {#snippet child({ props })}
                     <a {...props} href={resolve("/(app)/account")}>Account</a>
                 {/snippet}
+            </Command.Item>
+            <Command.Item onclick={signOut} disabled={signingOut}>
+                {#if signingOut}<SpinnerIcon class="animate-spin" />{/if}
+                <span>Sign out</span>
             </Command.Item>
         </Command.Group>
     </Command.List>
