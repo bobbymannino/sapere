@@ -39,14 +39,13 @@
 <Button.Root
     type="button"
     variant="outline"
-    class="min-w-24 justify-start"
     aria-label="Open command bar"
     aria-keyshortcuts="Meta+K Control+K"
     onclick={openCommandBar}
 >
     <SearchIcon />
-    <span class="can-hover:not-sr-only sr-only me-5!">Search</span>
-    <Kbd.Group class="hidden can-hover:inline">
+    <span class="me-5 hidden can-hover:block">Search</span>
+    <Kbd.Group class="hidden can-hover:block">
         <Kbd.Root>{page.data.isMac ? "⌘" : "Ctrl"}</Kbd.Root>
         <Kbd.Root>K</Kbd.Root>
     </Kbd.Group>
