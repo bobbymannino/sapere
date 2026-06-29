@@ -30,6 +30,14 @@ const workspaceOrderColumns = {
 
 export type WorkspaceCardSelection = Pick<typeof s.workspaces.$inferSelect, keyof typeof workspaceCardSelection>;
 
+const workspaceCommandSelection = {
+  id: s.workspaces.id,
+  title: s.workspaces.title,
+  slug: s.workspaces.slug,
+};
+
+export type WorkspaceCommandSelection = Pick<typeof s.workspaces.$inferSelect, keyof typeof workspaceCommandSelection>;
+
 type ListWorkspacesArgs = CommonArgs &
   Ordered<WorkspaceSortKey> &
   PaginationArgs & {
