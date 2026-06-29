@@ -16,6 +16,7 @@ declare global {
     interface PageData {
       session: null | Session;
       breadcrumbs?: BreadcrumbItem[];
+      isMac: boolean;
     }
     interface PageState {
       editWorkspace?: WorkspaceCardSelection;

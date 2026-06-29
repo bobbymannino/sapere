@@ -3,7 +3,7 @@ import type { OrderByTarget, Ordered, PaginationArgs, Paginated } from "$db/pagi
 import { buildOrderClause, buildPaginatedResult, buildPagination } from "$db/pagination";
 import * as s from "$lib/server/db/schema";
 import { files, deleteFileIfExists, fileTypeToExtension } from "$lib/server/files";
-import { and, count, DrizzleQueryError, eq, sql, asc } from "drizzle-orm";
+import { and, count, DrizzleQueryError, eq } from "drizzle-orm";
 import { BunSQLDatabase } from "drizzle-orm/bun-sql/postgres";
 
 type CommonArgs = {
@@ -66,6 +66,22 @@ export async function listWorkspaces(args: Prettify<ListWorkspacesArgs>): Promis
   ]);
 
   return buildPaginatedResult(spaces, totalRows[0]?.total ?? 0, pagination);
+}
+
+type ListWorkspaceCommandsArgs = CommonArgs & {
+  ownerId: typeof s.workspaces.$inferSelect.ownerId;
+};
+
+export async function listWorkspaceCommands(
+  args: Prettify<ListWorkspaceCommandsArgs>,
+): Promise<WorkspaceCommandSelection[]> {
+  const db = args.db ?? mdb;
+
+  return db
+    .select(workspaceCommandSelection)
+    .from(s.workspaces)
+    .where(eq(s.workspaces.ownerId, args.ownerId))
+    .orderBy(s.workspaces.orderableTitle, s.workspaces.id);
 }
 
 type FindWorkspaceBySlugArgs = CommonArgs & {
