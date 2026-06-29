@@ -15,13 +15,11 @@
 
     let { workspaces }: Props = $props();
 
-    let input: null | HTMLInputElement = $state(null);
     let open = $state(false);
     let signingOut = $state(false);
 
     function openCommandBar() {
         open = true;
-        input?.focus();
     }
 
     function closeCommandBar() {
@@ -31,7 +29,8 @@
     function onkeydown(e: KeyboardEvent) {
         if (e.metaKey && e.key === "k") {
             e.preventDefault();
-            open = !open;
+            if (open) closeCommandBar();
+            else openCommandBar();
         }
     }
 
@@ -66,7 +65,7 @@
 </Button.Root>
 
 <Command.Dialog bind:open>
-    <Command.Input placeholder="Type a command or search..." bind:ref={input} />
+    <Command.Input placeholder="Type a command or search..." autofocus />
     <Command.List>
         <Command.Empty>No results found.</Command.Empty>
         <Command.Group heading="Workspaces">
