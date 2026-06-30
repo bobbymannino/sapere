@@ -1,16 +1,17 @@
-<p style='text-align: center'>
+<div align='center'>
     <img src='src/lib/assets/favicon.svg' width='200' />
-</p>
+    <h1>Sapere</h1>
+    <p><strong>Project hub and tracker</strong></p>
+    <p><a href='https://sapere.bobman.dev'>website</a></p>
+</div>
 
-# Sapere
+---
+
+## Introduction
 
 Sapere (_sa-pay-ree_) is a completely free and open source software. It is
-created an alternative to [plane.so](https://plane.so). It does not have nearly
-the amount of features or consistent activity.
-
-This project was created because I did not want to pay for the GitHub
-integration for that service. I do still love Plane and will continue to praise
-it.
+created with insperation from [plane.so](https://plane.so). It does not have nearly
+the amount of features or consistent activity, it is more of a 'passion project'.
 
 ## Files
 
