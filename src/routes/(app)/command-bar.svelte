@@ -32,11 +32,11 @@
     }
 
     function onkeydown(e: KeyboardEvent) {
-        if (e.metaKey && e.key === "k") {
-            e.preventDefault();
-            if (open) closeCommandBar();
-            else openCommandBar();
-        }
+      if (((page.data.isMac && e.metaKey) || (!page.data.isMac && e.ctrlKey)) && e.key === 'k') {
+          e.preventDefault();
+          if (open) closeCommandBar();
+          else openCommandBar();
+      }
     }
 
     async function signOut() {
