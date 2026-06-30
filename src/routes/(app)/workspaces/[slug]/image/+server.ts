@@ -1,19 +1,30 @@
 import { findWorkspaceBySlug } from "$db/workspaces";
 import { requireUser } from "$lib/server/auth-utils";
 import { files } from "$lib/server/files";
-import { error } from "@sveltejs/kit";
+import { error as httpError } from "@sveltejs/kit";
+import { FilesError, type StoredFile } from "files-sdk";
 
 import type { RequestHandler } from "./$types";
 
 export const GET: RequestHandler = async ({ params }) => {
   const { user } = requireUser();
   const workspace = await findWorkspaceBySlug({ ownerId: user.id, slug: params.slug });
+  const imageKey = workspace?.image;
 
-  if (!workspace?.image || !(await files.exists(workspace.image))) {
-    error(404, "Workspace image not found");
+  if (!imageKey) {
+    httpError(404, "Workspace image not found");
   }
 
-  const image = await files.download(workspace.image, { as: "stream" });
+  let image: StoredFile;
+  try {
+    image = await files.download(imageKey);
+  } catch (error) {
+    if (error instanceof FilesError && error.code === "NotFound") {
+      httpError(404, "Workspace image not found");
+    }
+
+    throw error;
+  }
 
   return new Response(image.stream(), {
     headers: {
