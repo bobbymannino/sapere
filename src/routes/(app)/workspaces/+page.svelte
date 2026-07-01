@@ -45,7 +45,9 @@
             </ul>
         </section>
 
-        <Pagination count={workspaces.total} perPage={workspaces.perPage} page={workspaces.page} />
+        {#if workspaces.totalPages > 1}
+            <Pagination count={workspaces.total} perPage={workspaces.perPage} page={workspaces.page} />
+        {/if}
     {/if}
 </div>
 
