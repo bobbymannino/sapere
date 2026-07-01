@@ -28,30 +28,6 @@ services:
     volumes:
       - sapere-dragonfly-data:/data
 
-  rustrak-server:
-    image: rustrak/rustrak-server:latest
-    container_name: sapere-rustrak-server
-    ports:
-      - "8080:8080"
-    volumes:
-      - rustrak_data:/data
-    environment:
-      - SESSION_SECRET_KEY=${SESSION_SECRET_KEY}
-      - CREATE_SUPERUSER=${CREATE_SUPERUSER}
-    restart: unless-stopped
-
-  rustrak-ui:
-    image: rustrak/rustrak-ui:latest
-    container_name: sapere-rustrak-ui
-    ports:
-      - "3003:3000"
-    environment:
-      - RUSTRAK_API_URL=http://rustrak-server:8080
-    depends_on:
-      - rustrak-server
-    restart: unless-stopped
-
 volumes:
   sapere-postgres-data:
   sapere-dragonfly-data:
-  rustrak_data:
