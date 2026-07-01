@@ -181,6 +181,7 @@ export const documents = pgTable(
     slug: text().notNull(),
     content: text()
       .notNull()
+      .default(sql`''`)
       .$defaultFn((): SQL => sql`'# ' || ${documents.title}`),
 
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
