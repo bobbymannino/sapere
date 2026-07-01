@@ -5,6 +5,7 @@
     import AppBreadcrumbs from "./app-breadcrumbs.svelte";
     import CommandBar from "./command-bar.svelte";
     import AppSidebar from "./app-sidebar.svelte";
+    import SiteFooter from "../site-footer.svelte";
 
     let { children, data }: LayoutProps = $props();
 </script>
@@ -12,10 +13,11 @@
 <NavigationProgressBar />
 <SidebarProvider open={data.sidebarOpen}>
     <AppSidebar username={data.session.user.username} recentWorkspaces={data.recentWorkspaces} />
-    <main class="w-full grid grid-rows-[auto_1fr]">
+    <main class="w-full grid grid-rows-[auto_1fr_auto]">
         <AppBreadcrumbs>
             <CommandBar workspaces={data.commandWorkspaces} />
         </AppBreadcrumbs>
         {@render children?.()}
+        <SiteFooter />
     </main>
 </SidebarProvider>
