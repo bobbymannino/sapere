@@ -1,6 +1,6 @@
 import { SQL, sql } from "drizzle-orm";
 import { relations } from "drizzle-orm/_relations";
-import { pgTable, text, timestamp, boolean, integer, index, check, uniqueIndex } from "drizzle-orm/pg-core";
+import { pgTable, text, timestamp, boolean, integer, index, check, uniqueIndex, uuid } from "drizzle-orm/pg-core";
 
 export const users = pgTable("users", {
   id: text("id").primaryKey(),
@@ -128,7 +128,9 @@ export const passkeysRelations = relations(passkeys, ({ one }) => ({
 export const workspaces = pgTable(
   "workspaces",
   {
-    id: integer().generatedAlwaysAsIdentity().primaryKey(),
+    id: uuid()
+      .primaryKey()
+      .default(sql`uuidv7()`),
 
     title: text().notNull(),
     orderableTitle: text("orderable_title").generatedAlwaysAs(

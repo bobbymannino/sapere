@@ -1,0 +1,1 @@
+ALTER TABLE "workspaces" RENAME COLUMN "new_id" TO "id";
