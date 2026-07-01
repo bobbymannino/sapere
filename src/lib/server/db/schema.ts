@@ -162,3 +162,41 @@ export const workspaces = pgTable(
     check(`chk_workspaces_slug_valid`, sql`${t.slug} ~ '^[a-z0-9_\.-]+$'`),
   ],
 );
+
+export const documents = pgTable(
+  "documents",
+  {
+    id: uuid()
+      .primaryKey()
+      .default(sql`uuidv7()`),
+
+    workspaceId: uuid("workspace_id")
+      .notNull()
+      .references(() => workspaces.id, { onDelete: "cascade" }),
+
+    title: text().notNull(),
+    orderableTitle: text("orderable_title").generatedAlwaysAs(
+      (): SQL => sql`regexp_replace(lower(${documents.title}), '[^a-z0-9]', '', 'g')`,
+    ),
+    slug: text().notNull(),
+    content: text()
+      .notNull()
+      .$defaultFn((): SQL => sql`'# ' || ${documents.title}`),
+
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow()
+      .$onUpdate(() => sql`now()`),
+  },
+  (t) => [
+    uniqueIndex("workspaces_workspace_slug_unique").on(t.workspaceId, t.slug),
+    index("workspaces_workspace_created_at_idx").on(t.workspaceId, t.createdAt),
+    index("workspaces_workspace_updated_at_idx").on(t.workspaceId, t.updatedAt),
+    index("workspaces_workspace_orderable_title_idx").on(t.workspaceId, t.orderableTitle),
+    index("workspaces_workspace_title_idx").on(t.workspaceId, t.title),
+    check(`chk_documents_title_length`, sql`char_length(${t.title}) >= 3 and char_length(${t.title}) <= 64`),
+    check(`chk_documents_slug_length`, sql`char_length(${t.slug}) >= 3 and char_length(${t.slug}) <= 32`),
+    check(`chk_documents_slug_valid`, sql`${t.slug} ~ '^[a-z0-9_\.-]+$'`),
+  ],
+);
