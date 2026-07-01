@@ -17,8 +17,10 @@
             <Breadcrumb.Item>
                 <SidebarTrigger />
             </Breadcrumb.Item>
-            {#each page.data.breadcrumbs as b (b)}
-                <Breadcrumb.Separator />
+            {#each page.data.breadcrumbs as b, i (b)}
+                {#if i > 0}
+                    <Breadcrumb.Separator />
+                {/if}
                 <Breadcrumb.Item>
                     {#if b.href}
                         <Breadcrumb.Link href={b.href}>{b.label}</Breadcrumb.Link>
