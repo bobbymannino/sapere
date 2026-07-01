@@ -3,6 +3,7 @@ import { defineEnvVars } from "@sveltejs/kit/hooks";
 import * as v from "valibot";
 
 const AppNameSchema = v.pipe(v.string(), v.minLength(1));
+const PublicUrlSchema = v.pipe(v.string(), v.url());
 
 const DatabaseUrlSchema = v.pipe(v.string(), v.url(), v.startsWith("postgres://"));
 const RedisUrlSchema = v.pipe(v.string(), v.url(), v.startsWith("redis://"));
@@ -40,6 +41,12 @@ export const variables = defineEnvVars({
   APP_NAME: {
     schema: AppNameSchema,
     description: "The name of the project",
+    public: true,
+    static: true,
+  },
+  PUBLIC_URL: {
+    schema: PublicUrlSchema,
+    description: "Canonical public URL for SEO metadata, robots.txt, and sitemap.xml",
     public: true,
     static: true,
   },
