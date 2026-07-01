@@ -93,6 +93,7 @@
             disabled={!!pending}
             bind:value={formData.password}
             placeholder="Enter your password"
+            autocomplete="current-password"
         />
     </FormInput>
 

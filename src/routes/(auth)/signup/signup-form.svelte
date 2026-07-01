@@ -117,6 +117,7 @@
             disabled={pending}
             bind:value={formData.password}
             placeholder="Enter your password"
+            autocomplete="new-password"
         />
     </FormInput>
 
@@ -128,6 +129,7 @@
             disabled={pending}
             bind:value={formData.confirmPassword}
             placeholder="Confirm your password"
+            autocomplete="new-password"
         />
     </FormInput>
 
