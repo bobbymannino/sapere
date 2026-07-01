@@ -44,4 +44,5 @@
     {/if}
     <p>Updated <time datetime={updatedAtIso}>{formattedUpdatedAt}</time></p>
     <Button href={resolve("/(app)/workspaces/[slug]/edit", { slug: data.workspace.slug })}>Edit</Button>
+    <Button href={resolve("/(app)/workspaces/[slug]/documents", { slug: data.workspace.slug })}>Documents</Button>
 </div>
