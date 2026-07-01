@@ -11,7 +11,7 @@
     import { flushSync } from "svelte";
 
     type Props = {
-        workspaces: WorkspaceCommandSelection[];
+        workspaces: Promise<WorkspaceCommandSelection[]>;
     };
 
     let { workspaces }: Props = $props();
@@ -32,11 +32,11 @@
     }
 
     function onkeydown(e: KeyboardEvent) {
-      if (((page.data.isMac && e.metaKey) || (!page.data.isMac && e.ctrlKey)) && e.key === 'k') {
-          e.preventDefault();
-          if (open) closeCommandBar();
-          else openCommandBar();
-      }
+        if (((page.data.isMac && e.metaKey) || (!page.data.isMac && e.ctrlKey)) && e.key === "k") {
+            e.preventDefault();
+            if (open) closeCommandBar();
+            else openCommandBar();
+        }
     }
 
     async function signOut() {
@@ -79,13 +79,20 @@
                     <a {...props} href={resolve("/(app)/workspaces")}>Workspaces</a>
                 {/snippet}
             </Command.Item>
-            {#each workspaces as w (w.id)}
-                <Command.Item>
-                    {#snippet child({ props })}
-                        <a {...props} href={resolve("/(app)/workspaces/[slug]", { slug: w.slug })}>{w.title}</a>
-                    {/snippet}
+            {#await workspaces}
+                <Command.Item disabled>
+                    <SpinnerIcon class="animate-spin" />
+                    <span>Loading workspaces...</span>
                 </Command.Item>
-            {/each}
+            {:then workspaces}
+                {#each workspaces as w (w.id)}
+                    <Command.Item>
+                        {#snippet child({ props })}
+                            <a {...props} href={resolve("/(app)/workspaces/[slug]", { slug: w.slug })}>{w.title}</a>
+                        {/snippet}
+                    </Command.Item>
+                {/each}
+            {/await}
         </Command.Group>
         <Command.Separator />
         <Command.Group heading="Account">
