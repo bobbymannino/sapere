@@ -18,6 +18,8 @@ const MinioEndpointUrlSchema = v.pipe(v.string(), v.url());
 const MinioAccessKeyIdSchema = v.pipe(v.string(), v.minLength(16));
 const MinioSecretAccessKeySchema = v.pipe(v.string(), v.minLength(16));
 
+const UuidV4Schema = v.pipe(v.string(), v.uuid());
+
 export const variables = defineEnvVars({
   DATABASE_URL: {
     schema: DatabaseUrlSchema,
@@ -56,5 +58,10 @@ export const variables = defineEnvVars({
   MINIO_SECRET_ACCESS_KEY: {
     description: "The minio secret access key to use for file storage",
     schema: dev ? v.optional(MinioSecretAccessKeySchema) : MinioSecretAccessKeySchema,
+  },
+  UMAMI_WEBSITE_ID: {
+    description: "The website ID for your Umami project",
+    public: true,
+    schema: v.optional(UuidV4Schema),
   },
 });
