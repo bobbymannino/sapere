@@ -2,7 +2,7 @@ import { db as mdb } from "$db";
 import type { OrderByTarget, Ordered, PaginationArgs, Paginated } from "$db/pagination";
 import { buildOrderClause, buildPaginatedResult, buildPagination } from "$db/pagination";
 import * as s from "$lib/server/db/schema";
-import { count, eq } from "drizzle-orm";
+import { count, eq, sql } from "drizzle-orm";
 import { BunSQLDatabase } from "drizzle-orm/bun-sql/postgres";
 
 type CommonArgs = {
@@ -13,7 +13,7 @@ const documentCardSelection = {
   id: s.documents.id,
   title: s.documents.title,
   slug: s.documents.slug,
-  content: s.documents.content,
+  content: sql<string>`left(${s.documents.content}, 50)`,
   updatedAt: s.documents.updatedAt,
   createdAt: s.documents.createdAt,
 };

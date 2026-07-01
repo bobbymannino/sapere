@@ -55,8 +55,8 @@
 
                         <Card.Content>
                             {#if doc.content.trim()}
-                                <Card.Description class="line-clamp-4 break-words whitespace-pre-line">
-                                    {doc.content}
+                                <Card.Description class="line-clamp-4 wrap-break-words whitespace-pre-line">
+                                    {doc.content}{doc.content.length >= 50 ? "..." : ""}
                                 </Card.Description>
                             {:else}
                                 <Card.Description>Empty markdown file</Card.Description>
