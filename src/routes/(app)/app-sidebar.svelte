@@ -3,26 +3,20 @@
     import { resolve } from "$app/paths";
     import { APP_NAME } from "$app/env/public";
     import { authClient } from "$lib/auth-client";
-    import DropdownMenu from "$lib/components/ui/dropdown-menu/dropdown-menu.svelte";
-    import DropdownMenuContent from "$lib/components/ui/dropdown-menu/dropdown-menu-content.svelte";
-    import DropdownMenuTrigger from "$lib/components/ui/dropdown-menu/dropdown-menu-trigger.svelte";
-    import DropdownMenuItem from "$lib/components/ui/dropdown-menu/dropdown-menu-item.svelte";
-    import DropdownMenuGroup from "$lib/components/ui/dropdown-menu/dropdown-menu-group.svelte";
-    import SidebarHeader from "$lib/components/ui/sidebar/sidebar-header.svelte";
-    import SidebarContent from "$lib/components/ui/sidebar/sidebar-content.svelte";
-    import Sidebar from "$lib/components/ui/sidebar/sidebar.svelte";
-    import SidebarFooter from "$lib/components/ui/sidebar/sidebar-footer.svelte";
-    import SidebarMenu from "$lib/components/ui/sidebar/sidebar-menu.svelte";
-    import SidebarMenuItem from "$lib/components/ui/sidebar/sidebar-menu-item.svelte";
-    import SidebarMenuButton from "$lib/components/ui/sidebar/sidebar-menu-button.svelte";
-    import SidebarGroup from "$lib/components/ui/sidebar/sidebar-group.svelte";
-    import SidebarGroupContent from "$lib/components/ui/sidebar/sidebar-group-content.svelte";
-    import { ChevronUpIcon, ExitIcon, SpinnerIcon, UserIcon, WorkspaceIcon } from "$lib/icons";
+    import * as Collapsible from "$lib/components/ui/collapsible";
+    import * as Sidebar from "$lib/components/ui/sidebar";
+    import * as Dropdown from "$lib/components/ui/dropdown-menu";
+    import { ChevronUpIcon, ExitIcon, SpinnerIcon, UserIcon, WorkspaceIcon, ChevronDownIcon } from "$lib/icons";
     import Logo from "$lib/components/logo.svelte";
+    import type { RecentWorkspaceSelection } from "$lib/server/db/workspaces";
+    import { page } from "$app/state";
 
-    type Props = { username: string };
+    type Props = {
+        username: string;
+        recentWorkspaces: Promise<RecentWorkspaceSelection[]>;
+    };
 
-    let { username }: Props = $props();
+    let { username, recentWorkspaces }: Props = $props();
 
     let pending = $state(false);
 
@@ -37,51 +31,96 @@
     }
 </script>
 
-<Sidebar>
-    <SidebarHeader class="flex-row items-center py-3 px-5">
+<Sidebar.Root>
+    <Sidebar.Header class="flex-row items-center py-3 px-5">
         <Logo class="w-5" />
         <span class="font-heading text-lg font-bold">
             {APP_NAME}
         </span>
-    </SidebarHeader>
+    </Sidebar.Header>
 
-    <SidebarContent>
-        <SidebarGroup>
-            <SidebarGroupContent>
-                <SidebarMenu>
-                    <SidebarMenuItem>
-                        <SidebarMenuButton>
-                            {#snippet child({ props })}
-                                <a {...props} href={resolve("/(app)/workspaces")}>
-                                    <WorkspaceIcon />
-                                    <span>Workspaces</span>
-                                </a>
-                            {/snippet}
-                        </SidebarMenuButton>
-                    </SidebarMenuItem>
-                </SidebarMenu>
-            </SidebarGroupContent>
-        </SidebarGroup>
-    </SidebarContent>
+    <Sidebar.Content>
+        <Sidebar.Group>
+            <Sidebar.GroupContent>
+                <Sidebar.Menu>
+                    <Collapsible.Root open class="group/collapsible">
+                        <Sidebar.Group>
+                            <Sidebar.GroupLabel>
+                                {#snippet child({ props })}
+                                    <Collapsible.Trigger {...props}>
+                                        <WorkspaceIcon class="me-3" />
+                                        Workspaces
+                                        <ChevronDownIcon
+                                            class="ms-auto transition-transform group-data-[state=open]/collapsible:rotate-180"
+                                        />
+                                    </Collapsible.Trigger>
+                                {/snippet}
+                            </Sidebar.GroupLabel>
 
-    <SidebarFooter>
-        <SidebarMenu>
-            <SidebarMenuItem>
-                <DropdownMenu>
-                    <DropdownMenuTrigger>
+                            <Collapsible.Content>
+                                <Sidebar.GroupContent>
+                                    {#await recentWorkspaces}
+                                        {#each { length: 4 }}
+                                            <Sidebar.MenuItem>
+                                                <Sidebar.MenuSkeleton />
+                                            </Sidebar.MenuItem>
+                                        {/each}
+                                    {:then recentWorkspaces}
+                                        {#each recentWorkspaces as workspace}
+                                            <Sidebar.MenuItem>
+                                                <Sidebar.MenuButton
+                                                    isActive={page.url.pathname === `/workspaces/${workspace.slug}`}
+                                                >
+                                                    {#snippet child({ props })}
+                                                        <a
+                                                            {...props}
+                                                            href={resolve("/(app)/workspaces/[slug]", {
+                                                                slug: workspace.slug,
+                                                            })}
+                                                        >
+                                                            <span>{workspace.title}</span>
+                                                        </a>
+                                                    {/snippet}
+                                                </Sidebar.MenuButton>
+                                            </Sidebar.MenuItem>
+                                        {/each}
+                                    {/await}
+                                    <Sidebar.MenuItem>
+                                        <Sidebar.MenuButton isActive={page.url.pathname === "/workspaces"}>
+                                            {#snippet child({ props })}
+                                                <a {...props} href={resolve("/(app)/workspaces")}>
+                                                    <span>All Workspaces</span>
+                                                </a>
+                                            {/snippet}
+                                        </Sidebar.MenuButton>
+                                    </Sidebar.MenuItem>
+                                </Sidebar.GroupContent>
+                            </Collapsible.Content>
+                        </Sidebar.Group>
+                    </Collapsible.Root>
+                </Sidebar.Menu>
+            </Sidebar.GroupContent>
+        </Sidebar.Group>
+    </Sidebar.Content>
+
+    <Sidebar.Footer>
+        <Sidebar.Menu>
+            <Sidebar.MenuItem>
+                <Dropdown.Root>
+                    <Dropdown.Trigger>
                         {#snippet child({ props })}
-                            <SidebarMenuButton
+                            <Sidebar.MenuButton
                                 {...props}
                                 class="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
                             >
                                 {username}
                                 <ChevronUpIcon class="ms-auto" />
-                            </SidebarMenuButton>
+                            </Sidebar.MenuButton>
                         {/snippet}
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent side="top" class="w-(--bits-dropdown-menu-anchor-width)">
-                        <DropdownMenuGroup>
-                            <DropdownMenuItem>
+                    </Dropdown.Trigger>
+                    <Dropdown.Content side="top" class="w-(--bits-dropdown-menu-anchor-width)">
+                        <Dropdown.Group>
+                            <Dropdown.Item>
                                 {#snippet child({ props })}
                                     <a
                                         {...props}
@@ -92,19 +131,19 @@
                                         Account
                                     </a>
                                 {/snippet}
-                            </DropdownMenuItem>
-                            <DropdownMenuItem onclick={signOut} variant="destructive" disabled={pending}>
+                            </Dropdown.Item>
+                            <Dropdown.Item onclick={signOut} variant="destructive" disabled={pending}>
                                 {#if pending}
                                     <SpinnerIcon class="animate-spin" />
                                 {:else}
                                     <ExitIcon />
                                 {/if}
                                 <span>Sign out</span>
-                            </DropdownMenuItem>
-                        </DropdownMenuGroup>
-                    </DropdownMenuContent>
-                </DropdownMenu>
-            </SidebarMenuItem>
-        </SidebarMenu>
-    </SidebarFooter>
-</Sidebar>
+                            </Dropdown.Item>
+                        </Dropdown.Group>
+                    </Dropdown.Content>
+                </Dropdown.Root>
+            </Sidebar.MenuItem>
+        </Sidebar.Menu>
+    </Sidebar.Footer>
+</Sidebar.Root>

@@ -3,7 +3,7 @@ import type { OrderByTarget, Ordered, PaginationArgs, Paginated } from "$db/pagi
 import { buildOrderClause, buildPaginatedResult, buildPagination } from "$db/pagination";
 import * as s from "$lib/server/db/schema";
 import { files, deleteFileIfExists, fileTypeToExtension } from "$lib/server/files";
-import { and, count, DrizzleQueryError, eq } from "drizzle-orm";
+import { and, count, DrizzleQueryError, eq, desc } from "drizzle-orm";
 import { BunSQLDatabase } from "drizzle-orm/bun-sql/postgres";
 
 type CommonArgs = {
@@ -82,6 +82,36 @@ export async function listWorkspaceCommands(
     .from(s.workspaces)
     .where(eq(s.workspaces.ownerId, args.ownerId))
     .orderBy(s.workspaces.orderableTitle, s.workspaces.id);
+}
+
+const recentWorkspaceSelection = {
+  id: s.workspaces.id,
+  title: s.workspaces.title,
+  slug: s.workspaces.slug,
+  updatedAt: s.workspaces.updatedAt,
+};
+
+export type RecentWorkspaceSelection = Pick<typeof s.workspaces.$inferSelect, keyof typeof recentWorkspaceSelection>;
+
+type ListRecentWorkspacesArgs = CommonArgs & {
+  ownerId: typeof s.workspaces.$inferSelect.ownerId;
+  limit?: number;
+};
+
+/**
+ * @param args.limit @default 4
+ */
+export async function listRecentWorkspaces(
+  args: Prettify<ListRecentWorkspacesArgs>,
+): Promise<RecentWorkspaceSelection[]> {
+  const db = args.db ?? mdb;
+
+  return db
+    .select(recentWorkspaceSelection)
+    .from(s.workspaces)
+    .where(eq(s.workspaces.ownerId, args.ownerId))
+    .orderBy(desc(s.workspaces.updatedAt))
+    .limit(args.limit || 4);
 }
 
 type FindWorkspaceBySlugArgs = CommonArgs & {
