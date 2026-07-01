@@ -11,7 +11,7 @@
     let { children }: Props = $props();
 </script>
 
-<header class="flex items-center justify-between gap-3 p-5">
+<header class="flex items-center justify-between gap-3 p-5 border-b border-border">
     <Breadcrumb.Root>
         <Breadcrumb.List>
             <Breadcrumb.Item>

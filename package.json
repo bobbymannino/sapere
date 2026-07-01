@@ -28,6 +28,7 @@
     "central-icons": "npm:@central-icons-svelte/round-filled-radius-3-stroke-1.5",
     "drizzle-orm": "^1.0.0-rc.4-5d5b77c",
     "files-sdk": "^1.9.0",
+    "mode-watcher": "^1.1.0",
     "svelte-easy-crop": "^5.0.1",
     "valibot": "^1.4.1"
   },
