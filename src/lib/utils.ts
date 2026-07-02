@@ -20,3 +20,10 @@ export function isTextFieldTarget(target: EventTarget | null) {
   if (!(target instanceof HTMLElement)) return false;
   return Boolean(target.closest('input, textarea, select, [contenteditable="true"], [role="textbox"]'));
 }
+
+export function slugify(value: string) {
+  return value
+    .toLocaleLowerCase()
+    .replace(/\s/g, "_")
+    .replace(/[^a-z0-9._-]/g, "");
+}

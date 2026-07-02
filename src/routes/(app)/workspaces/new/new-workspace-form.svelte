@@ -13,6 +13,7 @@
     import Textarea from "$lib/components/ui/textarea/textarea.svelte";
     import Cropper, { type CropArea } from "svelte-easy-crop";
     import Slider from "$lib/components/ui/slider/slider.svelte";
+    import { slugify } from "$lib/utils";
 
     let pending = $state(false);
     let slug = $state("");
@@ -58,13 +59,6 @@
         } finally {
             URL.revokeObjectURL(url);
         }
-    }
-
-    function slugify(value: string) {
-        return value
-            .toLocaleLowerCase()
-            .replace(/\s/g, "_")
-            .replace(/[^a-z0-9._-]/g, "");
     }
 </script>
 

@@ -12,6 +12,7 @@
     import type { WorkspaceCardSelection } from "$lib/server/db/workspaces";
     import { onDestroy } from "svelte";
     import Cropper, { type CropArea } from "svelte-easy-crop";
+    import { slugify } from "$lib/utils";
 
     type FieldName = "title" | "slug" | "description" | "image";
     type Props = {
@@ -120,13 +121,6 @@
         } finally {
             URL.revokeObjectURL(url);
         }
-    }
-
-    function slugify(value: string) {
-        return value
-            .toLocaleLowerCase()
-            .replace(/\s/g, "_")
-            .replace(/[^a-z0-9._-]/g, "");
     }
 
     onDestroy(clearImagePreview);

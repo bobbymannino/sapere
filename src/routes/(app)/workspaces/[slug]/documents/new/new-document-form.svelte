@@ -7,6 +7,7 @@
     import { Input } from "$lib/components/ui/input";
     import { SpinnerIcon } from "$lib/icons";
     import type { WorkspaceCardSelection } from "$lib/server/db/workspaces";
+    import { slugify } from "$lib/utils";
 
     type FieldName = "title" | "slug";
     type Props = {
@@ -24,13 +25,6 @@
 
     function fieldInvalid(field: FieldName) {
         return fieldErrors(field).length > 0 ? "true" : undefined;
-    }
-
-    function slugify(value: string) {
-        return value
-            .toLocaleLowerCase()
-            .replace(/\s/g, "_")
-            .replace(/[^a-z0-9._-]/g, "");
     }
 </script>
 
