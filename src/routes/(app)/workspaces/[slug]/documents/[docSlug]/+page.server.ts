@@ -22,6 +22,8 @@ export const load: PageServerLoad = async ({ params }) => {
   if (!document) error(404, "Document not found");
 
   return {
+    workspace,
+    document,
     breadcrumbs: [
       {
         label: "Workspaces",
