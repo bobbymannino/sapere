@@ -14,10 +14,12 @@ export const load: PageServerLoad = async ({ params, url }) => {
 
   const sortBy = url.searchParams.get("sortBy") ?? undefined;
   const sortDir = url.searchParams.get("sortDir") ?? undefined;
+  const search = url.searchParams.get("search")?.trim() || undefined;
   const documents = await listDocuments({
     workspaceId: workspace.id,
     sortBy,
     sortDir,
+    search,
     page: url.searchParams.get("page"),
     perPage: url.searchParams.get("perPage"),
   });
@@ -26,6 +28,7 @@ export const load: PageServerLoad = async ({ params, url }) => {
     workspace,
     sortBy,
     sortDir,
+    search,
     documents,
     breadcrumbs: [
       { label: "Workspaces", href: resolve("/(app)/workspaces") },

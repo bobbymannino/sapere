@@ -11,6 +11,7 @@
 
     let { data }: PageProps = $props();
     let documents = $derived(data.documents);
+    let hasSearch = $derived(Boolean(data.search));
 </script>
 
 <Meta
@@ -29,7 +30,7 @@
             <h1>Documents</h1>
         </div>
         <div class="flex flex-wrap gap-2">
-            <Filters workspaceSlug={data.workspace.slug} sortBy={data.sortBy} sortDir={data.sortDir} />
+            <Filters workspaceSlug={data.workspace.slug} search={data.search} sortBy={data.sortBy} sortDir={data.sortDir} />
             <Button
                 href={resolve("/(app)/workspaces/[slug]/documents/new", { slug: data.workspace.slug })}
                 variant="outline"
@@ -42,7 +43,11 @@
     </header>
 
     {#if documents.results.length === 0}
-        <Empty title="No Documents" description="This workspace does not have any documents yet." icon={MarkdownIcon}>
+        <Empty
+            title={hasSearch ? "No matching documents" : "No Documents"}
+            description={hasSearch ? "No documents match your search." : "This workspace does not have any documents yet."}
+            icon={MarkdownIcon}
+        >
             <Button href={resolve("/(app)/workspaces/[slug]/documents/new", { slug: data.workspace.slug })}>
                 <MarkdownIcon />
                 <span>New Document</span>

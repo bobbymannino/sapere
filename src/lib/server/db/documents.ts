@@ -2,7 +2,7 @@ import { db as mdb, PostgresErrorCodes } from "$db";
 import type { OrderByTarget, Ordered, PaginationArgs, Paginated } from "$db/pagination";
 import { buildOrderClause, buildPaginatedResult, buildPagination } from "$db/pagination";
 import * as s from "$lib/server/db/schema";
-import { and, count, desc, DrizzleQueryError, eq, sql } from "drizzle-orm";
+import { and, count, desc, DrizzleQueryError, eq, or, sql } from "drizzle-orm";
 import { BunSQLDatabase } from "drizzle-orm/bun-sql/postgres";
 
 type CommonArgs = {
@@ -32,6 +32,7 @@ type ListDocumentArgs = CommonArgs &
   Ordered<DocumentSortKey> &
   PaginationArgs & {
     workspaceId: typeof s.documents.$inferSelect.workspaceId;
+    search?: Nullable<string>;
   };
 
 export async function listDocuments(args: Prettify<ListDocumentArgs>): Promise<Paginated<DocumentCardSelection>> {
@@ -42,7 +43,14 @@ export async function listDocuments(args: Prettify<ListDocumentArgs>): Promise<P
     defaultSortDir: "desc",
   });
   const pagination = buildPagination(args);
-  const where = eq(s.documents.workspaceId, args.workspaceId);
+  const search = args.search?.trim();
+  const searchFilter = search
+    ? or(
+        sql`position(lower(${search}) in lower(${s.documents.title})) > 0`,
+        sql`position(lower(${search}) in lower(${s.documents.content})) > 0`,
+      )
+    : undefined;
+  const where = and(eq(s.documents.workspaceId, args.workspaceId), searchFilter);
 
   const [spaces, totalRows] = await Promise.all([
     db
