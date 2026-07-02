@@ -1,8 +1,8 @@
-import { db as mdb } from "$db";
+import { db as mdb, PostgresErrorCodes } from "$db";
 import type { OrderByTarget, Ordered, PaginationArgs, Paginated } from "$db/pagination";
 import { buildOrderClause, buildPaginatedResult, buildPagination } from "$db/pagination";
 import * as s from "$lib/server/db/schema";
-import { count, eq, sql } from "drizzle-orm";
+import { count, DrizzleQueryError, eq, sql } from "drizzle-orm";
 import { BunSQLDatabase } from "drizzle-orm/bun-sql/postgres";
 
 type CommonArgs = {
@@ -56,4 +56,56 @@ export async function listDocuments(args: Prettify<ListDocumentArgs>): Promise<P
   ]);
 
   return buildPaginatedResult(spaces, totalRows[0]?.total ?? 0, pagination);
+}
+
+type CreateDocumentArgs = CommonArgs & {
+  workspaceId: typeof s.documents.$inferSelect.workspaceId;
+  title: typeof s.documents.$inferInsert.title;
+  slug: typeof s.documents.$inferInsert.slug;
+};
+
+export class DocumentSlugUsedError extends Error {
+  constructor(slug: string) {
+    super(`Document slug "${slug}" is already in use`);
+    this.name = "DocumentSlugUsedError";
+  }
+}
+
+export async function createDocument(args: Prettify<CreateDocumentArgs>) {
+  const db = args.db ?? mdb;
+
+  try {
+    return db.transaction(async (tx) => {
+      const [[document]] = await Promise.all([
+        tx
+          .insert(s.documents)
+          .values({
+            workspaceId: args.workspaceId,
+            title: args.title,
+            slug: args.slug,
+            content: `# ${args.title}\n\Dear diary...`,
+          })
+          .returning({ id: s.documents.id, slug: s.documents.slug }),
+        tx
+          .update(s.workspaces)
+          .set({ updatedAt: sql`now()` })
+          .where(eq(s.workspaces.id, args.workspaceId)),
+      ]);
+      if (!document) throw new Error("Failed to create document");
+      return document;
+    });
+  } catch (error) {
+    if (isDocumentSlugUniqueError(error)) throw new DocumentSlugUsedError(args.slug);
+    throw error;
+  }
+}
+
+function isDocumentSlugUniqueError(error: unknown) {
+  return (
+    (error instanceof DrizzleQueryError &&
+      error.cause instanceof Bun.SQL.PostgresError &&
+      error.cause.errno === PostgresErrorCodes.Unique &&
+      error.cause.constraint?.includes("slug")) ??
+    false
+  );
 }

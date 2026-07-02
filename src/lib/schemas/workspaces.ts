@@ -15,7 +15,7 @@ export const WorkspaceDescriptionSchema = v.pipe(
   v.transform((description) => description || null),
 );
 
-const reservedSlugs = ["new"];
+const reservedSlugs = ["new", "edit", "delete", "documents"];
 
 export const WorkspaceSlugSchema = v.pipe(
   v.string(),
