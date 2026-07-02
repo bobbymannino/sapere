@@ -1,8 +1,9 @@
-import { db as mdb, PostgresErrorCodes } from "$db";
+import { db as mdb } from "$db";
+import { isUniqueConstraintError } from "$db/errors";
 import type { OrderByTarget, Ordered, PaginationArgs, Paginated } from "$db/pagination";
 import { buildOrderClause, buildPaginatedResult, buildPagination } from "$db/pagination";
 import * as s from "$lib/server/db/schema";
-import { and, count, desc, DrizzleQueryError, eq, or, sql } from "drizzle-orm";
+import { and, count, desc, eq, or, sql } from "drizzle-orm";
 import { BunSQLDatabase } from "drizzle-orm/bun-sql/postgres";
 
 type CommonArgs = {
@@ -123,7 +124,7 @@ export async function createDocument(args: Prettify<CreateDocumentArgs>) {
   const db = args.db ?? mdb;
 
   try {
-    return db.transaction(async (tx) => {
+    return await db.transaction(async (tx) => {
       const [[document]] = await Promise.all([
         tx
           .insert(s.documents)
@@ -149,13 +150,7 @@ export async function createDocument(args: Prettify<CreateDocumentArgs>) {
 }
 
 function isDocumentSlugUniqueError(error: unknown) {
-  return (
-    (error instanceof DrizzleQueryError &&
-      error.cause instanceof Bun.SQL.PostgresError &&
-      error.cause.errno === PostgresErrorCodes.Unique &&
-      error.cause.constraint?.includes("slug")) ??
-    false
-  );
+  return isUniqueConstraintError(error, "workspaces_workspace_slug_unique");
 }
 
 const documentSelection = {
