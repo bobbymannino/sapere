@@ -1,5 +1,6 @@
 <script lang="ts">
     import { browser } from "$app/env";
+    import { resolve } from "$app/paths";
     import Meta from "$lib/components/meta.svelte";
     import * as Button from "$lib/components/ui/button";
     import * as Textarea from "$lib/components/ui/textarea";
@@ -143,6 +144,16 @@
             {showPreview ? "Hide" : "Show"} Preview
         </Button.Root>
         <span class={saveLabelClass} aria-live="polite">{saveLabel}</span>
+        <Button.Root
+            class="ms-auto"
+            variant="outline"
+            href={resolve("/(app)/workspaces/[slug]/documents/[docSlug]/edit", {
+                slug: data.workspace.slug,
+                docSlug: data.document.slug,
+            })}
+        >
+            Edit
+        </Button.Root>
     </header>
 
     <div class={["grid gap-5 p-5", showPreview && showEditor && "@3xl:grid-cols-2"]}>
