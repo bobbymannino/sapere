@@ -5,6 +5,7 @@
     import * as Button from "$lib/components/ui/button";
     import { buttonVariants } from "$lib/components/ui/button";
     import * as Dropdown from "$lib/components/ui/dropdown-menu";
+    import { WorkspaceIcon } from "$lib/icons";
 
     const sortOptions = [
         { label: "Recently updated", sortBy: "updatedAt", sortDir: "desc", value: "updatedAt:desc" },
@@ -38,9 +39,7 @@
     }
 </script>
 
-<div class="flex flex-col gap-3 p-5 pbe-0 @sm:flex-row @sm:items-center @sm:justify-between">
-    <Button.Root variant="outline" href={resolve("/(app)/workspaces/new")} size="sm">New Workspace</Button.Root>
-
+<div class="p-5 pbe-0 flex flex-wrap justify-end gap-2">
     <Dropdown.Root>
         <Dropdown.Trigger class={buttonVariants({ variant: "outline", size: "sm" })} disabled={Boolean(navigating.to)}>
             Sort: {sortOption.label}
@@ -57,4 +56,9 @@
             </Dropdown.RadioGroup>
         </Dropdown.Content>
     </Dropdown.Root>
+
+    <Button.Root variant="outline" href={resolve("/(app)/workspaces/new")} size="sm">
+        <WorkspaceIcon />
+        <span>New Workspace</span>
+    </Button.Root>
 </div>
