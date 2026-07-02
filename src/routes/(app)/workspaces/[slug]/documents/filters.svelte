@@ -5,6 +5,7 @@
     import { Input } from "$lib/components/ui/input";
     import * as Dropdown from "$lib/components/ui/dropdown-menu";
     import * as Kbd from "$lib/components/ui/kbd";
+    import * as InputGroup from "$lib/components/ui/input-group";
     import { SearchIcon } from "$lib/icons";
     import { isTextFieldTarget } from "$lib/utils";
 
@@ -75,33 +76,28 @@
         {#if perPage}
             <input type="hidden" name="perPage" value={perPage} />
         {/if}
-        <Input
-            type="search"
-            name="search"
-            value={searchValue}
-            placeholder="Search documents"
-            aria-label="Search documents"
-            disabled={Boolean(navigating.to)}
-        />
-        <Button
-            type="submit"
-            variant="outline"
-            size="icon-sm"
-            disabled={Boolean(navigating.to)}
-            aria-label="Search documents"
-        >
-            <SearchIcon />
-        </Button>
-        {#if searchValue}
-            <Button
-                href={`${resolve("/(app)/workspaces/[slug]/documents", { slug: workspaceSlug })}?${getClearSearch()}`}
-                variant="ghost"
-                size="sm"
+
+        <InputGroup.Root>
+            <InputGroup.Input
+                type="search"
+                name="search"
+                value={searchValue}
+                placeholder="Search documents"
+                aria-label="Search documents"
                 disabled={Boolean(navigating.to)}
-            >
-                Clear
-            </Button>
-        {/if}
+            />
+            <InputGroup.Addon align="inline-end">
+                <InputGroup.Button
+                    type="submit"
+                    variant="outline"
+                    size="icon-sm"
+                    disabled={Boolean(navigating.to)}
+                    aria-label="Search documents"
+                >
+                    <SearchIcon />
+                </InputGroup.Button>
+            </InputGroup.Addon>
+        </InputGroup.Root>
     </form>
 
     <Dropdown.Root bind:open={sortByDropdownOpen}>
