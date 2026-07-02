@@ -34,15 +34,24 @@
     robots="noindex,nofollow"
 />
 
-<div class="p-5">
-    {#if data.workspace.image}
-        <OptimizedImage src={imageUrl} alt="" class="mb-5 aspect-video w-full max-w-4xl rounded-3xl" />
-    {/if}
-    <h1>{data.workspace.title}</h1>
-    {#if data.workspace.description}
-        <p class="whitespace-pre-wrap text-muted-foreground">{data.workspace.description}</p>
-    {/if}
-    <p>Updated <time datetime={updatedAtIso}>{formattedUpdatedAt}</time></p>
-    <Button href={resolve("/(app)/workspaces/[slug]/edit", { slug: data.workspace.slug })}>Edit</Button>
-    <Button href={resolve("/(app)/workspaces/[slug]/documents", { slug: data.workspace.slug })}>Documents</Button>
-</div>
+<section>
+    <header class="p-5 flex flex-wrap gap-5">
+        {#if data.workspace.image}
+            <OptimizedImage src={imageUrl} alt="" class="aspect-video w-full max-w-lg rounded-3xl" />
+        {/if}
+
+        <div class="space-y-2">
+            <h1>{data.workspace.title}</h1>
+            {#if data.workspace.description}
+                <p class="whitespace-pre-wrap text-muted-foreground">{data.workspace.description}</p>
+            {/if}
+            <p>Updated <time datetime={updatedAtIso}>{formattedUpdatedAt}</time></p>
+            <Button href={resolve("/(app)/workspaces/[slug]/documents", { slug: data.workspace.slug })}>
+                Documents
+            </Button>
+            <Button variant="ghost" href={resolve("/(app)/workspaces/[slug]/edit", { slug: data.workspace.slug })}>
+                Edit
+            </Button>
+        </div>
+    </header>
+</section>
