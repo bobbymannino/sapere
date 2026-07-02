@@ -73,6 +73,7 @@
     <Command.Input placeholder="Type a command or search..." bind:ref={input} autofocus />
     <Command.List>
         <Command.Empty>No results found.</Command.Empty>
+
         <Command.Group heading="Workspaces">
             <Command.Item>
                 {#snippet child({ props })}
@@ -99,19 +100,38 @@
                             </a>
                         {/snippet}
                     </Command.Item>
-                    <Command.Item>
-                        {#snippet child({ props })}
-                            <a {...props} href={resolve("/(app)/workspaces/[slug]/documents", { slug: w.slug })}>
-                                <MarkdownIcon class="opacity-20" />
-                                <span>{w.title}</span>
-                                <span class="ms-auto opacity-20">Documents</span>
-                            </a>
-                        {/snippet}
-                    </Command.Item>
                 {/each}
             {/await}
         </Command.Group>
         <Command.Separator />
+
+        {#await workspaces}
+            <Command.Group heading="Documents">
+                <Command.Item disabled>
+                    <SpinnerIcon class="animate-spin" />
+                    <span>Loading documents...</span>
+                </Command.Item>
+                <Command.Separator />
+            </Command.Group>
+        {:then workspaces}
+            {#if workspaces.length}
+                <Command.Group heading="Documents">
+                    {#each workspaces as w (w.id)}
+                        <Command.Item>
+                            {#snippet child({ props })}
+                                <a {...props} href={resolve("/(app)/workspaces/[slug]/documents", { slug: w.slug })}>
+                                    <MarkdownIcon class="opacity-20" />
+                                    <span>{w.title}</span>
+                                    <span class="ms-auto opacity-20">Documents</span>
+                                </a>
+                            {/snippet}
+                        </Command.Item>
+                    {/each}
+                    <Command.Separator />
+                </Command.Group>
+            {/if}
+        {/await}
+
         <Command.Group heading="Account">
             <Command.Item>
                 {#snippet child({ props })}
