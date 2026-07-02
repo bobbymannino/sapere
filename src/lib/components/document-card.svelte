@@ -1,0 +1,38 @@
+<script lang="ts">
+    import type { DocumentCardSelection } from "$lib/server/db/documents";
+    import { MarkdownIcon } from "$lib/icons";
+    import * as Card from "$lib/components/ui/card";
+    import { toIsoDate, formatDateTime } from "$lib/date-format";
+
+    let { content, slug, title, updatedAt }: DocumentCardSelection = $props();
+</script>
+
+<Card.Root class="h-full">
+    <Card.Header>
+        <div class="flex min-w-0 items-start gap-3">
+            <div class="flex size-10 shrink-0 items-center justify-center rounded-md bg-muted text-muted-foreground">
+                <MarkdownIcon />
+            </div>
+            <div class="min-w-0">
+                <Card.Title class="truncate text-base">{title}</Card.Title>
+                <Card.Description class="truncate">{slug}.md</Card.Description>
+            </div>
+        </div>
+    </Card.Header>
+
+    <Card.Content>
+        {#if content.trim()}
+            <Card.Description class="line-clamp-4 wrap-break-words whitespace-pre-line">
+                {content}{content.length >= 50 ? "..." : ""}
+            </Card.Description>
+        {:else}
+            <Card.Description>Empty markdown file</Card.Description>
+        {/if}
+    </Card.Content>
+
+    <Card.Footer class="mt-auto">
+        <Card.Description class="text-xs">
+            Updated <time datetime={toIsoDate(updatedAt)}>{formatDateTime(updatedAt)}</time>
+        </Card.Description>
+    </Card.Footer>
+</Card.Root>
