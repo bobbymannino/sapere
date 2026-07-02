@@ -5,15 +5,14 @@
     import dompurify from "dompurify";
     import { parse } from "marked";
     import * as Textarea from "$lib/components/ui/textarea";
-    import * as Alert from "$lib/components/ui/alert";
-    import { ErrorIcon } from "$lib/icons";
+    import * as Button from "$lib/components/ui/button";
 
     let { data }: PageProps = $props();
 
     let showPreview = $state(true);
 
     let md = $derived(data.document.content);
-    const sanitized = $derived(browser && showPreview ? dompurify.sanitize(md) : "### Loading preview...");
+    const sanitized = $derived(browser && showPreview ? dompurify.sanitize(md) : "");
     const html = $derived(parse(sanitized));
 
     function oninput(e: KeyboardEvent & { currentTarget: HTMLTextAreaElement }) {
@@ -29,21 +28,24 @@
 />
 
 <div>
-    <div class="p-5">
-        <Alert.Root variant="destructive">
-            <ErrorIcon />
-            <Alert.Title>Nothing saves</Alert.Title>
-        </Alert.Root>
-    </div>
+    <header class="p-5 pbe-0">
+        <Button.Root class="" onclick={() => (showPreview = !showPreview)}>
+            {showPreview ? "Hide" : "Show"} Preview
+        </Button.Root>
+    </header>
 
     <div class={["grid gap-5", showPreview && "md:grid-cols-2"]}>
         <section class="p-5">
-            <Textarea.Root defaultValue={md} {oninput} />
+            <Textarea.Root bind:value={md} />
         </section>
 
         {#if showPreview}
             <section class="p-5">
-                {@html html}
+                {#if browser}
+                    {@html html}
+                {:else}
+                    <p>Loading preview...</p>
+                {/if}
             </section>
         {/if}
     </div>
