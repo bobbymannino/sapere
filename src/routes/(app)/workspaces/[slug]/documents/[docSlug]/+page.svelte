@@ -178,7 +178,7 @@
     <div class={["grid gap-5 p-5", showPreview && showEditor && "@3xl:grid-cols-2"]}>
         {#if showEditor}
             <section>
-                <Textarea.Root bind:value={md} {oninput} aria-label="Document content" class="font-mono" />
+                <Textarea.Root bind:value={md} autofocus {oninput} aria-label="Document content" class="font-mono" />
             </section>
         {/if}
 
