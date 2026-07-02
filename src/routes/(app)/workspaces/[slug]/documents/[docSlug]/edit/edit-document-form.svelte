@@ -5,6 +5,7 @@
     import { page } from "$app/state";
     import { Button } from "$lib/components/ui/button";
     import * as Dialog from "$lib/components/ui/dialog";
+    import * as Separator from "$lib/components/ui/separator";
     import * as Field from "$lib/components/ui/field";
     import { Input } from "$lib/components/ui/input";
     import { SpinnerIcon, TrashIcon } from "$lib/icons";
@@ -134,17 +135,16 @@
         </div>
     </form>
 
-    <div class="border-t pt-5">
-        <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <div class="space-y-1">
-                <h2 class="text-base font-medium">Delete document</h2>
-                <p class="text-sm text-muted-foreground">This permanently removes the document from the workspace.</p>
-            </div>
-            <Button type="button" variant="destructive" disabled={pending || deleting} onclick={openDeleteDialog}>
-                <TrashIcon data-icon="inline-start" />
-                Delete document
-            </Button>
-        </div>
+    <Separator.Root />
+
+    <div class="flex flex-col gap-3 items-center">
+        <small class="text-muted-foreground text-center">
+            This permanently removes the document from the workspace.
+        </small>
+        <Button type="button" variant="destructive" disabled={pending || deleting} onclick={openDeleteDialog}>
+            <TrashIcon data-icon="inline-start" />
+            Delete document
+        </Button>
     </div>
 </div>
 
