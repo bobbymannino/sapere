@@ -1,5 +1,7 @@
 import * as v from "valibot";
 
+export const WorkspaceIdSchema = v.pipe(v.string(), v.uuid());
+
 export const WorkspaceTitleSchema = v.pipe(
   v.string(),
   v.trim(),

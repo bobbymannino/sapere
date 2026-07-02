@@ -84,6 +84,7 @@ export type RecentDocumentSelection = {
 
 type ListRecentDocumentsArgs = CommonArgs & {
   ownerId: typeof s.workspaces.$inferSelect.ownerId;
+  workspaceId?: typeof s.workspaces.$inferSelect.id;
   limit?: number;
 };
 
@@ -93,11 +94,14 @@ type ListRecentDocumentsArgs = CommonArgs & {
 export async function listRecentDocuments(args: Prettify<ListRecentDocumentsArgs>): Promise<RecentDocumentSelection[]> {
   const db = args.db ?? mdb;
 
+  const filters = [eq(s.workspaces.ownerId, args.ownerId)];
+  if (args.workspaceId) filters.push(eq(s.workspaces.id, args.workspaceId));
+
   return db
     .select(recentDocumentSelection)
     .from(s.documents)
     .innerJoin(s.workspaces, eq(s.documents.workspaceId, s.workspaces.id))
-    .where(eq(s.workspaces.ownerId, args.ownerId))
+    .where(and(...filters))
     .orderBy(desc(s.documents.updatedAt))
     .limit(args.limit || 4);
 }
