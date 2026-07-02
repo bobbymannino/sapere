@@ -4,9 +4,9 @@ import { requireUser } from "$lib/server/auth-utils";
 import { error } from "@sveltejs/kit";
 import * as v from "valibot";
 
-const PositiveIntegerSchema = v.pipe(v.number(), v.minValue(1, "Value must be 1 or more"));
+const UuidSchema = v.pipe(v.string(), v.uuid());
 
-export const deleteWorkspaceCommand = command(PositiveIntegerSchema, async (workspaceId) => {
+export const deleteWorkspaceCommand = command(UuidSchema, async (workspaceId) => {
   const { user } = requireUser();
   const workspace = await deleteWorkspace({ ownerId: user.id, workspaceId });
   if (!workspace) error(404, "Workspace not found");
