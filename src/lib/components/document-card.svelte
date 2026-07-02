@@ -23,7 +23,7 @@
 
     <Card.Header>
         <div class="flex min-w-0 items-start gap-3">
-            <div class="flex size-10 shrink-0 items-center justify-center rounded-md bg-muted text-muted-foreground">
+            <div class="flex size-10 shrink-0 items-center justify-center rounded-md bg-primary/15 text-primary">
                 <MarkdownIcon />
             </div>
             <div class="min-w-0">
