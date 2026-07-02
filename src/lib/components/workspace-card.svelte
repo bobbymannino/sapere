@@ -119,6 +119,17 @@
                         {#snippet child({ props })}
                             <a
                                 {...props}
+                                href={resolve("/(app)/workspaces/[slug]/documents", { slug })}
+                                class={[props.class, "cursor-pointer"]}
+                            >
+                                Documents
+                            </a>
+                        {/snippet}
+                    </DropdownMenuItem>
+                    <DropdownMenuItem>
+                        {#snippet child({ props })}
+                            <a
+                                {...props}
                                 href={resolve("/(app)/workspaces/[slug]/edit", { slug })}
                                 class={[props.class, "cursor-pointer"]}
                                 onclick={onEditClick}
