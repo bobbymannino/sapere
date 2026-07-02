@@ -7,7 +7,7 @@
     import * as Button from "$lib/components/ui/button";
     import * as Command from "$lib/components/ui/command";
     import * as Kbd from "$lib/components/ui/kbd";
-    import { SearchIcon, SpinnerIcon } from "$lib/icons";
+    import { MarkdownIcon, SearchIcon, SpinnerIcon, WorkspaceIcon } from "$lib/icons";
     import { flushSync } from "svelte";
 
     type Props = {
@@ -88,7 +88,20 @@
                 {#each workspaces as w (w.id)}
                     <Command.Item>
                         {#snippet child({ props })}
-                            <a {...props} href={resolve("/(app)/workspaces/[slug]", { slug: w.slug })}>{w.title}</a>
+                            <a {...props} href={resolve("/(app)/workspaces/[slug]", { slug: w.slug })}>
+                                <WorkspaceIcon class="opacity-20" />
+                                <span>{w.title}</span>
+                                <span class="ms-auto opacity-20">Workspace</span>
+                            </a>
+                        {/snippet}
+                    </Command.Item>
+                    <Command.Item>
+                        {#snippet child({ props })}
+                            <a {...props} href={resolve("/(app)/workspaces/[slug]/documents", { slug: w.slug })}>
+                                <MarkdownIcon class="opacity-20" />
+                                <span>{w.title}</span>
+                                <span class="ms-auto opacity-20">Documents</span>
+                            </a>
                         {/snippet}
                     </Command.Item>
                 {/each}
