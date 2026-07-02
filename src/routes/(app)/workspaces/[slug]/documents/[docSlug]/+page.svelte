@@ -27,6 +27,16 @@
     let saveQueued = false;
     let destroyed = false;
 
+    function togglePreview() {
+        if (showPreview) showEditor = true;
+        showPreview = !showPreview;
+    }
+
+    function toggleEditor() {
+        if (showEditor) showPreview = true;
+        showEditor = !showEditor;
+    }
+
     let sanitizedMarkdown = $derived(
         browser ? dompurify.sanitize(md, { ALLOWED_TAGS: ["div", "img", "p", "a"], ALLOWED_ATTR: [] }) : md,
     );
@@ -126,10 +136,10 @@
 
 <div class="@container">
     <header class="flex items-center gap-1 p-5 pbe-0">
-        <Button.Root onclick={() => (showEditor = !showEditor)}>
+        <Button.Root onclick={toggleEditor}>
             {showEditor ? "Hide" : "Show"} Editor
         </Button.Root>
-        <Button.Root onclick={() => (showPreview = !showPreview)}>
+        <Button.Root onclick={togglePreview}>
             {showPreview ? "Hide" : "Show"} Preview
         </Button.Root>
         <span class={saveLabelClass} aria-live="polite">{saveLabel}</span>
