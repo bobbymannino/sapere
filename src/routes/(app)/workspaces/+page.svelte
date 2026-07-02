@@ -9,7 +9,7 @@
     import type { PageProps } from "./$types";
     import EditWorkspaceDialog from "./edit-workspace-dialog.svelte";
     import Filters from "./filters.svelte";
-    import Pagination from "./pagination.svelte";
+    import Pagination from "$lib/components/pagination.svelte";
     import WorkspaceCard from "$lib/components/workspace-card.svelte";
 
     let { data }: PageProps = $props();
@@ -46,7 +46,7 @@
         </section>
 
         {#if workspaces.totalPages > 1}
-            <Pagination count={workspaces.total} perPage={workspaces.perPage} page={workspaces.page} />
+            <Pagination count={workspaces.total} perPage={workspaces.perPage} page={workspaces.page} class="pbe-5" />
         {/if}
     {/if}
 </div>

@@ -8,7 +8,7 @@
     import * as Kbd from "$lib/components/ui/kbd";
     import type { PageProps } from "./$types";
     import Filters from "./filters.svelte";
-    import Pagination from "../../pagination.svelte";
+    import Pagination from "$lib/components/pagination.svelte";
     import { goto } from "$app/navigation";
     import { isTextFieldTarget } from "$lib/utils";
 
