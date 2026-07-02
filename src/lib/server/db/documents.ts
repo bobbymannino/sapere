@@ -119,7 +119,7 @@ export async function createDocument(args: Prettify<CreateDocumentArgs>) {
             workspaceId: args.workspaceId,
             title: args.title,
             slug: args.slug,
-            content: `# ${args.title}\n\Dear diary...`,
+            content: `# ${args.title}\n\nDear diary...`,
           })
           .returning({ id: s.documents.id, slug: s.documents.slug }),
         tx
