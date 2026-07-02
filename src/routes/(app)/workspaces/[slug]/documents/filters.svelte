@@ -7,7 +7,7 @@
     import * as Kbd from "$lib/components/ui/kbd";
     import * as InputGroup from "$lib/components/ui/input-group";
     import { SearchIcon } from "$lib/icons";
-    import { isTextFieldTarget } from "$lib/utils";
+    import { isTextFieldTarget, isUnmodifiedKey } from "$lib/utils";
 
     const sortOptions = [
         { label: "Recently updated", sortBy: "updatedAt", sortDir: "desc", value: "updatedAt:desc" },
@@ -50,10 +50,10 @@
 
     function onkeydown(e: KeyboardEvent) {
         if (e.defaultPrevented || isTextFieldTarget(e.target)) return;
-        if (e.key === "s") {
+        if (isUnmodifiedKey(e, "s")) {
             e.preventDefault();
             sortByDropdownOpen = true;
-        } else if (e.key === "/") {
+        } else if (isUnmodifiedKey(e, "/")) {
             e.preventDefault();
             searchInput?.focus();
         }

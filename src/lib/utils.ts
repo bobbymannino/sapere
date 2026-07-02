@@ -21,6 +21,24 @@ export function isTextFieldTarget(target: EventTarget | null) {
   return Boolean(target.closest('input, textarea, select, [contenteditable="true"], [role="textbox"]'));
 }
 
+type KeyboardShortcutEvent = {
+  altKey: boolean;
+  ctrlKey: boolean;
+  key: string;
+  metaKey: boolean;
+  shiftKey: boolean;
+};
+
+export function isUnmodifiedKey(event: KeyboardShortcutEvent, key: string) {
+  return (
+    !event.metaKey &&
+    !event.shiftKey &&
+    !event.ctrlKey &&
+    !event.altKey &&
+    event.key.toLocaleLowerCase() === key.toLocaleLowerCase()
+  );
+}
+
 export function slugify(value: string) {
   return value
     .toLocaleLowerCase()

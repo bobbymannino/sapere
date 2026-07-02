@@ -7,7 +7,7 @@
     import * as Dropdown from "$lib/components/ui/dropdown-menu";
     import { WorkspaceIcon } from "$lib/icons";
     import * as Kbd from "$lib/components/ui/kbd";
-    import { isTextFieldTarget } from "$lib/utils";
+    import { isTextFieldTarget, isUnmodifiedKey } from "$lib/utils";
 
     const sortOptions = [
         { label: "Recently updated", sortBy: "updatedAt", sortDir: "desc", value: "updatedAt:desc" },
@@ -44,10 +44,10 @@
 
     function onkeydown(e: KeyboardEvent) {
         if (e.defaultPrevented || isTextFieldTarget(e.target)) return;
-        if (e.key === "s") {
+        if (isUnmodifiedKey(e, "s")) {
             e.preventDefault();
             sortByDropdownOpen = true;
-        } else if (e.key === "n") {
+        } else if (isUnmodifiedKey(e, "n")) {
             e.preventDefault();
             goto(resolve("/(app)/workspaces/new"));
         }

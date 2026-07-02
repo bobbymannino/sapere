@@ -6,7 +6,7 @@
     import { PinIcon, SpinnerIcon, UnpinIcon } from "$lib/icons";
     import type { DocumentCardSelection } from "$lib/server/db/documents";
     import type { WorkspaceSelect } from "$lib/server/db/schema";
-    import { cn, isTextFieldTarget } from "$lib/utils";
+    import { cn, isTextFieldTarget, isUnmodifiedKey } from "$lib/utils";
 
     type Props = {
         workspaceSlug: WorkspaceSelect["slug"];
@@ -40,7 +40,7 @@
 
     function onkeydown(e: KeyboardEvent) {
         if (!keyboardShortcut || e.defaultPrevented || e.repeat || isTextFieldTarget(e.target)) return;
-        if (e.key.toLocaleLowerCase() !== keyboardShortcut.toLocaleLowerCase()) return;
+        if (!isUnmodifiedKey(e, keyboardShortcut.toLocaleLowerCase())) return;
 
         e.preventDefault();
         void togglePinned();

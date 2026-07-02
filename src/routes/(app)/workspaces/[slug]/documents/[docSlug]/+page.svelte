@@ -11,7 +11,7 @@
     import type { PageProps } from "./$types";
     import { saveDocumentContent } from "./document.remote";
     import { SpinnerIcon } from "$lib/icons";
-    import { isTextFieldTarget } from "$lib/utils";
+    import { isTextFieldTarget, isUnmodifiedKey } from "$lib/utils";
     import { goto } from "$app/navigation";
     import DocumentPinButton from "$lib/components/document-pin-button.svelte";
 
@@ -134,7 +134,7 @@
 
     function onkeydown(e: KeyboardEvent) {
         if (e.defaultPrevented || isTextFieldTarget(e.target)) return;
-        if (e.key === "e") {
+        if (isUnmodifiedKey(e, "e")) {
             e.preventDefault();
             goto(
                 resolve("/(app)/workspaces/[slug]/documents/[docSlug]/edit", {

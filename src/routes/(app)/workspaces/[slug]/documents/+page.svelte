@@ -10,7 +10,7 @@
     import Filters from "./filters.svelte";
     import Pagination from "$lib/components/pagination.svelte";
     import { goto } from "$app/navigation";
-    import { isTextFieldTarget } from "$lib/utils";
+    import { isTextFieldTarget, isUnmodifiedKey } from "$lib/utils";
 
     let { data }: PageProps = $props();
     let documents = $derived(data.documents);
@@ -18,7 +18,7 @@
 
     function onkeydown(e: KeyboardEvent) {
         if (e.defaultPrevented || isTextFieldTarget(e.target)) return;
-        if (e.key === "n") {
+        if (isUnmodifiedKey(e, "n")) {
             e.preventDefault();
             goto(resolve("/(app)/workspaces/[slug]/documents/new", { slug: data.workspace.slug }));
         }
