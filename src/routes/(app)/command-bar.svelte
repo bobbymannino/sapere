@@ -60,13 +60,24 @@
     aria-label="Open command bar"
     aria-keyshortcuts="Meta+K Control+K"
     onclick={openCommandBar}
+    class="hidden can-hover:flex"
 >
     <SearchIcon />
-    <span class="me-5 hidden can-hover:block">Search</span>
-    <Kbd.Group class="hidden can-hover:block">
+    <span class="me-5">Search</span>
+    <Kbd.Group>
         <Kbd.Root>{page.data.isMac ? "⌘" : "Ctrl"}</Kbd.Root>
         <Kbd.Root>K</Kbd.Root>
     </Kbd.Group>
+</Button.Root>
+<Button.Root
+    type="button"
+    variant="outline"
+    size="icon"
+    aria-label="Open command bar"
+    onclick={openCommandBar}
+    class="can-hover:hidden"
+>
+    <SearchIcon />
 </Button.Root>
 
 <Command.Dialog bind:open>
