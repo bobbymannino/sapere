@@ -7,7 +7,7 @@
     import * as Button from "$lib/components/ui/button";
     import * as Command from "$lib/components/ui/command";
     import * as Kbd from "$lib/components/ui/kbd";
-    import { MarkdownIcon, SearchIcon, SpinnerIcon, WorkspaceIcon } from "$lib/icons";
+    import { ExitIcon, MarkdownIcon, SearchIcon, SpinnerIcon, UserIcon, WorkspaceIcon } from "$lib/icons";
     import { flushSync } from "svelte";
 
     type Props = {
@@ -76,7 +76,11 @@
         <Command.Group heading="Workspaces">
             <Command.Item>
                 {#snippet child({ props })}
-                    <a {...props} href={resolve("/(app)/workspaces")}>Workspaces</a>
+                    <a {...props} href={resolve("/(app)/workspaces")}>
+                        <WorkspaceIcon class="opacity-20" />
+                        <span>Workspaces</span>
+                        <span class="ms-auto opacity-20">Workspace</span>
+                    </a>
                 {/snippet}
             </Command.Item>
             {#await workspaces}
@@ -111,12 +115,21 @@
         <Command.Group heading="Account">
             <Command.Item>
                 {#snippet child({ props })}
-                    <a {...props} href={resolve("/(app)/account")}>Account</a>
+                    <a {...props} href={resolve("/(app)/account")}>
+                        <UserIcon class="opacity-20" />
+                        <span>Account</span>
+                        <span class="ms-auto opacity-20">Account</span>
+                    </a>
                 {/snippet}
             </Command.Item>
             <Command.Item onclick={signOut} disabled={signingOut}>
-                {#if signingOut}<SpinnerIcon class="animate-spin" />{/if}
-                <span>Sign out</span>
+                {#snippet child({ props })}
+                    <button type="button" {...props} class={[props.class, "w-full"]}>
+                        {#if signingOut}<SpinnerIcon class="animate-spin" />{:else}<ExitIcon class="opacity-20" />{/if}
+                        <span>Sign out</span>
+                        <span class="ms-auto opacity-20">Account</span>
+                    </button>
+                {/snippet}
             </Command.Item>
         </Command.Group>
     </Command.List>
