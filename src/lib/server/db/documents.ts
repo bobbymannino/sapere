@@ -161,6 +161,7 @@ const documentSelection = {
   id: s.documents.id,
   title: s.documents.title,
   slug: s.documents.slug,
+  pinnedAt: s.documents.pinnedAt,
   content: s.documents.content,
   updatedAt: s.documents.updatedAt,
   createdAt: s.documents.createdAt,

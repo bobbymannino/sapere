@@ -13,6 +13,7 @@
     import { SpinnerIcon } from "$lib/icons";
     import { isTextFieldTarget } from "$lib/utils";
     import { goto } from "$app/navigation";
+    import DocumentPinButton from "$lib/components/document-pin-button.svelte";
 
     type SaveState = "saved" | "dirty" | "saving" | "error";
 
@@ -27,6 +28,7 @@
     let saveState = $state<SaveState>("saved");
     let saveError = $state("");
     let saveTimer: ReturnType<typeof setTimeout> | null = null;
+    let pinError = $state<string | null>(null);
     let saveInFlight = false;
     let saveQueued = false;
     let destroyed = false;
@@ -162,17 +164,30 @@
             {showPreview ? "Hide" : "Show"} Preview
         </Button.Root>
         <span class={saveLabelClass} aria-live="polite">{saveLabel}</span>
-        <Button.Root
-            class="ms-auto"
-            variant="outline"
-            href={resolve("/(app)/workspaces/[slug]/documents/[docSlug]/edit", {
-                slug: data.workspace.slug,
-                docSlug: data.document.slug,
-            })}
-        >
-            <span>Edit</span>
-            <Kbd.Root class="hidden can-hover:flex">E</Kbd.Root>
-        </Button.Root>
+        {#if pinError}
+            <span class="text-destructive text-sm" aria-live="polite">{pinError}</span>
+        {/if}
+        <div class="ms-auto flex items-center gap-1">
+            <DocumentPinButton
+                workspaceSlug={data.workspace.slug}
+                documentSlug={data.document.slug}
+                documentTitle={data.document.title}
+                pinnedAt={data.document.pinnedAt}
+                keyboardShortcut="p"
+                bind:error={pinError}
+                outline
+            />
+            <Button.Root
+                variant="outline"
+                href={resolve("/(app)/workspaces/[slug]/documents/[docSlug]/edit", {
+                    slug: data.workspace.slug,
+                    docSlug: data.document.slug,
+                })}
+            >
+                <span>Edit</span>
+                <Kbd.Root class="hidden can-hover:flex">E</Kbd.Root>
+            </Button.Root>
+        </div>
     </header>
 
     <div class={["grid gap-5 p-5", showPreview && showEditor && "@3xl:grid-cols-2"]}>
