@@ -36,6 +36,7 @@
         sortOptions.find((option) => option.value === `${sortBy}:${sortDir}`) ?? sortOptions[0],
     );
     const perPage = $derived(page.url.searchParams.get("perPage"));
+    let searchInput: Nullable<HTMLInputElement> = $state(null);
 
     function getSortSearch(option: SortOption) {
         const searchParams = new URLSearchParams(page.url.searchParams);
@@ -59,6 +60,9 @@
         if (e.key === "s") {
             e.preventDefault();
             sortByDropdownOpen = true;
+        } else if (e.key === "/") {
+            e.preventDefault();
+            searchInput?.focus();
         }
     }
 </script>
@@ -78,10 +82,14 @@
         {/if}
 
         <InputGroup.Root>
+            <InputGroup.Addon align="inline-start" class="hidden can-hover:flex">
+                <Kbd.Root class="hidden can-hover:flex">/</Kbd.Root>
+            </InputGroup.Addon>
             <InputGroup.Input
                 type="search"
                 name="search"
                 value={searchValue}
+                bind:ref={searchInput}
                 placeholder="Search documents"
                 aria-label="Search documents"
                 disabled={Boolean(navigating.to)}
