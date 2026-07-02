@@ -1,3 +1,4 @@
+import { listRecentDocuments } from "$db/documents";
 import { listWorkspaceCommands, listRecentWorkspaces } from "$db/workspaces";
 import { requireUser } from "$lib/server/auth-utils";
 
@@ -7,6 +8,7 @@ export const load: LayoutServerLoad = async () => {
   const session = requireUser();
   const commandWorkspaces = listWorkspaceCommands({ ownerId: session.user.id });
   const recentWorkspaces = listRecentWorkspaces({ ownerId: session.user.id });
+  const recentDocuments = listRecentDocuments({ ownerId: session.user.id });
 
-  return { session, commandWorkspaces, recentWorkspaces };
+  return { session, commandWorkspaces, recentWorkspaces, recentDocuments };
 };

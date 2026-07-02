@@ -6,9 +6,9 @@
 </script>
 
 <Meta
-    title={`${data.workspace.title} Documents`}
-    description={`View documents in ${data.workspace.title}.`}
-    tags={["documents", data.workspace.slug]}
+    title={data.document.title}
+    description={`View ${data.document.title} in ${data.workspace.title}.`}
+    tags={["documents", data.workspace.slug, data.document.slug]}
     robots="noindex,nofollow"
 />
 

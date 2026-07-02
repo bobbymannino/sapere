@@ -12,7 +12,11 @@
 
 <NavigationProgressBar />
 <SidebarProvider open={data.sidebarOpen}>
-    <AppSidebar username={data.session.user.username} recentWorkspaces={data.recentWorkspaces} />
+    <AppSidebar
+        username={data.session.user.username}
+        recentWorkspaces={data.recentWorkspaces}
+        recentDocuments={data.recentDocuments}
+    />
     <main class="w-full grid grid-rows-[auto_1fr_auto]">
         <AppBreadcrumbs>
             <CommandBar workspaces={data.commandWorkspaces} />

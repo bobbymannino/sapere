@@ -2,7 +2,7 @@ import { db as mdb, PostgresErrorCodes } from "$db";
 import type { OrderByTarget, Ordered, PaginationArgs, Paginated } from "$db/pagination";
 import { buildOrderClause, buildPaginatedResult, buildPagination } from "$db/pagination";
 import * as s from "$lib/server/db/schema";
-import { and, count, DrizzleQueryError, eq, sql } from "drizzle-orm";
+import { and, count, desc, DrizzleQueryError, eq, sql } from "drizzle-orm";
 import { BunSQLDatabase } from "drizzle-orm/bun-sql/postgres";
 
 type CommonArgs = {
@@ -56,6 +56,42 @@ export async function listDocuments(args: Prettify<ListDocumentArgs>): Promise<P
   ]);
 
   return buildPaginatedResult(spaces, totalRows[0]?.total ?? 0, pagination);
+}
+
+const recentDocumentSelection = {
+  id: s.documents.id,
+  title: s.documents.title,
+  slug: s.documents.slug,
+  updatedAt: s.documents.updatedAt,
+  workspaceSlug: s.workspaces.slug,
+};
+
+export type RecentDocumentSelection = {
+  id: typeof s.documents.$inferSelect.id;
+  title: typeof s.documents.$inferSelect.title;
+  slug: typeof s.documents.$inferSelect.slug;
+  updatedAt: typeof s.documents.$inferSelect.updatedAt;
+  workspaceSlug: typeof s.workspaces.$inferSelect.slug;
+};
+
+type ListRecentDocumentsArgs = CommonArgs & {
+  ownerId: typeof s.workspaces.$inferSelect.ownerId;
+  limit?: number;
+};
+
+/**
+ * @param args.limit @default 4
+ */
+export async function listRecentDocuments(args: Prettify<ListRecentDocumentsArgs>): Promise<RecentDocumentSelection[]> {
+  const db = args.db ?? mdb;
+
+  return db
+    .select(recentDocumentSelection)
+    .from(s.documents)
+    .innerJoin(s.workspaces, eq(s.documents.workspaceId, s.workspaces.id))
+    .where(eq(s.workspaces.ownerId, args.ownerId))
+    .orderBy(desc(s.documents.updatedAt))
+    .limit(args.limit || 4);
 }
 
 type CreateDocumentArgs = CommonArgs & {

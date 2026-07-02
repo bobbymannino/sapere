@@ -6,17 +6,27 @@
     import * as Collapsible from "$lib/components/ui/collapsible";
     import * as Sidebar from "$lib/components/ui/sidebar";
     import * as Dropdown from "$lib/components/ui/dropdown-menu";
-    import { ChevronUpIcon, ExitIcon, SpinnerIcon, UserIcon, WorkspaceIcon, ChevronDownIcon } from "$lib/icons";
+    import {
+        ChevronDownIcon,
+        ChevronUpIcon,
+        ExitIcon,
+        MarkdownIcon,
+        SpinnerIcon,
+        UserIcon,
+        WorkspaceIcon,
+    } from "$lib/icons";
     import Logo from "$lib/components/logo.svelte";
     import type { RecentWorkspaceSelection } from "$lib/server/db/workspaces";
+    import type { RecentDocumentSelection } from "$lib/server/db/documents";
     import { page } from "$app/state";
 
     type Props = {
         username: string;
         recentWorkspaces: Promise<RecentWorkspaceSelection[]>;
+        recentDocuments: Promise<RecentDocumentSelection[]>;
     };
 
-    let { username, recentWorkspaces }: Props = $props();
+    let { username, recentWorkspaces, recentDocuments }: Props = $props();
 
     let pending = $state(false);
 
@@ -66,7 +76,7 @@
                                             </Sidebar.MenuItem>
                                         {/each}
                                     {:then recentWorkspaces}
-                                        {#each recentWorkspaces as workspace}
+                                        {#each recentWorkspaces as workspace (workspace.id)}
                                             <Sidebar.MenuItem>
                                                 <Sidebar.MenuButton
                                                     isActive={page.url.pathname === `/workspaces/${workspace.slug}`}
@@ -94,6 +104,64 @@
                                             {/snippet}
                                         </Sidebar.MenuButton>
                                     </Sidebar.MenuItem>
+                                </Sidebar.GroupContent>
+                            </Collapsible.Content>
+                        </Sidebar.Group>
+                    </Collapsible.Root>
+
+                    <Sidebar.Separator />
+
+                    <Collapsible.Root open class="group/collapsible">
+                        <Sidebar.Group>
+                            <Sidebar.GroupLabel>
+                                {#snippet child({ props })}
+                                    <Collapsible.Trigger {...props}>
+                                        <MarkdownIcon class="me-3" />
+                                        Documents
+                                        <ChevronDownIcon
+                                            class="ms-auto transition-transform group-data-[state=open]/collapsible:rotate-180"
+                                        />
+                                    </Collapsible.Trigger>
+                                {/snippet}
+                            </Sidebar.GroupLabel>
+
+                            <Collapsible.Content>
+                                <Sidebar.GroupContent>
+                                    {#await recentDocuments}
+                                        {#each { length: 4 } as _, index (index)}
+                                            <Sidebar.MenuItem>
+                                                <Sidebar.MenuSkeleton />
+                                            </Sidebar.MenuItem>
+                                        {/each}
+                                    {:then recentDocuments}
+                                        {#each recentDocuments as document (document.id)}
+                                            <Sidebar.MenuItem>
+                                                <Sidebar.MenuButton
+                                                    isActive={page.url.pathname ===
+                                                        `/workspaces/${document.workspaceSlug}/documents/${document.slug}`}
+                                                >
+                                                    {#snippet child({ props })}
+                                                        <a
+                                                            {...props}
+                                                            href={resolve(
+                                                                "/(app)/workspaces/[slug]/documents/[docSlug]",
+                                                                {
+                                                                    slug: document.workspaceSlug,
+                                                                    docSlug: document.slug,
+                                                                },
+                                                            )}
+                                                        >
+                                                            <span>{document.title}</span>
+                                                        </a>
+                                                    {/snippet}
+                                                </Sidebar.MenuButton>
+                                            </Sidebar.MenuItem>
+                                        {:else}
+                                            <Sidebar.MenuItem>
+                                                <Sidebar.MenuButton disabled>No Documents</Sidebar.MenuButton>
+                                            </Sidebar.MenuItem>
+                                        {/each}
+                                    {/await}
                                 </Sidebar.GroupContent>
                             </Collapsible.Content>
                         </Sidebar.Group>
@@ -146,4 +214,6 @@
             </Sidebar.MenuItem>
         </Sidebar.Menu>
     </Sidebar.Footer>
+
+    <Sidebar.Rail />
 </Sidebar.Root>

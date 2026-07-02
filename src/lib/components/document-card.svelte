@@ -8,7 +8,7 @@
 
     type Props = DocumentCardSelection & { workspaceSlug: WorkspaceSelect["slug"] };
 
-    let { content, slug, title, updatedAt, workspaceSlug }: DocumentCardSelection = $props();
+    let { content, slug, title, updatedAt, workspaceSlug }: Props = $props();
 </script>
 
 <Card.Root
