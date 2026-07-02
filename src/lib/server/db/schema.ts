@@ -182,6 +182,7 @@ export const documents = pgTable(
       (): SQL => sql`regexp_replace(lower(${documents.title}), '[^a-z0-9]', '', 'g')`,
     ),
     slug: text().notNull(),
+    pinnedAt: timestamp("pinned_at", { withTimezone: true }),
     content: text()
       .notNull()
       .default(sql`''`)

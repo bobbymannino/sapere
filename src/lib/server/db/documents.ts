@@ -14,6 +14,7 @@ const documentCardSelection = {
   id: s.documents.id,
   title: s.documents.title,
   slug: s.documents.slug,
+  pinnedAt: s.documents.pinnedAt,
   content: s.documents.content,
   updatedAt: s.documents.updatedAt,
   createdAt: s.documents.createdAt,
@@ -38,11 +39,14 @@ type ListDocumentArgs = CommonArgs &
 
 export async function listDocuments(args: Prettify<ListDocumentArgs>): Promise<Paginated<DocumentCardSelection>> {
   const db = args.db ?? mdb;
-  const orderBy = buildOrderClause(args, {
-    columns: documentOrderColumns,
-    defaultSortBy: "updatedAt",
-    defaultSortDir: "desc",
-  });
+  const orderBy = [
+    sql`${desc(s.documents.pinnedAt)} nulls last`,
+    ...buildOrderClause(args, {
+      columns: documentOrderColumns,
+      defaultSortBy: "updatedAt",
+      defaultSortDir: "desc",
+    }),
+  ];
   const pagination = buildPagination(args);
   const search = args.search?.trim();
   const searchFilter = search
@@ -201,6 +205,42 @@ export async function updateDocumentContent(args: Prettify<UpdateDocumentContent
         .where(eq(s.workspaces.id, document.workspaceId)),
     ]);
     if (!updated) throw new Error("Failed to update document content");
+
+    return updated;
+  });
+}
+
+type SetDocumentPinnedArgs = CommonArgs & {
+  userId: typeof s.users.$inferSelect.id;
+  workspaceSlug: typeof s.workspaces.$inferSelect.slug;
+  documentSlug: typeof s.documents.$inferSelect.slug;
+  pinned: boolean;
+};
+
+export async function setDocumentPinned(args: Prettify<SetDocumentPinnedArgs>) {
+  const db = args.db ?? mdb;
+
+  return db.transaction(async (tx) => {
+    const [document] = await tx
+      .select({ id: s.documents.id })
+      .from(s.documents)
+      .innerJoin(s.workspaces, eq(s.documents.workspaceId, s.workspaces.id))
+      .where(
+        and(
+          eq(s.workspaces.slug, args.workspaceSlug),
+          eq(s.documents.slug, args.documentSlug),
+          eq(s.workspaces.ownerId, args.userId),
+        ),
+      )
+      .limit(1);
+    if (!document) return null;
+
+    const [updated] = await tx
+      .update(s.documents)
+      .set({ pinnedAt: args.pinned ? sql`now()` : null })
+      .where(eq(s.documents.id, document.id))
+      .returning({ id: s.documents.id, pinnedAt: s.documents.pinnedAt });
+    if (!updated) throw new Error("Failed to update document pin");
 
     return updated;
   });
