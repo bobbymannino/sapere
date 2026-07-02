@@ -157,6 +157,48 @@ const documentSelection = {
 
 export type DocumentSelection = Pick<typeof s.documents.$inferSelect, keyof typeof documentSelection>;
 
+type UpdateDocumentContentArgs = CommonArgs & {
+  userId: typeof s.users.$inferSelect.id;
+  workspaceSlug: typeof s.workspaces.$inferSelect.slug;
+  documentSlug: typeof s.documents.$inferSelect.slug;
+  content: typeof s.documents.$inferInsert.content;
+};
+
+export async function updateDocumentContent(args: Prettify<UpdateDocumentContentArgs>) {
+  const db = args.db ?? mdb;
+
+  return db.transaction(async (tx) => {
+    const [document] = await tx
+      .select({ id: s.documents.id, workspaceId: s.documents.workspaceId })
+      .from(s.documents)
+      .innerJoin(s.workspaces, eq(s.documents.workspaceId, s.workspaces.id))
+      .where(
+        and(
+          eq(s.workspaces.slug, args.workspaceSlug),
+          eq(s.documents.slug, args.documentSlug),
+          eq(s.workspaces.ownerId, args.userId),
+        ),
+      )
+      .limit(1);
+    if (!document) return null;
+
+    const [[updated]] = await Promise.all([
+      tx
+        .update(s.documents)
+        .set({ content: args.content, updatedAt: sql`now()` })
+        .where(eq(s.documents.id, document.id))
+        .returning({ content: s.documents.content, updatedAt: s.documents.updatedAt }),
+      tx
+        .update(s.workspaces)
+        .set({ updatedAt: sql`now()` })
+        .where(eq(s.workspaces.id, document.workspaceId)),
+    ]);
+    if (!updated) throw new Error("Failed to update document content");
+
+    return updated;
+  });
+}
+
 type FindDocumentBySlugArgs = CommonArgs & {
   userId: typeof s.users.$inferSelect.id;
   documentSlug: typeof s.documents.$inferSelect.slug;

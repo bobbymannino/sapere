@@ -25,3 +25,8 @@ export const DocumentSlugSchema = v.pipe(
     `Document slug cannot be one of the reserved slugs: ${reservedSlugs.join(", ")}`,
   ),
 );
+
+export const DocumentContentSchema = v.pipe(
+  v.string("Document content must be a string"),
+  v.maxLength(200000, "Document content must be at most 200,000 characters long"),
+);
