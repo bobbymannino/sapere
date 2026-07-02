@@ -12,14 +12,20 @@ export const load: PageServerLoad = async ({ params, url }) => {
   const workspace = await findWorkspaceBySlug({ ownerId: user.id, slug: params.slug });
   if (!workspace) error(404, "Workspace not found");
 
+  const sortBy = url.searchParams.get("sortBy") ?? undefined;
+  const sortDir = url.searchParams.get("sortDir") ?? undefined;
   const documents = await listDocuments({
     workspaceId: workspace.id,
+    sortBy,
+    sortDir,
     page: url.searchParams.get("page"),
     perPage: url.searchParams.get("perPage"),
   });
 
   return {
     workspace,
+    sortBy,
+    sortDir,
     documents,
     breadcrumbs: [
       { label: "Workspaces", href: resolve("/(app)/workspaces") },

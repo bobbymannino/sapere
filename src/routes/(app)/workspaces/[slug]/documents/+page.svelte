@@ -3,10 +3,10 @@
     import Empty from "$lib/components/empty.svelte";
     import Meta from "$lib/components/meta.svelte";
     import { Button } from "$lib/components/ui/button";
-    import { formatDateTime, toIsoDate } from "$lib/date-format";
-    import { MarkdownIcon } from "$lib/icons";
     import DocumentCard from "$lib/components/document-card.svelte";
+    import { MarkdownIcon } from "$lib/icons";
     import type { PageProps } from "./$types";
+    import Filters from "./filters.svelte";
     import Pagination from "../../pagination.svelte";
 
     let { data }: PageProps = $props();
@@ -28,13 +28,17 @@
             </p>
             <h1>Documents</h1>
         </div>
-        <Button
-            href={resolve("/(app)/workspaces/[slug]/documents/new", { slug: data.workspace.slug })}
-            variant="outline"
-        >
-            <MarkdownIcon />
-            <span>New Document</span>
-        </Button>
+        <div class="flex flex-wrap gap-2">
+            <Filters workspaceSlug={data.workspace.slug} sortBy={data.sortBy} sortDir={data.sortDir} />
+            <Button
+                href={resolve("/(app)/workspaces/[slug]/documents/new", { slug: data.workspace.slug })}
+                variant="outline"
+                size="sm"
+            >
+                <MarkdownIcon />
+                <span>New Document</span>
+            </Button>
+        </div>
     </header>
 
     {#if documents.results.length === 0}
