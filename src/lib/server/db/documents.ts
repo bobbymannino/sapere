@@ -2,7 +2,7 @@ import { db as mdb, PostgresErrorCodes } from "$db";
 import type { OrderByTarget, Ordered, PaginationArgs, Paginated } from "$db/pagination";
 import { buildOrderClause, buildPaginatedResult, buildPagination } from "$db/pagination";
 import * as s from "$lib/server/db/schema";
-import { count, DrizzleQueryError, eq, sql } from "drizzle-orm";
+import { and, count, DrizzleQueryError, eq, sql } from "drizzle-orm";
 import { BunSQLDatabase } from "drizzle-orm/bun-sql/postgres";
 
 type CommonArgs = {
@@ -13,7 +13,7 @@ const documentCardSelection = {
   id: s.documents.id,
   title: s.documents.title,
   slug: s.documents.slug,
-  content: sql<string>`left(${s.documents.content}, 50)`,
+  content: s.documents.content,
   updatedAt: s.documents.updatedAt,
   createdAt: s.documents.createdAt,
 };
@@ -108,4 +108,39 @@ function isDocumentSlugUniqueError(error: unknown) {
       error.cause.constraint?.includes("slug")) ??
     false
   );
+}
+
+const documentSelection = {
+  id: s.documents.id,
+  title: s.documents.title,
+  slug: s.documents.slug,
+  content: sql<string>`left(${s.documents.content}, 50)`,
+  updatedAt: s.documents.updatedAt,
+  createdAt: s.documents.createdAt,
+};
+
+export type DocumentSelection = Pick<typeof s.documents.$inferSelect, keyof typeof documentSelection>;
+
+type FindDocumentBySlugArgs = CommonArgs & {
+  userId: typeof s.users.$inferSelect.id;
+  documentSlug: typeof s.documents.$inferSelect.slug;
+  workspaceSlug: typeof s.workspaces.$inferSelect.slug;
+};
+
+export async function findDocumentBySlug(args: FindDocumentBySlugArgs) {
+  const db = args.db ?? mdb;
+
+  const [workspace] = await db
+    .select(documentSelection)
+    .from(s.documents)
+    .innerJoin(s.workspaces, eq(s.documents.workspaceId, s.workspaces.id))
+    .where(
+      and(
+        eq(s.workspaces.slug, args.workspaceSlug),
+        eq(s.documents.slug, args.documentSlug),
+        eq(s.workspaces.ownerId, args.userId),
+      ),
+    )
+    .limit(1);
+  return workspace ?? null;
 }
