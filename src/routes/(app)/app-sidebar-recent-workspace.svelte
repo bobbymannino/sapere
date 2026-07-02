@@ -4,9 +4,16 @@
     import * as Sidebar from "$lib/components/ui/sidebar";
     import { page } from "$app/state";
     import { resolve } from "$app/paths";
-    import { EllipsisIcon } from "$lib/icons";
+    import { getRecentWorkspaceDocuments } from "$lib/documents.remote";
+    import { EllipsisIcon, SpinnerIcon } from "$lib/icons";
 
-    let { slug, title }: RecentWorkspaceSelection = $props();
+    let { slug, title, id }: RecentWorkspaceSelection = $props();
+
+    let hasOpenedDropdown = $state(false);
+
+    function dropdownOpenChange() {
+        hasOpenedDropdown = true;
+    }
 </script>
 
 <Sidebar.MenuItem>
@@ -17,7 +24,7 @@
             </a>
         {/snippet}
     </Sidebar.MenuButton>
-    <Dropdown.Root>
+    <Dropdown.Root onOpenChange={dropdownOpenChange}>
         <Dropdown.Trigger>
             {#snippet child({ props })}
                 <Sidebar.MenuAction {...props}>
@@ -25,30 +32,67 @@
                 </Sidebar.MenuAction>
             {/snippet}
         </Dropdown.Trigger>
+
         <Dropdown.Content side="right" align="start">
-            <Dropdown.Item>
-                {#snippet child({ props })}
-                    <a
-                        {...props}
-                        href={resolve("/(app)/workspaces/[slug]/documents", { slug })}
-                        class={[props.class, "hover:cursor-pointer"]}
-                    >
-                        <span>Documents</span>
-                    </a>
-                {/snippet}
-            </Dropdown.Item>
+            <Dropdown.Group>
+                <Dropdown.GroupHeading>Documents</Dropdown.GroupHeading>
+
+                {#if hasOpenedDropdown}
+                    {#await getRecentWorkspaceDocuments(id)}
+                        <Dropdown.Item disabled>
+                            <SpinnerIcon class="animate-spin" />
+                            <span>Loading...</span>
+                        </Dropdown.Item>
+                    {:then workspaces}
+                        {#each workspaces as w (w.id)}
+                            <Dropdown.Item>
+                                {#snippet child({ props })}
+                                    <a
+                                        {...props}
+                                        href={resolve("/(app)/workspaces/[slug]/documents/[docSlug]", {
+                                            slug: w.workspaceSlug,
+                                            docSlug: w.slug,
+                                        })}
+                                        class={[props.class, "hover:cursor-pointer"]}
+                                    >
+                                        <span>{w.title}</span>
+                                    </a>
+                                {/snippet}
+                            </Dropdown.Item>
+                        {/each}
+                    {/await}
+                {/if}
+
+                <Dropdown.Item>
+                    {#snippet child({ props })}
+                        <a
+                            {...props}
+                            href={resolve("/(app)/workspaces/[slug]/documents", { slug })}
+                            class={[props.class, "hover:cursor-pointer"]}
+                        >
+                            <span>All Documents</span>
+                        </a>
+                    {/snippet}
+                </Dropdown.Item>
+            </Dropdown.Group>
+
             <Dropdown.Separator />
-            <Dropdown.Item>
-                {#snippet child({ props })}
-                    <a
-                        {...props}
-                        href={resolve("/(app)/workspaces/[slug]/edit", { slug })}
-                        class={[props.class, "hover:cursor-pointer"]}
-                    >
-                        <span>Edit</span>
-                    </a>
-                {/snippet}
-            </Dropdown.Item>
+
+            <Dropdown.Group>
+                <Dropdown.GroupHeading>Actions</Dropdown.GroupHeading>
+
+                <Dropdown.Item>
+                    {#snippet child({ props })}
+                        <a
+                            {...props}
+                            href={resolve("/(app)/workspaces/[slug]/edit", { slug })}
+                            class={[props.class, "hover:cursor-pointer"]}
+                        >
+                            <span>Edit</span>
+                        </a>
+                    {/snippet}
+                </Dropdown.Item>
+            </Dropdown.Group>
         </Dropdown.Content>
     </Dropdown.Root>
 </Sidebar.MenuItem>
