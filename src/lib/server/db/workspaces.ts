@@ -1,9 +1,10 @@
-import { db as mdb, PostgresErrorCodes } from "$db";
+import { db as mdb } from "$db";
+import { isUniqueConstraintError } from "$db/errors";
 import type { OrderByTarget, Ordered, PaginationArgs, Paginated } from "$db/pagination";
 import { buildOrderClause, buildPaginatedResult, buildPagination } from "$db/pagination";
 import * as s from "$lib/server/db/schema";
 import { files, deleteFileIfExists, fileTypeToExtension } from "$lib/server/files";
-import { and, count, DrizzleQueryError, eq, desc } from "drizzle-orm";
+import { and, count, eq, desc } from "drizzle-orm";
 import { BunSQLDatabase } from "drizzle-orm/bun-sql/postgres";
 
 type CommonArgs = {
@@ -254,11 +255,5 @@ export async function deleteWorkspace(args: Prettify<DeleteWorkspaceArgs>) {
 }
 
 function isWorkspaceSlugUniqueError(error: unknown) {
-  return (
-    (error instanceof DrizzleQueryError &&
-      error.cause instanceof Bun.SQL.PostgresError &&
-      error.cause.errno === PostgresErrorCodes.Unique &&
-      error.cause.constraint?.includes("slug")) ??
-    false
-  );
+  return isUniqueConstraintError(error, "workspaces_owner_slug_unique");
 }
