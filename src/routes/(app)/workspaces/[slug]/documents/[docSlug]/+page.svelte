@@ -25,7 +25,9 @@
     let saveQueued = false;
     let destroyed = false;
 
-    let sanitizedMarkdown = $derived(browser ? dompurify.sanitize(md, { ALLOWED_TAGS: [], ALLOWED_ATTR: [] }) : md);
+    let sanitizedMarkdown = $derived(
+        browser ? dompurify.sanitize(md, { ALLOWED_TAGS: ["div", "img", "p", "a"], ALLOWED_ATTR: [] }) : md,
+    );
     let previewHtml = $derived(
         browser && showPreview ? dompurify.sanitize(marked.parse(sanitizedMarkdown, { async: false })) : "",
     );
@@ -134,10 +136,11 @@
         </section>
 
         {#if showPreview}
-            <section class="">
+            <section>
                 {#if browser}
-                    <iframe title="Markdown preview" sandbox="" srcdoc={previewHtml} class="w-full rounded-2xl border"
-                    ></iframe>
+                    <div class="prose rounded-2xl border p-5">
+                        {@html previewHtml}
+                    </div>
                 {:else}
                     <p>Loading preview...</p>
                 {/if}
