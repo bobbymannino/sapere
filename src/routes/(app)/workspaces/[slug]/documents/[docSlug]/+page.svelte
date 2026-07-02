@@ -8,6 +8,7 @@
     import { onDestroy } from "svelte";
     import type { PageProps } from "./$types";
     import { saveDocumentContent } from "./document.remote";
+    import { SpinnerIcon } from "$lib/icons";
 
     type SaveState = "saved" | "dirty" | "saving" | "error";
 
@@ -16,6 +17,7 @@
     let { data }: PageProps = $props();
 
     let showPreview = $state(true);
+    let showEditor = $state(true);
     let md = $derived(data.document.content);
     let lastSavedContent = $derived(data.document.content);
     let saveState = $state<SaveState>("saved");
@@ -123,27 +125,35 @@
 />
 
 <div class="@container">
-    <header class="flex items-center gap-3 p-5 pbe-0">
+    <header class="flex items-center gap-1 p-5 pbe-0">
+        <Button.Root onclick={() => (showEditor = !showEditor)}>
+            {showEditor ? "Hide" : "Show"} Editor
+        </Button.Root>
         <Button.Root onclick={() => (showPreview = !showPreview)}>
             {showPreview ? "Hide" : "Show"} Preview
         </Button.Root>
         <span class={saveLabelClass} aria-live="polite">{saveLabel}</span>
     </header>
 
-    <div class={["grid gap-5 p-5", showPreview && "@3xl:grid-cols-2"]}>
-        <section>
-            <Textarea.Root bind:value={md} {oninput} aria-label="Document content" class="font-mono" />
-        </section>
+    <div class={["grid gap-5 p-5", showPreview && showEditor && "@3xl:grid-cols-2"]}>
+        {#if showEditor}
+            <section>
+                <Textarea.Root bind:value={md} {oninput} aria-label="Document content" class="font-mono" />
+            </section>
+        {/if}
 
         {#if showPreview}
-            <section>
-                {#if browser}
-                    <div class="prose rounded-2xl border p-5">
+            <section class="@container/preview flex justify-center">
+                <div class="@3xl/preview:prose-lg prose rounded-2xl border p-5 w-full">
+                    {#if browser}
                         {@html previewHtml}
-                    </div>
-                {:else}
-                    <p>Loading preview...</p>
-                {/if}
+                    {:else}
+                        <p>
+                            <SpinnerIcon class="animate-spin size-5 inline-block" />
+                            Loading preview...
+                        </p>
+                    {/if}
+                </div>
             </section>
         {/if}
     </div>

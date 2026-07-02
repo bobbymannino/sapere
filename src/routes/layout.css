@@ -165,7 +165,3 @@
     }
   }
 }
-
-@utility prose {
-  @apply [*_+_*]:mbs-[1em];
-}
