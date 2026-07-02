@@ -163,6 +163,9 @@ export const workspaces = pgTable(
   ],
 );
 
+export type WorkspaceSelect = typeof workspaces.$inferSelect;
+export type WorkspaceInsert = typeof workspaces.$inferInsert;
+
 export const documents = pgTable(
   "documents",
   {
@@ -201,3 +204,6 @@ export const documents = pgTable(
     check(`chk_documents_slug_valid`, sql`${t.slug} ~ '^[a-z0-9_\.-]+$'`),
   ],
 );
+
+export type DocumentSelect = typeof documents.$inferSelect;
+export type DocumentInsert = typeof documents.$inferInsert;

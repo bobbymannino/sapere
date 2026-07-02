@@ -48,7 +48,7 @@
         <ul class="grid gap-5 @xl:grid-cols-2 @3xl:grid-cols-3 @5xl:grid-cols-4">
             {#each documents.results as doc (doc.id)}
                 <li class="min-w-0">
-                    <DocumentCard {...doc} />
+                    <DocumentCard {...doc} workspaceSlug={data.workspace.slug} />
                 </li>
             {/each}
         </ul>
