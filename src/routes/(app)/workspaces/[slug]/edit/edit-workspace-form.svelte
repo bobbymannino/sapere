@@ -180,6 +180,7 @@
                 name="title"
                 required
                 autocapitalize="words"
+                autofocus
                 bind:value={title}
             />
             {#each fieldErrors("title") as error (error)}

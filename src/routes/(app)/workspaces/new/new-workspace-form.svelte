@@ -100,6 +100,7 @@
             name="title"
             required
             autocapitalize="words"
+            autofocus
             oninput={(e) => (slug = slugify(e.currentTarget.value))}
         />
         {#each page.form?.valiErrors?.nested?.title as error (error)}

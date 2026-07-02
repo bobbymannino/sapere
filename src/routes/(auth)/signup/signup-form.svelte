@@ -71,6 +71,7 @@
             name="name"
             required
             autocomplete="name"
+            autofocus
             disabled={pending}
             bind:value={formData.name}
             placeholder="Enter your name"

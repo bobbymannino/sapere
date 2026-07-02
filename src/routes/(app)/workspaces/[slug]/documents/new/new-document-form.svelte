@@ -65,6 +65,7 @@
                 name="title"
                 required
                 autocapitalize="words"
+                autofocus
                 bind:value={title}
                 oninput={(event) => (slug = slugify(event.currentTarget.value))}
             />

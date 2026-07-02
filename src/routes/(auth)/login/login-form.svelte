@@ -78,6 +78,7 @@
             autocomplete="email"
             spellcheck="false"
             autocapitalize="off"
+            autofocus
             required
             disabled={!!pending}
             bind:value={formData.email}
