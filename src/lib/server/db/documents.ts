@@ -150,7 +150,7 @@ const documentSelection = {
   id: s.documents.id,
   title: s.documents.title,
   slug: s.documents.slug,
-  content: sql<string>`left(${s.documents.content}, 50)`,
+  content: s.documents.content,
   updatedAt: s.documents.updatedAt,
   createdAt: s.documents.createdAt,
 };

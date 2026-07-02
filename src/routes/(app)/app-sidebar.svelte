@@ -158,7 +158,9 @@
                                             </Sidebar.MenuItem>
                                         {:else}
                                             <Sidebar.MenuItem>
-                                                <Sidebar.MenuButton disabled>No Documents</Sidebar.MenuButton>
+                                                <Sidebar.MenuButton aria-disabled="true">
+                                                    No Documents
+                                                </Sidebar.MenuButton>
                                             </Sidebar.MenuItem>
                                         {/each}
                                     {/await}
