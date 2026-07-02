@@ -211,6 +211,91 @@ export async function updateDocumentContent(args: Prettify<UpdateDocumentContent
   });
 }
 
+type UpdateDocumentArgs = CommonArgs & {
+  userId: typeof s.users.$inferSelect.id;
+  workspaceSlug: typeof s.workspaces.$inferSelect.slug;
+  currentDocumentSlug: typeof s.documents.$inferSelect.slug;
+  title: typeof s.documents.$inferInsert.title;
+  slug: typeof s.documents.$inferInsert.slug;
+};
+
+export async function updateDocument(args: Prettify<UpdateDocumentArgs>) {
+  const db = args.db ?? mdb;
+
+  try {
+    return db.transaction(async (tx) => {
+      const [document] = await tx
+        .select({ id: s.documents.id, workspaceId: s.documents.workspaceId })
+        .from(s.documents)
+        .innerJoin(s.workspaces, eq(s.documents.workspaceId, s.workspaces.id))
+        .where(
+          and(
+            eq(s.workspaces.slug, args.workspaceSlug),
+            eq(s.documents.slug, args.currentDocumentSlug),
+            eq(s.workspaces.ownerId, args.userId),
+          ),
+        )
+        .limit(1);
+      if (!document) return null;
+
+      const [[updated]] = await Promise.all([
+        tx
+          .update(s.documents)
+          .set({ title: args.title, slug: args.slug, updatedAt: sql`now()` })
+          .where(eq(s.documents.id, document.id))
+          .returning({ id: s.documents.id, slug: s.documents.slug }),
+        tx
+          .update(s.workspaces)
+          .set({ updatedAt: sql`now()` })
+          .where(eq(s.workspaces.id, document.workspaceId)),
+      ]);
+      if (!updated) throw new Error("Failed to update document");
+
+      return updated;
+    });
+  } catch (error) {
+    if (isDocumentSlugUniqueError(error)) throw new DocumentSlugUsedError(args.slug);
+    throw error;
+  }
+}
+
+type DeleteDocumentArgs = CommonArgs & {
+  userId: typeof s.users.$inferSelect.id;
+  workspaceSlug: typeof s.workspaces.$inferSelect.slug;
+  documentSlug: typeof s.documents.$inferSelect.slug;
+};
+
+export async function deleteDocument(args: Prettify<DeleteDocumentArgs>) {
+  const db = args.db ?? mdb;
+
+  return db.transaction(async (tx) => {
+    const [document] = await tx
+      .select({ id: s.documents.id, workspaceId: s.documents.workspaceId })
+      .from(s.documents)
+      .innerJoin(s.workspaces, eq(s.documents.workspaceId, s.workspaces.id))
+      .where(
+        and(
+          eq(s.workspaces.slug, args.workspaceSlug),
+          eq(s.documents.slug, args.documentSlug),
+          eq(s.workspaces.ownerId, args.userId),
+        ),
+      )
+      .limit(1);
+    if (!document) return null;
+
+    const [[deleted]] = await Promise.all([
+      tx.delete(s.documents).where(eq(s.documents.id, document.id)).returning({ id: s.documents.id }),
+      tx
+        .update(s.workspaces)
+        .set({ updatedAt: sql`now()` })
+        .where(eq(s.workspaces.id, document.workspaceId)),
+    ]);
+    if (!deleted) throw new Error("Failed to delete document");
+
+    return deleted;
+  });
+}
+
 type FindDocumentBySlugArgs = CommonArgs & {
   userId: typeof s.users.$inferSelect.id;
   documentSlug: typeof s.documents.$inferSelect.slug;
