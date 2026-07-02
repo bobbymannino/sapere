@@ -46,13 +46,6 @@
         return searchParams.toString();
     }
 
-    function getClearSearch() {
-        const searchParams = new URLSearchParams(page.url.searchParams);
-        searchParams.delete("search");
-        searchParams.delete("page");
-        return searchParams.toString();
-    }
-
     let sortByDropdownOpen = $state(false);
 
     function onkeydown(e: KeyboardEvent) {

@@ -4,12 +4,15 @@
     import Meta from "$lib/components/meta.svelte";
     import * as Button from "$lib/components/ui/button";
     import * as Textarea from "$lib/components/ui/textarea";
+    import * as Kbd from "$lib/components/ui/kbd";
     import dompurify from "dompurify";
     import { marked } from "marked";
     import { onDestroy } from "svelte";
     import type { PageProps } from "./$types";
     import { saveDocumentContent } from "./document.remote";
     import { SpinnerIcon } from "$lib/icons";
+    import { isTextFieldTarget } from "$lib/utils";
+    import { goto } from "$app/navigation";
 
     type SaveState = "saved" | "dirty" | "saving" | "error";
 
@@ -126,7 +129,22 @@
         destroyed = true;
         if (saveTimer) clearTimeout(saveTimer);
     });
+
+    function onkeydown(e: KeyboardEvent) {
+        if (e.defaultPrevented || isTextFieldTarget(e.target)) return;
+        if (e.key === "e") {
+            e.preventDefault();
+            goto(
+                resolve("/(app)/workspaces/[slug]/documents/[docSlug]/edit", {
+                    slug: data.workspace.slug,
+                    docSlug: data.document.slug,
+                }),
+            );
+        }
+    }
 </script>
+
+<svelte:window {onkeydown} />
 
 <Meta
     title={data.document.title}
@@ -152,7 +170,8 @@
                 docSlug: data.document.slug,
             })}
         >
-            Edit
+            <span>Edit</span>
+            <Kbd.Root class="hidden can-hover:flex">E</Kbd.Root>
         </Button.Root>
     </header>
 
