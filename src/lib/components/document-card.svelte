@@ -1,41 +1,16 @@
 <script lang="ts">
     import type { DocumentCardSelection } from "$lib/server/db/documents";
-    import { MarkdownIcon, PinIcon, SpinnerIcon, UnpinIcon } from "$lib/icons";
+    import { MarkdownIcon } from "$lib/icons";
     import * as Card from "$lib/components/ui/card";
-    import { Button } from "$lib/components/ui/button";
     import { toIsoDate, formatDateTime } from "$lib/date-format";
     import { resolve } from "$app/paths";
     import type { WorkspaceSelect } from "$lib/server/db/schema";
-    import { setDocumentPinnedCommand } from "$lib/documents.remote";
-    import { refreshAll } from "$app/navigation";
+    import DocumentPinButton from "$lib/components/document-pin-button.svelte";
 
     type Props = DocumentCardSelection & { workspaceSlug: WorkspaceSelect["slug"] };
 
     let { content, slug, title, pinnedAt, updatedAt, workspaceSlug }: Props = $props();
-    let pinning = $state(false);
     let pinError = $state<string | null>(null);
-    let pinLabel = $derived(pinnedAt ? "Pinned" : "Pin");
-    let pinActionLabel = $derived(pinnedAt ? `Unpin ${title}` : `Pin ${title}`);
-
-    async function togglePinned() {
-        if (pinning) return;
-
-        pinning = true;
-        pinError = null;
-
-        try {
-            await setDocumentPinnedCommand({
-                workspaceSlug,
-                documentSlug: slug,
-                pinned: !pinnedAt,
-            });
-            await refreshAll({ includeLoadFunctions: true });
-        } catch (error) {
-            pinError = error instanceof Error ? error.message : "Failed to update pin";
-        } finally {
-            pinning = false;
-        }
-    }
 </script>
 
 <Card.Root
@@ -80,23 +55,13 @@
             {/if}
         </div>
 
-        <Button
-            class="relative z-20"
-            variant={pinnedAt ? "secondary" : "ghost"}
-            size="sm"
-            aria-label={pinActionLabel}
-            aria-pressed={Boolean(pinnedAt)}
-            disabled={pinning}
-            onclick={togglePinned}
-        >
-            {#if pinning}
-                <SpinnerIcon class="size-3 animate-spin" />
-            {:else if pinnedAt}
-                <UnpinIcon class="size-3" />
-            {:else}
-                <PinIcon class="size-3" />
-            {/if}
-            <span>{pinLabel}</span>
-        </Button>
+        <DocumentPinButton
+            {workspaceSlug}
+            documentSlug={slug}
+            documentTitle={title}
+            {pinnedAt}
+            bind:error={pinError}
+            hideLabel
+        />
     </Card.Footer>
 </Card.Root>
