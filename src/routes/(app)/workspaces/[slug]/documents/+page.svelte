@@ -21,17 +21,27 @@
 />
 
 <section class="@container flex flex-col gap-5 p-5">
-    <header class="flex flex-col gap-1">
-        <p class="text-muted-foreground">
-            <small>{data.workspace.title}</small>
-        </p>
-        <h1>Documents</h1>
+    <header class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+        <div class="flex flex-col gap-1">
+            <p class="text-muted-foreground">
+                <small>{data.workspace.title}</small>
+            </p>
+            <h1>Documents</h1>
+        </div>
+        <Button
+            href={resolve("/(app)/workspaces/[slug]/documents/new", { slug: data.workspace.slug })}
+            variant="outline"
+        >
+            <MarkdownIcon />
+            <span>New Document</span>
+        </Button>
     </header>
 
     {#if documents.results.length === 0}
         <Empty title="No Documents" description="This workspace does not have any documents yet." icon={MarkdownIcon}>
-            <Button href={resolve("/(app)/workspaces/[slug]", { slug: data.workspace.slug })} variant="outline">
-                Workspace
+            <Button href={resolve("/(app)/workspaces/[slug]/documents/new", { slug: data.workspace.slug })}>
+                <MarkdownIcon />
+                <span>New Document</span>
             </Button>
         </Empty>
     {:else}
@@ -73,8 +83,8 @@
             {/each}
         </ul>
     {/if}
-</section>
 
-{#if documents.totalPages > 1}
-    <Pagination count={documents.total} perPage={documents.perPage} page={documents.page} />
-{/if}
+    {#if documents.totalPages > 1}
+        <Pagination count={documents.total} perPage={documents.perPage} page={documents.page} />
+    {/if}
+</section>
