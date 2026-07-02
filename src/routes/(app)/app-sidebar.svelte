@@ -9,6 +9,7 @@
     import {
         ChevronDownIcon,
         ChevronUpIcon,
+        EllipsisIcon,
         ExitIcon,
         MarkdownIcon,
         SpinnerIcon,
@@ -92,6 +93,45 @@
                                                         </a>
                                                     {/snippet}
                                                 </Sidebar.MenuButton>
+                                                <Dropdown.Root>
+                                                    <Dropdown.Trigger>
+                                                        {#snippet child({ props })}
+                                                            <Sidebar.MenuAction {...props}>
+                                                                <EllipsisIcon />
+                                                            </Sidebar.MenuAction>
+                                                        {/snippet}
+                                                    </Dropdown.Trigger>
+                                                    <Dropdown.Content side="right" align="start">
+                                                        <Dropdown.Item>
+                                                            {#snippet child({ props })}
+                                                                <a
+                                                                    {...props}
+                                                                    href={resolve(
+                                                                        "/(app)/workspaces/[slug]/documents",
+                                                                        { slug: workspace.slug },
+                                                                    )}
+                                                                    class={[props.class, "hover:cursor-pointer"]}
+                                                                >
+                                                                    <span>Documents</span>
+                                                                </a>
+                                                            {/snippet}
+                                                        </Dropdown.Item>
+                                                        <Dropdown.Separator />
+                                                        <Dropdown.Item>
+                                                            {#snippet child({ props })}
+                                                                <a
+                                                                    {...props}
+                                                                    href={resolve("/(app)/workspaces/[slug]/edit", {
+                                                                        slug: workspace.slug,
+                                                                    })}
+                                                                    class={[props.class, "hover:cursor-pointer"]}
+                                                                >
+                                                                    <span>Edit</span>
+                                                                </a>
+                                                            {/snippet}
+                                                        </Dropdown.Item>
+                                                    </Dropdown.Content>
+                                                </Dropdown.Root>
                                             </Sidebar.MenuItem>
                                         {/each}
                                     {/await}
