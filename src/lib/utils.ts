@@ -15,3 +15,8 @@ export type WithElementRef<T, U extends HTMLElement = HTMLElement> = T & { ref?:
 export function isBodySizeLimitError(error: unknown) {
   return typeof error === "object" && error !== null && "status" in error && error.status === 413;
 }
+
+export function isTextFieldTarget(target: EventTarget | null) {
+  if (!(target instanceof HTMLElement)) return false;
+  return Boolean(target.closest('input, textarea, select, [contenteditable="true"], [role="textbox"]'));
+}

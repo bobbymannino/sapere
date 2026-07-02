@@ -4,7 +4,9 @@
     import { Button, buttonVariants } from "$lib/components/ui/button";
     import { Input } from "$lib/components/ui/input";
     import * as Dropdown from "$lib/components/ui/dropdown-menu";
+    import * as Kbd from "$lib/components/ui/kbd";
     import { SearchIcon } from "$lib/icons";
+    import { isTextFieldTarget } from "$lib/utils";
 
     const sortOptions = [
         { label: "Recently updated", sortBy: "updatedAt", sortDir: "desc", value: "updatedAt:desc" },
@@ -29,7 +31,9 @@
     let { workspaceSlug, search = "", sortBy = "updatedAt", sortDir = "desc" }: Props = $props();
 
     const searchValue = $derived(search ?? "");
-    const sortOption = $derived(sortOptions.find((option) => option.value === `${sortBy}:${sortDir}`) ?? sortOptions[0]);
+    const sortOption = $derived(
+        sortOptions.find((option) => option.value === `${sortBy}:${sortDir}`) ?? sortOptions[0],
+    );
     const perPage = $derived(page.url.searchParams.get("perPage"));
 
     function getSortSearch(option: SortOption) {
@@ -46,7 +50,19 @@
         searchParams.delete("page");
         return searchParams.toString();
     }
+
+    let sortByDropdownOpen = $state(false);
+
+    function onkeydown(e: KeyboardEvent) {
+        if (e.defaultPrevented || isTextFieldTarget(e.target)) return;
+        if (e.key === "s") {
+            e.preventDefault();
+            sortByDropdownOpen = true;
+        }
+    }
 </script>
+
+<svelte:window {onkeydown} />
 
 <div class="flex w-full flex-col gap-2 @sm:w-auto @sm:flex-row">
     <form
@@ -67,7 +83,13 @@
             aria-label="Search documents"
             disabled={Boolean(navigating.to)}
         />
-        <Button type="submit" variant="outline" size="icon-sm" disabled={Boolean(navigating.to)} aria-label="Search documents">
+        <Button
+            type="submit"
+            variant="outline"
+            size="icon-sm"
+            disabled={Boolean(navigating.to)}
+            aria-label="Search documents"
+        >
             <SearchIcon />
         </Button>
         {#if searchValue}
@@ -82,9 +104,10 @@
         {/if}
     </form>
 
-    <Dropdown.Root>
+    <Dropdown.Root bind:open={sortByDropdownOpen}>
         <Dropdown.Trigger class={buttonVariants({ variant: "outline", size: "sm" })} disabled={Boolean(navigating.to)}>
-            Sort: {sortOption.label}
+            <span>Sort: {sortOption.label}</span>
+            <Kbd.Root class="hidden can-hover:flex">S</Kbd.Root>
         </Dropdown.Trigger>
 
         <Dropdown.Content align="end">
@@ -96,7 +119,11 @@
                             <a
                                 {...props}
                                 href={`${resolve("/(app)/workspaces/[slug]/documents", { slug: workspaceSlug })}?${getSortSearch(option)}`}
-                                class={[props.class, "cursor-pointer", sortOption.value === option.value && "bg-accent text-accent-foreground"]}
+                                class={[
+                                    props.class,
+                                    "cursor-pointer",
+                                    sortOption.value === option.value && "bg-accent text-accent-foreground",
+                                ]}
                                 aria-current={sortOption.value === option.value ? "true" : undefined}
                             >
                                 {option.label}

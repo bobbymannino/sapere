@@ -6,6 +6,8 @@
     import { buttonVariants } from "$lib/components/ui/button";
     import * as Dropdown from "$lib/components/ui/dropdown-menu";
     import { WorkspaceIcon } from "$lib/icons";
+    import * as Kbd from "$lib/components/ui/kbd";
+    import { isTextFieldTarget } from "$lib/utils";
 
     const sortOptions = [
         { label: "Recently updated", sortBy: "updatedAt", sortDir: "desc", value: "updatedAt:desc" },
@@ -35,14 +37,30 @@
         sp.set("sortBy", sortOption.sortBy);
         sp.set("sortDir", sortOption.sortDir);
         sp.delete("page");
-        goto(`${page.url.pathname}?${sp.toString()}`);
+        goto(`${resolve("/(app)/workspaces")}?${sp.toString()}`);
+    }
+
+    let sortByDropdownOpen = $state(false);
+
+    function onkeydown(e: KeyboardEvent) {
+        if (e.defaultPrevented || isTextFieldTarget(e.target)) return;
+        if (e.key === "s") {
+            e.preventDefault();
+            sortByDropdownOpen = true;
+        } else if (e.key === "n") {
+            e.preventDefault();
+            goto(resolve("/(app)/workspaces/new"));
+        }
     }
 </script>
 
+<svelte:window {onkeydown} />
+
 <div class="p-5 pbe-0 flex flex-wrap justify-end gap-2">
-    <Dropdown.Root>
+    <Dropdown.Root bind:open={sortByDropdownOpen}>
         <Dropdown.Trigger class={buttonVariants({ variant: "outline", size: "sm" })} disabled={Boolean(navigating.to)}>
-            Sort: {sortOption.label}
+            <span>Sort: {sortOption.label}</span>
+            <Kbd.Root class="hidden can-hover:flex">S</Kbd.Root>
         </Dropdown.Trigger>
 
         <Dropdown.Content align="end">
@@ -60,5 +78,6 @@
     <Button.Root variant="outline" href={resolve("/(app)/workspaces/new")} size="sm">
         <WorkspaceIcon />
         <span>New Workspace</span>
+        <Kbd.Root class="hidden can-hover:flex">N</Kbd.Root>
     </Button.Root>
 </div>
