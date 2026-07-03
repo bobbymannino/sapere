@@ -1,11 +1,20 @@
 import { resolve } from "$app/paths";
+import { findDocumentBySlug } from "$db/documents";
+import { error } from "@sveltejs/kit";
 
-import type { PageServerLoad } from "./$types";
+import type { LayoutServerLoad } from "./$types";
 
-export const load: PageServerLoad = async ({ parent, params }) => {
-  const { workspace, document } = await parent();
+export const load: LayoutServerLoad = async ({ parent, params }) => {
+  const { workspace, user, commands } = await parent();
+  const document = await findDocumentBySlug({
+    userId: user.id,
+    workspaceSlug: params.slug,
+    documentSlug: params.docSlug,
+  });
+  if (!document) error(404, "Document not found");
 
   return {
+    document,
     breadcrumbs: [
       {
         label: "Workspaces",
