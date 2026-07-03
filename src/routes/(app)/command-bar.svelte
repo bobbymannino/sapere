@@ -1,29 +1,16 @@
-<script lang="ts" module>
-    export type CommandBarCommand = {
-        id: string;
-        group: string;
-        label: string;
-        icon: "workspace" | "markdown" | "new" | "edit" | "pin" | "unpin";
-    } & (
-        | {
-              href: string;
-          }
-        | {
-              onclick?: () => void;
-          }
-    );
-</script>
-
 <script lang="ts">
-    import { invalidateAll, onNavigate } from "$app/navigation";
+    import { invalidateAll, onNavigate, refreshAll } from "$app/navigation";
     import { resolve } from "$app/paths";
     import { page } from "$app/state";
     import type { WorkspaceCommandSelection } from "$db/workspaces";
     import { authClient } from "$lib/auth-client";
+    import type { CommandBarAction, CommandBarCommand } from "$lib/command-bar";
     import * as Button from "$lib/components/ui/button";
     import * as Command from "$lib/components/ui/command";
     import * as Kbd from "$lib/components/ui/kbd";
+    import { setDocumentPinnedCommand } from "$lib/documents.remote";
     import {
+        ErrorIcon,
         ExitIcon,
         MarkdownIcon,
         PencilIcon,
@@ -31,6 +18,7 @@
         PlusIcon,
         SearchIcon,
         SpinnerIcon,
+        type IconComponent,
         UnpinIcon,
         UserIcon,
         WorkspaceIcon,
@@ -41,11 +29,15 @@
         workspaces: Promise<WorkspaceCommandSelection[]>;
     };
 
+    type ActionCommand = Extract<CommandBarCommand, { action: CommandBarAction }>;
+
     let { workspaces }: Props = $props();
 
     let input: null | HTMLInputElement = $state(null);
     let open = $state(false);
     let signingOut = $state(false);
+    let pendingCommandId: string | null = $state(null);
+    let commandError: string | null = $state(null);
 
     function openCommandBar() {
         flushSync(() => {
@@ -73,6 +65,51 @@
             await invalidateAll();
         } finally {
             signingOut = false;
+        }
+    }
+
+    function isActionCommand(command: CommandBarCommand): command is ActionCommand {
+        return "action" in command;
+    }
+
+    function getCommandIcon(icon: CommandBarCommand["icon"]): IconComponent {
+        switch (icon) {
+            case "workspace":
+                return WorkspaceIcon;
+            case "markdown":
+                return MarkdownIcon;
+            case "new":
+                return PlusIcon;
+            case "edit":
+                return PencilIcon;
+            case "pin":
+                return PinIcon;
+            case "unpin":
+                return UnpinIcon;
+        }
+    }
+
+    async function runCommandAction(command: ActionCommand) {
+        if (pendingCommandId !== null) return;
+
+        pendingCommandId = command.id;
+        commandError = null;
+
+        try {
+            switch (command.action.type) {
+                case "set-document-pinned":
+                    await setDocumentPinnedCommand({
+                        workspaceSlug: command.action.workspaceSlug,
+                        documentSlug: command.action.documentSlug,
+                        pinned: command.action.pinned,
+                    });
+                    await refreshAll({ includeLoadFunctions: true });
+                    break;
+            }
+        } catch (caught) {
+            commandError = caught instanceof Error ? caught.message : "Failed to run command";
+        } finally {
+            pendingCommandId = null;
         }
     }
 
@@ -118,40 +155,55 @@
     <SearchIcon />
 </Button.Root>
 
+{#snippet commandContent(c: CommandBarCommand, group: string)}
+    {@const Icon = getCommandIcon(c.icon)}
+    {#if pendingCommandId === c.id}
+        <SpinnerIcon class="animate-spin opacity-20" />
+    {:else}
+        <Icon class="opacity-20" />
+    {/if}
+    <span>{c.label}</span>
+    <span class="ms-auto opacity-20">{group}</span>
+{/snippet}
+
 <Command.Dialog bind:open>
     <Command.Input placeholder="Type a command or search..." bind:ref={input} autofocus />
     <Command.List>
         <Command.Empty>No results found.</Command.Empty>
 
+        {#if commandError}
+            <Command.Item disabled>
+                <ErrorIcon class="text-destructive" />
+                <span>{commandError}</span>
+            </Command.Item>
+            <Command.Separator />
+        {/if}
+
         {#each Object.entries(customCommands) as [group, commands] (group)}
             <Command.Group heading={group}>
                 {#each commands as c (c.id)}
-                    <Command.Item>
-                        {#snippet child({ props })}
-                            <svelte:element
-                                this={"href" in c ? "a" : "button"}
-                                {...props}
-                                onclick={"onclick" in c ? c.onclick : undefined}
-                                href={"href" in c ? c.href : undefined}
-                            >
-                                {#if c.icon === "workspace"}
-                                    <WorkspaceIcon class="opacity-20" />
-                                {:else if c.icon === "markdown"}
-                                    <MarkdownIcon class="opacity-20" />
-                                {:else if c.icon === "new"}
-                                    <PlusIcon class="opacity-20" />
-                                {:else if c.icon === "edit"}
-                                    <PencilIcon class="opacity-20" />
-                                {:else if c.icon === "pin"}
-                                    <PinIcon class="opacity-20" />
-                                {:else if c.icon === "unpin"}
-                                    <UnpinIcon class="opacity-20" />
-                                {/if}
-                                <span>{c.label}</span>
-                                <span class="ms-auto opacity-20">{group}</span>
-                            </svelte:element>
-                        {/snippet}
-                    </Command.Item>
+                    {#if "href" in c}
+                        <Command.Item>
+                            {#snippet child({ props })}
+                                <a {...props} href={c.href}>
+                                    {@render commandContent(c, group)}
+                                </a>
+                            {/snippet}
+                        </Command.Item>
+                    {:else if isActionCommand(c)}
+                        <Command.Item onclick={() => void runCommandAction(c)} disabled={pendingCommandId !== null}>
+                            {#snippet child({ props })}
+                                <button
+                                    type="button"
+                                    {...props}
+                                    class={[props.class, "w-full"]}
+                                    disabled={pendingCommandId !== null}
+                                >
+                                    {@render commandContent(c, group)}
+                                </button>
+                            {/snippet}
+                        </Command.Item>
+                    {/if}
                 {/each}
             </Command.Group>
 

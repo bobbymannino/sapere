@@ -1,7 +1,6 @@
 import type { auth } from "$lib/auth";
+import type { CommandBarCommand } from "$lib/command-bar";
 import type { WorkspaceCardSelection } from "$lib/server/db/workspaces";
-
-import type { CommandBarCommand } from "./routes/(app)/command-bar.svelte";
 
 type Session = typeof auth.$Infer.Session & { user: { username: string } };
 

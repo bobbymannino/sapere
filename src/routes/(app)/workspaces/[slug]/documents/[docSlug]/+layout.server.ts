@@ -1,6 +1,6 @@
 import { resolve } from "$app/paths";
 import { findDocumentBySlug } from "$db/documents";
-import { setDocumentPinnedCommand } from "$lib/documents.remote";
+import type { CommandBarCommand } from "$lib/command-bar";
 import { error } from "@sveltejs/kit";
 
 import type { LayoutServerLoad } from "./$types";
@@ -14,23 +14,22 @@ export const load: LayoutServerLoad = async ({ parent, params }) => {
   });
   if (!document) error(404, "Document not found");
 
+  const pinCommand = {
+    group: document.title,
+    action: {
+      type: "set-document-pinned",
+      pinned: !document.pinnedAt,
+      documentSlug: params.docSlug,
+      workspaceSlug: params.slug,
+    },
+    icon: document.pinnedAt ? "unpin" : "pin",
+    id: `${document.slug}-${document.pinnedAt ? "unpin" : "pin"}`,
+    label: document.pinnedAt ? "Unpin Document" : "Pin Document",
+  } satisfies CommandBarCommand;
+
   return {
     document,
-    commands: [
-      {
-        group: document.title,
-        onclick: () =>
-          setDocumentPinnedCommand({
-            pinned: !document.pinnedAt,
-            documentSlug: params.docSlug,
-            workspaceSlug: params.slug,
-          }),
-        icon: document.pinnedAt ? "unpin" : "pin",
-        id: `${document.slug}-${document.pinnedAt ? "unpin" : "pin"}`,
-        label: document.pinnedAt ? "Unpin Document" : "Pin Document",
-      },
-      ...commands,
-    ],
+    commands: [pinCommand, ...commands],
     breadcrumbs: [
       {
         label: "Workspaces",
