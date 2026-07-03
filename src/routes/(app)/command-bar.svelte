@@ -3,9 +3,15 @@
         id: string;
         group: string;
         label: string;
-        icon: "workspace" | "markdown" | "new" | "edit";
-        href: string;
-    };
+        icon: "workspace" | "markdown" | "new" | "edit" | "pin" | "unpin";
+    } & (
+        | {
+              href: string;
+          }
+        | {
+              onclick?: () => void;
+          }
+    );
 </script>
 
 <script lang="ts">
@@ -21,9 +27,11 @@
         ExitIcon,
         MarkdownIcon,
         PencilIcon,
+        PinIcon,
         PlusIcon,
         SearchIcon,
         SpinnerIcon,
+        UnpinIcon,
         UserIcon,
         WorkspaceIcon,
     } from "$lib/icons";
@@ -120,7 +128,12 @@
                 {#each commands as c (c.id)}
                     <Command.Item>
                         {#snippet child({ props })}
-                            <a {...props} href={c.href}>
+                            <svelte:element
+                                this={"href" in c ? "a" : "button"}
+                                {...props}
+                                onclick={"onclick" in c ? c.onclick : undefined}
+                                href={"href" in c ? c.href : undefined}
+                            >
                                 {#if c.icon === "workspace"}
                                     <WorkspaceIcon class="opacity-20" />
                                 {:else if c.icon === "markdown"}
@@ -129,10 +142,14 @@
                                     <PlusIcon class="opacity-20" />
                                 {:else if c.icon === "edit"}
                                     <PencilIcon class="opacity-20" />
+                                {:else if c.icon === "pin"}
+                                    <PinIcon class="opacity-20" />
+                                {:else if c.icon === "unpin"}
+                                    <UnpinIcon class="opacity-20" />
                                 {/if}
                                 <span>{c.label}</span>
                                 <span class="ms-auto opacity-20">{group}</span>
-                            </a>
+                            </svelte:element>
                         {/snippet}
                     </Command.Item>
                 {/each}

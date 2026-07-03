@@ -1,5 +1,6 @@
 import { resolve } from "$app/paths";
 import { findDocumentBySlug } from "$db/documents";
+import { setDocumentPinnedCommand } from "$lib/documents.remote";
 import { error } from "@sveltejs/kit";
 
 import type { LayoutServerLoad } from "./$types";
@@ -15,6 +16,21 @@ export const load: LayoutServerLoad = async ({ parent, params }) => {
 
   return {
     document,
+    commands: [
+      {
+        group: document.title,
+        onclick: () =>
+          setDocumentPinnedCommand({
+            pinned: !document.pinnedAt,
+            documentSlug: params.docSlug,
+            workspaceSlug: params.slug,
+          }),
+        icon: document.pinnedAt ? "unpin" : "pin",
+        id: `${document.slug}-${document.pinnedAt ? "unpin" : "pin"}`,
+        label: document.pinnedAt ? "Unpin Document" : "Pin Document",
+      },
+      ...commands,
+    ],
     breadcrumbs: [
       {
         label: "Workspaces",

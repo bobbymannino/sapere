@@ -7,7 +7,7 @@ import * as v from "valibot";
 
 import type { Actions, PageServerLoad } from "./$types";
 
-export const load: PageServerLoad = async ({ parent, params }) => {
+export const load: PageServerLoad = async ({ parent }) => {
   const { workspace, document } = await parent();
 
   return {
