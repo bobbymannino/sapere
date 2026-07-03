@@ -1,6 +1,5 @@
 import { resolve } from "$app/paths";
 import { DocumentSlugUsedError, findDocumentBySlug, updateDocument } from "$db/documents";
-import { findWorkspaceBySlug } from "$db/workspaces";
 import { DocumentSlugSchema, DocumentTitleSchema } from "$lib/schemas/documents";
 import { requireUser } from "$lib/server/auth-utils";
 import { error, fail, redirect } from "@sveltejs/kit";
@@ -8,25 +7,17 @@ import * as v from "valibot";
 
 import type { Actions, PageServerLoad } from "./$types";
 
-async function loadWorkspace(ownerId: string, slug: string) {
-  const workspace = await findWorkspaceBySlug({ ownerId, slug });
-  if (!workspace) error(404, "Workspace not found");
-  return workspace;
-}
-
 async function loadDocument(userId: string, workspaceSlug: string, documentSlug: string) {
   const document = await findDocumentBySlug({ userId, workspaceSlug, documentSlug });
   if (!document) error(404, "Document not found");
   return document;
 }
 
-export const load: PageServerLoad = async ({ params }) => {
-  const { user } = requireUser();
-  const workspace = await loadWorkspace(user.id, params.slug);
+export const load: PageServerLoad = async ({ parent, params }) => {
+  const { user, workspace } = await parent();
   const document = await loadDocument(user.id, params.slug, params.docSlug);
 
   return {
-    workspace,
     document,
     breadcrumbs: [
       { label: "Workspaces", href: resolve("/(app)/workspaces") },

@@ -12,6 +12,9 @@ export const load: LayoutServerLoad = async ({ params }) => {
   if (!workspace) error(404, "Workspace not found");
 
   return {
+    user,
+    workspace,
+    breadcrumbs: [{ label: "Workspaces", href: "/workspaces" }, { label: workspace.title }],
     commands: [
       {
         group: workspace.title,

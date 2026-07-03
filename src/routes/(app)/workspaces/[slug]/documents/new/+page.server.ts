@@ -14,12 +14,10 @@ async function loadWorkspace(ownerId: string, slug: string) {
   return workspace;
 }
 
-export const load: PageServerLoad = async ({ params }) => {
-  const { user } = requireUser();
-  const workspace = await loadWorkspace(user.id, params.slug);
+export const load: PageServerLoad = async ({ parent }) => {
+  const { workspace } = await parent();
 
   return {
-    workspace,
     breadcrumbs: [
       { label: "Workspaces", href: resolve("/(app)/workspaces") },
       { label: workspace.title, href: resolve("/(app)/workspaces/[slug]", { slug: workspace.slug }) },

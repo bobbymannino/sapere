@@ -1,5 +1,5 @@
 import { resolve } from "$app/paths";
-import { findWorkspaceBySlug, SlugUsedError, updateWorkspace } from "$db/workspaces";
+import { SlugUsedError, updateWorkspace } from "$db/workspaces";
 import {
   WorkspaceDescriptionSchema,
   WorkspaceImageSchema,
@@ -14,13 +14,9 @@ import * as v from "valibot";
 
 import type { Actions, PageServerLoad } from "./$types";
 
-export const load: PageServerLoad = async ({ params }) => {
-  const { user } = requireUser();
-
-  const workspace = await findWorkspaceBySlug({ ownerId: user.id, slug: params.slug });
-  if (!workspace) error(404, "Workspace not found");
+export const load: PageServerLoad = async ({ parent }) => {
+  const { workspace } = await parent();
   return {
-    workspace,
     breadcrumbs: [
       { label: "Workspaces", href: "/workspaces" },
       { label: workspace.title, href: `/workspaces/${workspace.slug}` },

@@ -1,19 +1,11 @@
 import { resolve } from "$app/paths";
 import { findDocumentBySlug } from "$db/documents";
-import { findWorkspaceBySlug } from "$db/workspaces";
-import { requireUser } from "$lib/server/auth-utils";
 import { error } from "@sveltejs/kit";
 
 import type { PageServerLoad } from "./$types";
 
-export const load: PageServerLoad = async ({ params }) => {
-  const { user } = requireUser();
-
-  const workspace = await findWorkspaceBySlug({
-    ownerId: user.id,
-    slug: params.slug,
-  });
-  if (!workspace) error(404, "Workspace not found");
+export const load: PageServerLoad = async ({ parent, params }) => {
+  const { workspace, user } = await parent();
   const document = await findDocumentBySlug({
     userId: user.id,
     workspaceSlug: params.slug,
@@ -22,7 +14,6 @@ export const load: PageServerLoad = async ({ params }) => {
   if (!document) error(404, "Document not found");
 
   return {
-    workspace,
     document,
     breadcrumbs: [
       {
