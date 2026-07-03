@@ -1,6 +1,8 @@
 import type { auth } from "$lib/auth";
 import type { WorkspaceCardSelection } from "$lib/server/db/workspaces";
 
+import type { CommandBarCommand } from "./routes/(app)/command-bar.svelte";
+
 type Session = typeof auth.$Infer.Session & { user: { username: string } };
 
 type BreadcrumbItem = { label: string; href?: string };
@@ -16,6 +18,7 @@ declare global {
     interface PageData {
       session: null | Session;
       breadcrumbs?: BreadcrumbItem[];
+      commands?: CommandBarCommand[];
       isMac: boolean;
     }
     interface PageState {

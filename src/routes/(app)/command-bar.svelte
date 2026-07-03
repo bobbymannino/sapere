@@ -1,3 +1,13 @@
+<script lang="ts" module>
+    export type CommandBarCommand = {
+        id: string;
+        group: string;
+        label: string;
+        icon: "workspace" | "markdown" | "new" | "edit";
+        href: string;
+    };
+</script>
+
 <script lang="ts">
     import { invalidateAll, onNavigate } from "$app/navigation";
     import { resolve } from "$app/paths";
@@ -7,7 +17,16 @@
     import * as Button from "$lib/components/ui/button";
     import * as Command from "$lib/components/ui/command";
     import * as Kbd from "$lib/components/ui/kbd";
-    import { ExitIcon, MarkdownIcon, SearchIcon, SpinnerIcon, UserIcon, WorkspaceIcon } from "$lib/icons";
+    import {
+        ExitIcon,
+        MarkdownIcon,
+        PencilIcon,
+        PlusIcon,
+        SearchIcon,
+        SpinnerIcon,
+        UserIcon,
+        WorkspaceIcon,
+    } from "$lib/icons";
     import { flushSync } from "svelte";
 
     type Props = {
@@ -50,6 +69,17 @@
     }
 
     onNavigate(closeCommandBar);
+
+    const customCommands = $derived(
+        page.data.commands?.reduce(
+            (acc, c) => {
+                const r = acc[c.group] ?? [];
+                acc[c.group] = [...r, c];
+                return acc;
+            },
+            {} as Record<string, CommandBarCommand[]>,
+        ) ?? {},
+    );
 </script>
 
 <svelte:window {onkeydown} />
@@ -85,6 +115,32 @@
     <Command.List>
         <Command.Empty>No results found.</Command.Empty>
 
+        {#each Object.entries(customCommands) as [group, commands] (group)}
+            <Command.Group heading={group}>
+                {#each commands as c (c.id)}
+                    <Command.Item>
+                        {#snippet child({ props })}
+                            <a {...props} href={c.href}>
+                                {#if c.icon === "workspace"}
+                                    <WorkspaceIcon class="opacity-20" />
+                                {:else if c.icon === "markdown"}
+                                    <MarkdownIcon class="opacity-20" />
+                                {:else if c.icon === "new"}
+                                    <PlusIcon class="opacity-20" />
+                                {:else if c.icon === "edit"}
+                                    <PencilIcon class="opacity-20" />
+                                {/if}
+                                <span>{c.label}</span>
+                                <span class="ms-auto opacity-20">{group}</span>
+                            </a>
+                        {/snippet}
+                    </Command.Item>
+                {/each}
+            </Command.Group>
+
+            <Command.Separator />
+        {/each}
+
         <Command.Group heading="Workspaces">
             <Command.Item>
                 {#snippet child({ props })}
@@ -114,6 +170,7 @@
                 {/each}
             {/await}
         </Command.Group>
+
         <Command.Separator />
 
         {#await workspaces}
