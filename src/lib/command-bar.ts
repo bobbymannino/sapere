@@ -1,11 +1,15 @@
-export type CommandBarCommandIcon = "workspace" | "markdown" | "new" | "edit" | "pin" | "unpin";
+export type CommandBarCommandIcon = "workspace" | "markdown" | "new" | "edit" | "pin" | "unpin" | "user" | "exit";
 
-export type CommandBarAction = {
+type CommandBarSignOutAction = { type: "sign-out" };
+
+type CommandBarSetDocumentPinnedAction = {
   type: "set-document-pinned";
   workspaceSlug: string;
   documentSlug: string;
   pinned: boolean;
 };
+
+export type CommandBarAction = CommandBarSignOutAction | CommandBarSetDocumentPinnedAction;
 
 type CommandBarCommandBase = {
   id: string;
@@ -25,3 +29,5 @@ export type CommandBarCommand = CommandBarCommandBase &
         href?: never;
       }
   );
+
+export type CommandBarActionCommand = Extract<CommandBarCommand, { action: CommandBarAction }>;
