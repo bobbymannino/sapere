@@ -4,7 +4,7 @@ import type { OrderByTarget, Ordered, PaginationArgs, Paginated } from "$db/pagi
 import { buildOrderClause, buildPaginatedResult, buildPagination } from "$db/pagination";
 import * as s from "$lib/server/db/schema";
 import { files, deleteFileIfExists, fileTypeToExtension } from "$lib/server/files";
-import { and, count, eq, desc } from "drizzle-orm";
+import { and, count, desc, eq, sql } from "drizzle-orm";
 import { BunSQLDatabase } from "drizzle-orm/bun-sql/postgres";
 
 type CommonArgs = {
@@ -17,6 +17,7 @@ const workspaceCardSelection = {
   slug: s.workspaces.slug,
   description: s.workspaces.description,
   image: s.workspaces.image,
+  pinnedAt: s.workspaces.pinnedAt,
   updatedAt: s.workspaces.updatedAt,
   createdAt: s.workspaces.createdAt,
 };
@@ -47,11 +48,14 @@ type ListWorkspacesArgs = CommonArgs &
 
 export async function listWorkspaces(args: Prettify<ListWorkspacesArgs>): Promise<Paginated<WorkspaceCardSelection>> {
   const db = args.db ?? mdb;
-  const orderBy = buildOrderClause(args, {
-    columns: workspaceOrderColumns,
-    defaultSortBy: "updatedAt",
-    defaultSortDir: "desc",
-  });
+  const orderBy = [
+    sql`${desc(s.workspaces.pinnedAt)} nulls last`,
+    ...buildOrderClause(args, {
+      columns: workspaceOrderColumns,
+      defaultSortBy: "updatedAt",
+      defaultSortDir: "desc",
+    }),
+  ];
   const pagination = buildPagination(args);
   const where = eq(s.workspaces.ownerId, args.ownerId);
 
@@ -89,6 +93,7 @@ const recentWorkspaceSelection = {
   id: s.workspaces.id,
   title: s.workspaces.title,
   slug: s.workspaces.slug,
+  pinnedAt: s.workspaces.pinnedAt,
   updatedAt: s.workspaces.updatedAt,
 };
 
@@ -235,6 +240,24 @@ export async function updateWorkspace(args: Prettify<UpdateWorkspaceArgs>) {
     if (isWorkspaceSlugUniqueError(error)) throw new SlugUsedError(args.slug);
     throw error;
   }
+}
+
+type SetWorkspacePinnedArgs = CommonArgs & {
+  ownerId: typeof s.workspaces.$inferSelect.ownerId;
+  workspaceSlug: typeof s.workspaces.$inferSelect.slug;
+  pinned: boolean;
+};
+
+export async function setWorkspacePinned(args: Prettify<SetWorkspacePinnedArgs>) {
+  const db = args.db ?? mdb;
+
+  const [updated] = await db
+    .update(s.workspaces)
+    .set({ pinnedAt: args.pinned ? sql`now()` : null })
+    .where(and(eq(s.workspaces.ownerId, args.ownerId), eq(s.workspaces.slug, args.workspaceSlug)))
+    .returning({ id: s.workspaces.id, pinnedAt: s.workspaces.pinnedAt });
+
+  return updated ?? null;
 }
 
 type DeleteWorkspaceArgs = CommonArgs & {
