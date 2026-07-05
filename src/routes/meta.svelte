@@ -2,12 +2,24 @@
     import { APP_NAME } from "$app/env/public";
     import faviconSvg from "$lib/assets/favicon.svg";
     import faviconIco from "$lib/assets/favicon.ico";
+    import blackFaviconSvg from "$lib/assets/favicon-black.svg";
+    import blackFaviconIco from "$lib/assets/favicon-black.ico";
+    import orangeFaviconSvg from "$lib/assets/favicon-orange.svg";
+    import orangeFaviconIco from "$lib/assets/favicon-orange.ico";
 </script>
 
 <svelte:head>
     <title>{APP_NAME}</title>
-    <link rel="icon" href={faviconIco} sizes="144x144" type="image/x-icon" />
-    <link rel="icon" href={faviconSvg} type="image/svg+xml" />
+    {#if process.env.NODE_ENV === "production"}
+        <link rel="icon" href={faviconIco} sizes="144x144" type="image/x-icon" />
+        <link rel="icon" href={faviconSvg} type="image/svg+xml" />
+    {:else if process.env.NODE_ENV === "beta"}
+        <link rel="icon" href={orangeFaviconIco} sizes="144x144" type="image/x-icon" />
+        <link rel="icon" href={orangeFaviconSvg} type="image/svg+xml" />
+    {:else}
+        <link rel="icon" href={blackFaviconIco} sizes="144x144" type="image/x-icon" />
+        <link rel="icon" href={blackFaviconSvg} type="image/svg+xml" />
+    {/if}
     <meta name="application-name" content={APP_NAME} />
     <meta name="apple-mobile-web-app-title" content={APP_NAME} />
     <meta property="og:site_name" content={APP_NAME} />
