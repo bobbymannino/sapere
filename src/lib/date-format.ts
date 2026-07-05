@@ -1,12 +1,15 @@
 const dateFormatter = new Intl.DateTimeFormat(undefined, {
   dateStyle: "long",
-  timeZone: "UTC",
 });
 
 const dateTimeFormatter = new Intl.DateTimeFormat(undefined, {
   dateStyle: "medium",
   timeStyle: "short",
-  timeZone: "UTC",
+});
+
+const shortDateTimeFormatter = new Intl.DateTimeFormat(undefined, {
+  dateStyle: "short",
+  timeStyle: "short",
 });
 
 type DateValue = Date | string;
@@ -21,6 +24,10 @@ export function formatDate(value: DateValue) {
 
 export function formatDateTime(value: DateValue) {
   return dateTimeFormatter.format(toDate(value));
+}
+
+export function formatShortDateTime(value: DateValue) {
+  return shortDateTimeFormatter.format(toDate(value));
 }
 
 export function toIsoDate(value: DateValue) {

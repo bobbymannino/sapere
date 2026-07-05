@@ -2,7 +2,7 @@
     import { resolve } from "$app/paths";
     import * as Card from "$lib/components/ui/card";
     import OptimizedImage from "$lib/components/optimized-image.svelte";
-    import { formatDateTime, toIsoDate } from "$lib/date-format";
+    import { formatShortDateTime, toIsoDate } from "$lib/date-format";
     import { ClockIcon, PictureIcon } from "$lib/icons";
     import type { WorkspaceCardSelection } from "$lib/server/db/workspaces";
     import WorkspaceCardOptions from "./workspace-card-options.svelte";
@@ -12,7 +12,7 @@
     };
 
     let workspace: Props = $props();
-    let formattedUpdatedAt = $derived(formatDateTime(workspace.updatedAt));
+    let formattedUpdatedAt = $derived(formatShortDateTime(workspace.updatedAt));
     let updatedAtIso = $derived(toIsoDate(workspace.updatedAt));
     let imageUrl = $derived(
         `${resolve("/(app)/workspaces/[slug]/image", { slug: workspace.slug })}?v=${workspace.updatedAt.getTime()}`,
