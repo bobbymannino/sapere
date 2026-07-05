@@ -22,7 +22,7 @@
     import DropdownMenu from "$lib/components/ui/dropdown-menu/dropdown-menu.svelte";
     import OptimizedImage from "$lib/components/optimized-image.svelte";
     import { formatDateTime, toIsoDate } from "$lib/date-format";
-    import { EllipsisIcon, PictureIcon, SpinnerIcon, TrashIcon } from "$lib/icons";
+    import { ClockIcon, EllipsisIcon, PictureIcon, SpinnerIcon, TrashIcon } from "$lib/icons";
     import type { WorkspaceCardSelection } from "$lib/server/db/workspaces";
     import { deleteWorkspaceCommand } from "$lib/workspaces.remote";
 
@@ -100,8 +100,9 @@
     {/if}
 
     <CardFooter class="flex items-center justify-between mbs-auto">
-        <CardDescription class="text-xs">
-            Updated <time datetime={updatedAtIso}>{formattedUpdatedAt}</time>
+        <CardDescription class="text-xs flex items-center gap-1">
+            <ClockIcon class="size-3" />
+            <time datetime={updatedAtIso}>{formattedUpdatedAt}</time>
         </CardDescription>
 
         <DropdownMenu>

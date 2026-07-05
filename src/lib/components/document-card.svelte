@@ -1,6 +1,6 @@
 <script lang="ts">
     import type { DocumentCardSelection } from "$lib/server/db/documents";
-    import { MarkdownIcon } from "$lib/icons";
+    import { ClockIcon, MarkdownIcon } from "$lib/icons";
     import * as Card from "$lib/components/ui/card";
     import { toIsoDate, formatDateTime } from "$lib/date-format";
     import { resolve } from "$app/paths";
@@ -47,8 +47,9 @@
 
     <Card.Footer class="mt-auto flex items-center justify-between gap-3">
         <div class="min-w-0">
-            <Card.Description class="text-xs">
-                Updated <time datetime={toIsoDate(updatedAt)}>{formatDateTime(updatedAt)}</time>
+            <Card.Description class="text-xs flex items-center gap-1">
+                <ClockIcon class="size-3" />
+                <time datetime={toIsoDate(updatedAt)}>{formatDateTime(updatedAt)}</time>
             </Card.Description>
             {#if pinError}
                 <Card.Description class="text-destructive text-xs" aria-live="polite">{pinError}</Card.Description>
