@@ -4,8 +4,9 @@ import type { OrderByTarget, Ordered, PaginationArgs, Paginated } from "$db/pagi
 import { buildOrderClause, buildPaginatedResult, buildPagination } from "$db/pagination";
 import * as s from "$lib/server/db/schema";
 import { files, deleteFileIfExists, fileTypeToExtension } from "$lib/server/files";
-import { and, count, desc, eq, sql } from "drizzle-orm";
+import { and, count, desc, eq, isNotNull, sql } from "drizzle-orm";
 import { BunSQLDatabase } from "drizzle-orm/bun-sql/postgres";
+import { union } from "drizzle-orm/pg-core";
 
 type CommonArgs = {
   db?: BunSQLDatabase;
@@ -280,3 +281,43 @@ export async function deleteWorkspace(args: Prettify<DeleteWorkspaceArgs>) {
 function isWorkspaceSlugUniqueError(error: unknown) {
   return isUniqueConstraintError(error, "workspaces_owner_slug_unique");
 }
+
+type ListRecentPinnedThingsArgs = CommonArgs & {
+  userId: typeof s.users.$inferSelect.id;
+};
+
+type RecentPinnedThingType = "workspace" | "document";
+
+export async function listRecentPinnedThings(args: ListRecentPinnedThingsArgs) {
+  const db = args.db ?? mdb;
+
+  return await union(
+    db
+      .select({
+        id: s.workspaces.id,
+        title: s.workspaces.title,
+        workspaceSlug: s.workspaces.slug,
+        documentSlug: sql<string | null>`null`,
+        pinnedAt: s.workspaces.pinnedAt,
+        type: sql<RecentPinnedThingType>`'workspace'`.as("type"),
+      })
+      .from(s.workspaces)
+      .where(and(eq(s.workspaces.ownerId, args.userId), isNotNull(s.workspaces.pinnedAt))),
+    db
+      .select({
+        id: s.documents.id,
+        title: s.documents.title,
+        workspaceSlug: s.workspaces.slug,
+        documentSlug: s.documents.slug,
+        pinnedAt: s.documents.pinnedAt,
+        type: sql<RecentPinnedThingType>`'document'`.as("type"),
+      })
+      .from(s.documents)
+      .innerJoin(s.workspaces, eq(s.documents.workspaceId, s.workspaces.id))
+      .where(and(eq(s.workspaces.ownerId, args.userId), isNotNull(s.documents.pinnedAt))),
+  )
+    .orderBy(({ pinnedAt }) => desc(pinnedAt))
+    .limit(5);
+}
+
+export type RecentPinnedThingSelection = Awaited<ReturnType<typeof listRecentPinnedThings>>[number];

@@ -14,6 +14,7 @@
 <SidebarProvider open={data.sidebarOpen}>
     <AppSidebar
         username={data.session.user.username}
+        recentPinnedThings={data.recentPinnedThings}
         recentWorkspaces={data.recentWorkspaces}
         recentDocuments={data.recentDocuments}
     />
