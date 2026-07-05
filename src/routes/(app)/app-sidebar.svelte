@@ -22,6 +22,7 @@
     import { page } from "$app/state";
     import RecentWorkspace from "./app-sidebar-recent-workspace.svelte";
     import AppSidebarFooter from "./app-sidebar-footer.svelte";
+    import AppSidebarHeader from "./app-sidebar-header.svelte";
 
     type Props = {
         username: string;
@@ -33,12 +34,7 @@
 </script>
 
 <Sidebar.Root>
-    <Sidebar.Header class="flex-row items-center py-3 px-5">
-        <Logo class="w-5" />
-        <span class="font-heading text-lg font-bold">
-            {APP_NAME}
-        </span>
-    </Sidebar.Header>
+    <AppSidebarHeader />
 
     <Sidebar.Content>
         <Sidebar.Group>
