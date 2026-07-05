@@ -139,6 +139,7 @@ export const workspaces = pgTable(
     slug: text().notNull(),
     description: text(),
     image: text(),
+    pinnedAt: timestamp("pinned_at", { withTimezone: true }),
 
     ownerId: text("owner_id")
       .notNull()
