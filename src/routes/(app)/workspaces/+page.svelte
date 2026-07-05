@@ -16,7 +16,8 @@
     let workspaces = $derived(data.workspaces);
 
     function openEditWorkspace(workspace: WorkspaceCardSelection) {
-        pushState(resolve("/(app)/workspaces/[slug]/edit", { slug: workspace.slug }), { editWorkspace: workspace });
+        const url = resolve("/(app)/workspaces/[slug]/edit", { slug: workspace.slug });
+        pushState(url, { editWorkspace: workspace });
     }
 </script>
 
