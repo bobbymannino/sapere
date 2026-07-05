@@ -21,6 +21,7 @@
     import type { RecentDocumentSelection } from "$lib/server/db/documents";
     import { page } from "$app/state";
     import RecentWorkspace from "./app-sidebar-recent-workspace.svelte";
+    import AppSidebarFooter from "./app-sidebar-footer.svelte";
 
     type Props = {
         username: string;
@@ -29,18 +30,6 @@
     };
 
     let { username, recentWorkspaces, recentDocuments }: Props = $props();
-
-    let pending = $state(false);
-
-    async function signOut() {
-        pending = true;
-        await authClient.signOut({
-            fetchOptions: {
-                onSuccess: () => goto(resolve("/(auth)/login"), { invalidateAll: true }),
-            },
-        });
-        pending = false;
-    }
 </script>
 
 <Sidebar.Root>
@@ -160,49 +149,7 @@
         </Sidebar.Group>
     </Sidebar.Content>
 
-    <Sidebar.Footer>
-        <Sidebar.Menu>
-            <Sidebar.MenuItem>
-                <Dropdown.Root>
-                    <Dropdown.Trigger>
-                        {#snippet child({ props })}
-                            <Sidebar.MenuButton
-                                {...props}
-                                class="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
-                            >
-                                {username}
-                                <ChevronUpIcon class="ms-auto" />
-                            </Sidebar.MenuButton>
-                        {/snippet}
-                    </Dropdown.Trigger>
-                    <Dropdown.Content side="top" class="w-(--bits-dropdown-menu-anchor-width)">
-                        <Dropdown.Group>
-                            <Dropdown.Item>
-                                {#snippet child({ props })}
-                                    <a
-                                        {...props}
-                                        href={resolve("/(app)/account")}
-                                        class={[props.class, "cursor-pointer"]}
-                                    >
-                                        <UserIcon />
-                                        Account
-                                    </a>
-                                {/snippet}
-                            </Dropdown.Item>
-                            <Dropdown.Item onclick={signOut} variant="destructive" disabled={pending}>
-                                {#if pending}
-                                    <SpinnerIcon class="animate-spin" />
-                                {:else}
-                                    <ExitIcon />
-                                {/if}
-                                <span>Sign out</span>
-                            </Dropdown.Item>
-                        </Dropdown.Group>
-                    </Dropdown.Content>
-                </Dropdown.Root>
-            </Sidebar.MenuItem>
-        </Sidebar.Menu>
-    </Sidebar.Footer>
+    <AppSidebarFooter {username} />
 
     <Sidebar.Rail />
 </Sidebar.Root>
