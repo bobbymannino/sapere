@@ -3,7 +3,7 @@
     import * as Card from "$lib/components/ui/card";
     import OptimizedImage from "$lib/components/optimized-image.svelte";
     import { formatShortDateTime, toIsoDate } from "$lib/date-format";
-    import { ClockIcon, PictureIcon } from "$lib/icons";
+    import { ClockIcon, PictureIcon, PinIcon } from "$lib/icons";
     import type { WorkspaceCardSelection } from "$lib/server/db/workspaces";
     import WorkspaceCardOptions from "./workspace-card-options.svelte";
 
@@ -29,13 +29,18 @@
         <span class="sr-only">Open {workspace.title} workspace</span>
     </a>
 
-    {#if workspace.image}
-        <OptimizedImage src={imageUrl} alt="{workspace.title} thumbnail" class="aspect-video w-full" />
-    {:else}
-        <div class="bg-muted aspect-video flex-center">
-            <PictureIcon class="text-muted-foreground" />
-        </div>
-    {/if}
+    <div class="relative">
+        {#if workspace.image}
+            <OptimizedImage src={imageUrl} alt="{workspace.title} thumbnail" class="aspect-video w-full" />
+        {:else}
+            <div class="bg-muted aspect-video flex-center">
+                <PictureIcon class="text-muted-foreground" />
+            </div>
+        {/if}
+        {#if workspace.pinnedAt}
+            <PinIcon class="absolute inset-bs-3 inset-e-3 size-3 text-primary" />
+        {/if}
+    </div>
 
     <Card.Header>
         <Card.Title>{workspace.title}</Card.Title>
