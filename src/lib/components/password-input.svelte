@@ -3,7 +3,7 @@
     import { EyeOpenIcon, EyeSlashIcon } from "$lib/icons";
     import type { ComponentProps } from "svelte";
 
-    type Props = Omit<ComponentProps<typeof InputGroup.Input>, "type">;
+    type Props = Omit<ComponentProps<typeof InputGroup.Input>, "type" | "files">;
 
     let { value = $bindable(), disabled, ...restProps }: Props = $props();
     let showPassword = $state(false);
