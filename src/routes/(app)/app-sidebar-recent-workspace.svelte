@@ -5,7 +5,7 @@
     import { page } from "$app/state";
     import { resolve } from "$app/paths";
     import { getRecentWorkspaceDocuments } from "$lib/documents.remote";
-    import { EllipsisIcon, SpinnerIcon } from "$lib/icons";
+    import { EllipsisIcon, MarkdownIcon, PencilIcon, SpinnerIcon } from "$lib/icons";
 
     let { slug, title, id }: RecentWorkspaceSelection = $props();
 
@@ -17,7 +17,7 @@
 </script>
 
 <Sidebar.MenuItem>
-    <Sidebar.MenuButton isActive={page.url.pathname === `/workspaces/${slug}`}>
+    <Sidebar.MenuButton isActive={page.url.pathname === `/workspaces/${slug}`} tooltipContent={title}>
         {#snippet child({ props })}
             <a {...props} href={resolve("/(app)/workspaces/[slug]", { slug })}>
                 <span>{title}</span>
@@ -27,13 +27,13 @@
     <Dropdown.Root onOpenChange={dropdownOpenChange}>
         <Dropdown.Trigger>
             {#snippet child({ props })}
-                <Sidebar.MenuAction {...props}>
+                <Sidebar.MenuAction {...props} showOnHover aria-label={`Open ${title} menu`}>
                     <EllipsisIcon />
                 </Sidebar.MenuAction>
             {/snippet}
         </Dropdown.Trigger>
 
-        <Dropdown.Content side="right" align="start">
+        <Dropdown.Content side="right" align="start" class="w-64">
             <Dropdown.Group>
                 <Dropdown.GroupHeading>Documents</Dropdown.GroupHeading>
 
@@ -43,21 +43,25 @@
                             <SpinnerIcon class="animate-spin" />
                             <span>Loading...</span>
                         </Dropdown.Item>
-                    {:then workspaces}
-                        {#each workspaces as w (w.id)}
+                    {:then documents}
+                        {#each documents as document (document.id)}
                             <Dropdown.Item>
                                 {#snippet child({ props })}
                                     <a
                                         {...props}
                                         href={resolve("/(app)/workspaces/[slug]/documents/[docSlug]", {
-                                            slug: w.workspaceSlug,
-                                            docSlug: w.slug,
+                                            slug: document.workspaceSlug,
+                                            docSlug: document.slug,
                                         })}
-                                        class={[props.class, "hover:cursor-pointer"]}
+                                        class={[props.class, "cursor-pointer"]}
                                     >
-                                        <span>{w.title}</span>
+                                        <span>{document.title}</span>
                                     </a>
                                 {/snippet}
+                            </Dropdown.Item>
+                        {:else}
+                            <Dropdown.Item disabled>
+                                <span>No recent documents</span>
                             </Dropdown.Item>
                         {/each}
                     {/await}
@@ -68,9 +72,10 @@
                         <a
                             {...props}
                             href={resolve("/(app)/workspaces/[slug]/documents", { slug })}
-                            class={[props.class, "hover:cursor-pointer"]}
+                            class={[props.class, "cursor-pointer"]}
                         >
-                            <span>All Documents</span>
+                            <MarkdownIcon />
+                            <span>All documents</span>
                         </a>
                     {/snippet}
                 </Dropdown.Item>
@@ -86,8 +91,9 @@
                         <a
                             {...props}
                             href={resolve("/(app)/workspaces/[slug]/edit", { slug })}
-                            class={[props.class, "hover:cursor-pointer"]}
+                            class={[props.class, "cursor-pointer"]}
                         >
+                            <PencilIcon />
                             <span>Edit</span>
                         </a>
                     {/snippet}
