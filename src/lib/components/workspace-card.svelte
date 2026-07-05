@@ -22,7 +22,7 @@
     import DropdownMenu from "$lib/components/ui/dropdown-menu/dropdown-menu.svelte";
     import OptimizedImage from "$lib/components/optimized-image.svelte";
     import { formatDateTime, toIsoDate } from "$lib/date-format";
-    import { ClockIcon, EllipsisIcon, PictureIcon, SpinnerIcon, TrashIcon } from "$lib/icons";
+    import { ClockIcon, EllipsisIcon, MarkdownIcon, PencilIcon, PictureIcon, SpinnerIcon, TrashIcon } from "$lib/icons";
     import type { WorkspaceCardSelection } from "$lib/server/db/workspaces";
     import { deleteWorkspaceCommand } from "$lib/workspaces.remote";
 
@@ -123,7 +123,8 @@
                                 href={resolve("/(app)/workspaces/[slug]/documents", { slug })}
                                 class={[props.class, "cursor-pointer"]}
                             >
-                                Documents
+                                <MarkdownIcon />
+                                <span>Documents</span>
                             </a>
                         {/snippet}
                     </DropdownMenuItem>
@@ -135,11 +136,15 @@
                                 class={[props.class, "cursor-pointer"]}
                                 onclick={onEditClick}
                             >
-                                Edit
+                                <PencilIcon />
+                                <span>Edit</span>
                             </a>
                         {/snippet}
                     </DropdownMenuItem>
-                    <DropdownMenuItem variant="destructive" onclick={openDeleteDialog}>Delete</DropdownMenuItem>
+                    <DropdownMenuItem variant="destructive" onclick={openDeleteDialog}>
+                        <TrashIcon />
+                        <span>Delete</span>
+                    </DropdownMenuItem>
                 </DropdownMenuGroup>
             </DropdownMenuContent>
         </DropdownMenu>
