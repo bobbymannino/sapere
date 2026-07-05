@@ -16,18 +16,18 @@
     }
 </script>
 
-<Sidebar.MenuItem>
-    <Sidebar.MenuButton isActive={page.url.pathname === `/workspaces/${slug}`} tooltipContent={title}>
-        {#snippet child({ props })}
-            <a {...props} href={resolve("/(app)/workspaces/[slug]", { slug })}>
-                <span>{title}</span>
-            </a>
-        {/snippet}
-    </Sidebar.MenuButton>
+<Sidebar.MenuSubItem class="group/menu-item">
+    <Sidebar.MenuSubButton
+        isActive={page.url.pathname === `/workspaces/${slug}`}
+        href={resolve("/(app)/workspaces/[slug]", { slug })}
+        class="pr-8"
+    >
+        <span>{title}</span>
+    </Sidebar.MenuSubButton>
     <Dropdown.Root onOpenChange={dropdownOpenChange}>
         <Dropdown.Trigger>
             {#snippet child({ props })}
-                <Sidebar.MenuAction {...props} showOnHover aria-label={`Open ${title} menu`}>
+                <Sidebar.MenuAction {...props} showOnHover aria-label={`Open ${title} menu`} class="top-1 right-0.5">
                     <EllipsisIcon />
                 </Sidebar.MenuAction>
             {/snippet}
@@ -101,4 +101,4 @@
             </Dropdown.Group>
         </Dropdown.Content>
     </Dropdown.Root>
-</Sidebar.MenuItem>
+</Sidebar.MenuSubItem>

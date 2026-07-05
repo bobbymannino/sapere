@@ -19,7 +19,7 @@
     }
 </script>
 
-<Sidebar.Footer class="border-sidebar-border/50 border-t p-3">
+<Sidebar.Footer class="p-3">
     <Sidebar.Menu>
         <Sidebar.MenuItem>
             <Dropdown.Root>
