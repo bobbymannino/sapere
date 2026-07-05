@@ -2,10 +2,10 @@
     import * as Dropdown from "$lib/components/ui/dropdown-menu";
     import * as Button from "$lib/components/ui/button";
     import * as Dialog from "$lib/components/ui/dialog";
-    import { EllipsisIcon, MarkdownIcon, PencilIcon, TrashIcon, SpinnerIcon } from "$lib/icons";
+    import { EllipsisIcon, MarkdownIcon, PencilIcon, TrashIcon, SpinnerIcon, PinIcon, UnpinIcon } from "$lib/icons";
     import { resolve } from "$app/paths";
     import type { WorkspaceCardSelection } from "$db/workspaces";
-    import { deleteWorkspaceCommand } from "$lib/workspaces.remote";
+    import { deleteWorkspaceCommand, setWorkspacePinnedCommand } from "$lib/workspaces.remote";
     import { refreshAll } from "$app/navigation";
 
     type Props = WorkspaceCardSelection & {
@@ -13,7 +13,7 @@
     };
 
     let { onEdit, ...workspace }: Props = $props();
-    const { id, slug, title } = $derived(workspace);
+    let { id, slug, title, pinnedAt } = $derived(workspace);
 
     type DeleteStatus = {
         error: string | null;
@@ -26,6 +26,7 @@
         modalOpen: false,
         isDeleting: false,
     });
+    let isPinning = $state(false);
 
     async function deleteWorkspace() {
         deleteStatus = {
@@ -60,6 +61,19 @@
 
         e.preventDefault();
         onEdit({ ...workspace });
+    }
+
+    async function togglePinned() {
+        isPinning = true;
+        try {
+            await setWorkspacePinnedCommand({
+                pinned: !pinnedAt,
+                workspaceId: id,
+            });
+            await refreshAll({ includeLoadFunctions: true });
+        } finally {
+            isPinning = false;
+        }
     }
 </script>
 
@@ -98,6 +112,16 @@
                         <span>Edit</span>
                     </a>
                 {/snippet}
+            </Dropdown.Item>
+            <Dropdown.Item onclick={togglePinned} disabled={isPinning}>
+                {#if isPinning}
+                    <SpinnerIcon class="animate-spin" />
+                {:else if pinnedAt}
+                    <UnpinIcon />
+                {:else}
+                    <PinIcon />
+                {/if}
+                <span>{pinnedAt ? "Unpin" : "Pin"}</span>
             </Dropdown.Item>
             <Dropdown.Item variant="destructive" onclick={() => (deleteStatus.modalOpen = true)}>
                 <TrashIcon />

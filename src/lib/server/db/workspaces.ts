@@ -244,7 +244,7 @@ export async function updateWorkspace(args: Prettify<UpdateWorkspaceArgs>) {
 
 type SetWorkspacePinnedArgs = CommonArgs & {
   ownerId: typeof s.workspaces.$inferSelect.ownerId;
-  workspaceSlug: typeof s.workspaces.$inferSelect.slug;
+  workspaceId: typeof s.workspaces.$inferSelect.id;
   pinned: boolean;
 };
 
@@ -254,7 +254,7 @@ export async function setWorkspacePinned(args: Prettify<SetWorkspacePinnedArgs>)
   const [updated] = await db
     .update(s.workspaces)
     .set({ pinnedAt: args.pinned ? sql`now()` : null })
-    .where(and(eq(s.workspaces.ownerId, args.ownerId), eq(s.workspaces.slug, args.workspaceSlug)))
+    .where(and(eq(s.workspaces.ownerId, args.ownerId), eq(s.workspaces.id, args.workspaceId)))
     .returning({ id: s.workspaces.id, pinnedAt: s.workspaces.pinnedAt });
 
   return updated ?? null;
