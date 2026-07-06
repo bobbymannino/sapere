@@ -299,6 +299,7 @@ export async function listRecentPinnedThings(args: ListRecentPinnedThingsArgs) {
         workspaceSlug: s.workspaces.slug,
         documentSlug: sql<string | null>`null`,
         pinnedAt: s.workspaces.pinnedAt,
+        updatedAt: s.workspaces.updatedAt,
         type: sql<RecentPinnedThingType>`'workspace'`.as("type"),
       })
       .from(s.workspaces)
@@ -310,13 +311,14 @@ export async function listRecentPinnedThings(args: ListRecentPinnedThingsArgs) {
         workspaceSlug: s.workspaces.slug,
         documentSlug: s.documents.slug,
         pinnedAt: s.documents.pinnedAt,
+        updatedAt: s.documents.updatedAt,
         type: sql<RecentPinnedThingType>`'document'`.as("type"),
       })
       .from(s.documents)
       .innerJoin(s.workspaces, eq(s.documents.workspaceId, s.workspaces.id))
       .where(and(eq(s.workspaces.ownerId, args.userId), isNotNull(s.documents.pinnedAt))),
   )
-    .orderBy(({ pinnedAt }) => desc(pinnedAt))
+    .orderBy(({ updatedAt }) => desc(updatedAt))
     .limit(5);
 }
 
