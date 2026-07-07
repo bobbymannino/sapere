@@ -221,14 +221,14 @@ export async function setDocumentPinned(args: Prettify<SetDocumentPinnedArgs>) {
       .values({ documentId: args.documentId, userId: args.userId })
       .onConflictDoNothing()
       .returning();
-    return doc;
+    return doc ?? null;
   }
 
   const [doc] = await db
     .delete(s.pinnedDocuments)
     .where(and(eq(s.pinnedDocuments.documentId, args.documentId), eq(s.pinnedDocuments.userId, args.userId)))
     .returning();
-  return doc;
+  return doc ?? null;
 }
 
 type UpdateDocumentArgs = CommonArgs & {

@@ -244,7 +244,7 @@ export async function updateWorkspace(args: Prettify<UpdateWorkspaceArgs>) {
 }
 
 type SetWorkspacePinnedArgs = CommonArgs & {
-  ownerId: typeof s.workspaces.$inferSelect.ownerId;
+  userId: typeof s.users.$inferSelect.id;
   workspaceId: typeof s.workspaces.$inferSelect.id;
   pinned: boolean;
 };
@@ -252,13 +252,20 @@ type SetWorkspacePinnedArgs = CommonArgs & {
 export async function setWorkspacePinned(args: Prettify<SetWorkspacePinnedArgs>) {
   const db = args.db ?? mdb;
 
-  const [updated] = await db
-    .update(s.workspaces)
-    .set({ pinnedAt: args.pinned ? sql`now()` : null })
-    .where(and(eq(s.workspaces.ownerId, args.ownerId), eq(s.workspaces.id, args.workspaceId)))
-    .returning({ id: s.workspaces.id, pinnedAt: s.workspaces.pinnedAt });
+  if (args.pinned) {
+    const [space] = await db
+      .insert(s.pinnedWorkspaces)
+      .values({ userId: args.userId, workspaceId: args.workspaceId })
+      .onConflictDoNothing()
+      .returning();
+    return space ?? null;
+  }
 
-  return updated ?? null;
+  const [space] = await db
+    .delete(s.pinnedWorkspaces)
+    .where(and(eq(s.pinnedWorkspaces.userId, args.userId), eq(s.pinnedWorkspaces.workspaceId, args.workspaceId)))
+    .returning();
+  return space ?? null;
 }
 
 type DeleteWorkspaceArgs = CommonArgs & {

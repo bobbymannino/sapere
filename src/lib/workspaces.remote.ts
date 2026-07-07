@@ -20,10 +20,9 @@ const SetWorkspacePinnedSchema = v.object({
 export const setWorkspacePinnedCommand = command(SetWorkspacePinnedSchema, async ({ workspaceId, pinned }) => {
   const { user } = requireUser();
   const workspace = await setWorkspacePinned({
-    ownerId: user.id,
+    userId: user.id,
     workspaceId,
     pinned,
   });
   if (!workspace) error(404, "Workspace not found");
-  return workspace;
 });
