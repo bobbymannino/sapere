@@ -13,7 +13,8 @@
     @apply list-inside list-decimal;
   }
 
-  pre:has(code) {
+  pre:has(code),
+  blockquote {
     @apply bg-sidebar border-border rounded-xl border p-3;
   }
 
