@@ -2,6 +2,7 @@ import { db as mdb } from "$db";
 import { isUniqueConstraintError } from "$db/errors";
 import type { OrderByTarget, Ordered, PaginationArgs, Paginated } from "$db/pagination";
 import { buildOrderClause, buildPaginatedResult, buildPagination } from "$db/pagination";
+import { sqlNow } from "$db/utils";
 import * as s from "$lib/server/db/schema";
 import { and, count, desc, eq, or, sql } from "drizzle-orm";
 import { BunSQLDatabase } from "drizzle-orm/bun-sql/postgres";
@@ -139,10 +140,7 @@ export async function createDocument(args: Prettify<CreateDocumentArgs>) {
             content: `# ${args.title}\n\nDear diary...`,
           })
           .returning({ id: s.documents.id, slug: s.documents.slug }),
-        tx
-          .update(s.workspaces)
-          .set({ updatedAt: sql`now()` })
-          .where(eq(s.workspaces.id, args.workspaceId)),
+        tx.update(s.workspaces).set({ updatedAt: sqlNow }).where(eq(s.workspaces.id, args.workspaceId)),
       ]);
       if (!document) throw new Error("Failed to create document");
       return document;
@@ -197,13 +195,10 @@ export async function updateDocumentContent(args: Prettify<UpdateDocumentContent
     const [[updated]] = await Promise.all([
       tx
         .update(s.documents)
-        .set({ content: args.content, updatedAt: sql`now()` })
+        .set({ content: args.content, updatedAt: sqlNow })
         .where(eq(s.documents.id, document.id))
         .returning({ content: s.documents.content, updatedAt: s.documents.updatedAt }),
-      tx
-        .update(s.workspaces)
-        .set({ updatedAt: sql`now()` })
-        .where(eq(s.workspaces.id, document.workspaceId)),
+      tx.update(s.workspaces).set({ updatedAt: sqlNow }).where(eq(s.workspaces.id, document.workspaceId)),
     ]);
     if (!updated) throw new Error("Failed to update document content");
 
@@ -213,38 +208,27 @@ export async function updateDocumentContent(args: Prettify<UpdateDocumentContent
 
 type SetDocumentPinnedArgs = CommonArgs & {
   userId: typeof s.users.$inferSelect.id;
-  workspaceSlug: typeof s.workspaces.$inferSelect.slug;
-  documentSlug: typeof s.documents.$inferSelect.slug;
+  documentId: typeof s.documents.$inferSelect.id;
   pinned: boolean;
 };
 
 export async function setDocumentPinned(args: Prettify<SetDocumentPinnedArgs>) {
   const db = args.db ?? mdb;
 
-  return db.transaction(async (tx) => {
-    const [document] = await tx
-      .select({ id: s.documents.id })
-      .from(s.documents)
-      .innerJoin(s.workspaces, eq(s.documents.workspaceId, s.workspaces.id))
-      .where(
-        and(
-          eq(s.workspaces.slug, args.workspaceSlug),
-          eq(s.documents.slug, args.documentSlug),
-          eq(s.workspaces.ownerId, args.userId),
-        ),
-      )
-      .limit(1);
-    if (!document) return null;
+  if (args.pinned) {
+    const [doc] = await db
+      .insert(s.pinnedDocuments)
+      .values({ documentId: args.documentId, userId: args.userId })
+      .onConflictDoNothing()
+      .returning();
+    return doc;
+  }
 
-    const [updated] = await tx
-      .update(s.documents)
-      .set({ pinnedAt: args.pinned ? sql`now()` : null })
-      .where(eq(s.documents.id, document.id))
-      .returning({ id: s.documents.id, pinnedAt: s.documents.pinnedAt });
-    if (!updated) throw new Error("Failed to update document pin");
-
-    return updated;
-  });
+  const [doc] = await db
+    .delete(s.pinnedDocuments)
+    .where(and(eq(s.pinnedDocuments.documentId, args.documentId), eq(s.pinnedDocuments.userId, args.userId)))
+    .returning();
+  return doc;
 }
 
 type UpdateDocumentArgs = CommonArgs & {
@@ -277,13 +261,10 @@ export async function updateDocument(args: Prettify<UpdateDocumentArgs>) {
       const [[updated]] = await Promise.all([
         tx
           .update(s.documents)
-          .set({ title: args.title, slug: args.slug, updatedAt: sql`now()` })
+          .set({ title: args.title, slug: args.slug, updatedAt: sqlNow })
           .where(eq(s.documents.id, document.id))
           .returning({ id: s.documents.id, slug: s.documents.slug }),
-        tx
-          .update(s.workspaces)
-          .set({ updatedAt: sql`now()` })
-          .where(eq(s.workspaces.id, document.workspaceId)),
+        tx.update(s.workspaces).set({ updatedAt: sqlNow }).where(eq(s.workspaces.id, document.workspaceId)),
       ]);
       if (!updated) throw new Error("Failed to update document");
 
@@ -321,10 +302,7 @@ export async function deleteDocument(args: Prettify<DeleteDocumentArgs>) {
 
     const [[deleted]] = await Promise.all([
       tx.delete(s.documents).where(eq(s.documents.id, document.id)).returning({ id: s.documents.id }),
-      tx
-        .update(s.workspaces)
-        .set({ updatedAt: sql`now()` })
-        .where(eq(s.workspaces.id, document.workspaceId)),
+      tx.update(s.workspaces).set({ updatedAt: sqlNow }).where(eq(s.workspaces.id, document.workspaceId)),
     ]);
     if (!deleted) throw new Error("Failed to delete document");
 
