@@ -1,8 +1,8 @@
 {
   "version": "8",
   "dialect": "postgres",
-  "id": "ed3c8e7a-83a2-4a7e-b0af-677fba8b1dd7",
-  "prevIds": ["d00f4e0d-9087-42cc-80ad-20499ee83d8c"],
+  "id": "d8add093-2264-44dd-b4a3-ef71a113668c",
+  "prevIds": ["ed3c8e7a-83a2-4a7e-b0af-677fba8b1dd7"],
   "ddl": [
     {
       "isRlsEnabled": false,
@@ -19,6 +19,18 @@
     {
       "isRlsEnabled": false,
       "name": "passkeys",
+      "entityType": "tables",
+      "schema": "public"
+    },
+    {
+      "isRlsEnabled": false,
+      "name": "pinned_documents",
+      "entityType": "tables",
+      "schema": "public"
+    },
+    {
+      "isRlsEnabled": false,
+      "name": "pinned_workspaces",
       "entityType": "tables",
       "schema": "public"
     },
@@ -284,19 +296,6 @@
       "table": "documents"
     },
     {
-      "type": "timestamp with time zone",
-      "typeSchema": null,
-      "notNull": false,
-      "dimensions": 0,
-      "default": null,
-      "generated": null,
-      "identity": null,
-      "name": "pinned_at",
-      "entityType": "columns",
-      "schema": "public",
-      "table": "documents"
-    },
-    {
       "type": "text",
       "typeSchema": null,
       "notNull": true,
@@ -477,6 +476,84 @@
       "entityType": "columns",
       "schema": "public",
       "table": "passkeys"
+    },
+    {
+      "type": "uuid",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "document_id",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "pinned_documents"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "user_id",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "pinned_documents"
+    },
+    {
+      "type": "timestamp with time zone",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": "now()",
+      "generated": null,
+      "identity": null,
+      "name": "pinned_at",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "pinned_documents"
+    },
+    {
+      "type": "uuid",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "workspace_id",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "pinned_workspaces"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "user_id",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "pinned_workspaces"
+    },
+    {
+      "type": "timestamp with time zone",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": "now()",
+      "generated": null,
+      "identity": null,
+      "name": "pinned_at",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "pinned_workspaces"
     },
     {
       "type": "text",
@@ -872,19 +949,6 @@
       "table": "workspaces"
     },
     {
-      "type": "timestamp with time zone",
-      "typeSchema": null,
-      "notNull": false,
-      "dimensions": 0,
-      "default": null,
-      "generated": null,
-      "identity": null,
-      "name": "pinned_at",
-      "entityType": "columns",
-      "schema": "public",
-      "table": "workspaces"
-    },
-    {
       "type": "text",
       "typeSchema": null,
       "notNull": true,
@@ -1130,6 +1194,104 @@
       "nameExplicit": true,
       "columns": [
         {
+          "value": "document_id",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        },
+        {
+          "value": "user_id",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        }
+      ],
+      "isUnique": true,
+      "where": null,
+      "with": "",
+      "method": "btree",
+      "concurrently": false,
+      "name": "pinned_documents_document_id_user_id_idx",
+      "entityType": "indexes",
+      "schema": "public",
+      "table": "pinned_documents"
+    },
+    {
+      "nameExplicit": true,
+      "columns": [
+        {
+          "value": "user_id",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        }
+      ],
+      "isUnique": false,
+      "where": null,
+      "with": "",
+      "method": "btree",
+      "concurrently": false,
+      "name": "pinned_documents_user_id_idx",
+      "entityType": "indexes",
+      "schema": "public",
+      "table": "pinned_documents"
+    },
+    {
+      "nameExplicit": true,
+      "columns": [
+        {
+          "value": "workspace_id",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        },
+        {
+          "value": "user_id",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        }
+      ],
+      "isUnique": true,
+      "where": null,
+      "with": "",
+      "method": "btree",
+      "concurrently": false,
+      "name": "pinned_workspaces_workspace_id_user_id_idx",
+      "entityType": "indexes",
+      "schema": "public",
+      "table": "pinned_workspaces"
+    },
+    {
+      "nameExplicit": true,
+      "columns": [
+        {
+          "value": "user_id",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        }
+      ],
+      "isUnique": false,
+      "where": null,
+      "with": "",
+      "method": "btree",
+      "concurrently": false,
+      "name": "pinned_workspaces_user_id_idx",
+      "entityType": "indexes",
+      "schema": "public",
+      "table": "pinned_workspaces"
+    },
+    {
+      "nameExplicit": true,
+      "columns": [
+        {
           "value": "user_id",
           "isExpression": false,
           "asc": true,
@@ -1346,6 +1508,58 @@
       "entityType": "fks",
       "schema": "public",
       "table": "passkeys"
+    },
+    {
+      "nameExplicit": false,
+      "columns": ["document_id"],
+      "schemaTo": "public",
+      "tableTo": "documents",
+      "columnsTo": ["id"],
+      "onUpdate": "NO ACTION",
+      "onDelete": "CASCADE",
+      "name": "pinned_documents_document_id_documents_id_fkey",
+      "entityType": "fks",
+      "schema": "public",
+      "table": "pinned_documents"
+    },
+    {
+      "nameExplicit": false,
+      "columns": ["user_id"],
+      "schemaTo": "public",
+      "tableTo": "users",
+      "columnsTo": ["id"],
+      "onUpdate": "NO ACTION",
+      "onDelete": "CASCADE",
+      "name": "pinned_documents_user_id_users_id_fkey",
+      "entityType": "fks",
+      "schema": "public",
+      "table": "pinned_documents"
+    },
+    {
+      "nameExplicit": false,
+      "columns": ["workspace_id"],
+      "schemaTo": "public",
+      "tableTo": "workspaces",
+      "columnsTo": ["id"],
+      "onUpdate": "NO ACTION",
+      "onDelete": "CASCADE",
+      "name": "pinned_workspaces_workspace_id_workspaces_id_fkey",
+      "entityType": "fks",
+      "schema": "public",
+      "table": "pinned_workspaces"
+    },
+    {
+      "nameExplicit": false,
+      "columns": ["user_id"],
+      "schemaTo": "public",
+      "tableTo": "users",
+      "columnsTo": ["id"],
+      "onUpdate": "NO ACTION",
+      "onDelete": "CASCADE",
+      "name": "pinned_workspaces_user_id_users_id_fkey",
+      "entityType": "fks",
+      "schema": "public",
+      "table": "pinned_workspaces"
     },
     {
       "nameExplicit": false,

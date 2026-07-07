@@ -139,7 +139,6 @@ export const workspaces = pgTable(
     slug: text().notNull(),
     description: text(),
     image: text(),
-    pinnedAt: timestamp("pinned_at", { withTimezone: true }),
 
     ownerId: text("owner_id")
       .notNull()
@@ -167,6 +166,23 @@ export const workspaces = pgTable(
 export type WorkspaceSelect = typeof workspaces.$inferSelect;
 export type WorkspaceInsert = typeof workspaces.$inferInsert;
 
+export const pinnedWorkspaces = pgTable(
+  "pinned_workspaces",
+  {
+    workspaceId: uuid("workspace_id")
+      .notNull()
+      .references(() => workspaces.id, { onDelete: "cascade" }),
+    userId: text("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    pinnedAt: timestamp("pinned_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [
+    uniqueIndex("pinned_workspaces_workspace_id_user_id_idx").on(t.workspaceId, t.userId),
+    index("pinned_workspaces_user_id_idx").on(t.userId),
+  ],
+);
+
 export const documents = pgTable(
   "documents",
   {
@@ -183,7 +199,6 @@ export const documents = pgTable(
       (): SQL => sql`regexp_replace(lower(${documents.title}), '[^a-z0-9]', '', 'g')`,
     ),
     slug: text().notNull(),
-    pinnedAt: timestamp("pinned_at", { withTimezone: true }),
     content: text()
       .notNull()
       .default(sql`''`)
@@ -209,3 +224,20 @@ export const documents = pgTable(
 
 export type DocumentSelect = typeof documents.$inferSelect;
 export type DocumentInsert = typeof documents.$inferInsert;
+
+export const pinnedDocuments = pgTable(
+  "pinned_documents",
+  {
+    documentId: uuid("document_id")
+      .notNull()
+      .references(() => documents.id, { onDelete: "cascade" }),
+    userId: text("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    pinnedAt: timestamp("pinned_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [
+    uniqueIndex("pinned_documents_document_id_user_id_idx").on(t.documentId, t.userId),
+    index("pinned_documents_user_id_idx").on(t.userId),
+  ],
+);
