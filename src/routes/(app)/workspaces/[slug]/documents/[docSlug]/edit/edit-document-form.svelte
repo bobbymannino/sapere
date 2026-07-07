@@ -12,7 +12,7 @@
     import type { DocumentSelection } from "$lib/server/db/documents";
     import type { WorkspaceCardSelection } from "$lib/server/db/workspaces";
     import { slugify } from "$lib/utils";
-    import { deleteDocumentCommand } from "../document.remote";
+    import { deleteDocumentCommand } from "$lib/documents.remote";
 
     type FieldName = "title" | "slug";
     type Props = {
