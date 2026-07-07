@@ -9,7 +9,7 @@
     import { marked } from "marked";
     import { onDestroy } from "svelte";
     import type { PageProps } from "./$types";
-    import { saveDocumentContent } from "./document.remote";
+    import { saveDocumentContent } from "$lib/documents.remote";
     import { SpinnerIcon } from "$lib/icons";
     import { isTextFieldTarget, isUnmodifiedKey } from "$lib/utils";
     import { goto } from "$app/navigation";
