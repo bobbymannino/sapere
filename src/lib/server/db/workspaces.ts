@@ -4,7 +4,7 @@ import type { OrderByTarget, Ordered, PaginationArgs, Paginated } from "$db/pagi
 import { buildOrderClause, buildPaginatedResult, buildPagination } from "$db/pagination";
 import * as s from "$lib/server/db/schema";
 import { files, deleteFileIfExists, fileTypeToExtension } from "$lib/server/files";
-import { and, count, desc, eq, isNotNull, sql } from "drizzle-orm";
+import { and, count, desc, eq, sql } from "drizzle-orm";
 import { BunSQLDatabase } from "drizzle-orm/bun-sql/postgres";
 import { union } from "drizzle-orm/pg-core";
 
@@ -18,9 +18,16 @@ const workspaceCardSelection = {
   slug: s.workspaces.slug,
   description: s.workspaces.description,
   image: s.workspaces.image,
-  pinnedAt: s.workspaces.pinnedAt,
+  pinnedAt: s.pinnedWorkspaces.pinnedAt,
   updatedAt: s.workspaces.updatedAt,
   createdAt: s.workspaces.createdAt,
+};
+
+export type WorkspaceCardSelection = Pick<
+  typeof s.workspaces.$inferSelect,
+  "id" | "title" | "slug" | "description" | "image" | "updatedAt" | "createdAt"
+> & {
+  pinnedAt: Date | null;
 };
 
 type WorkspaceSortKey = "updatedAt" | "createdAt" | "title";
@@ -31,16 +38,6 @@ const workspaceOrderColumns = {
   updatedAt: s.workspaces.updatedAt,
 } satisfies Record<WorkspaceSortKey, OrderByTarget | OrderByTarget[]>;
 
-export type WorkspaceCardSelection = Pick<typeof s.workspaces.$inferSelect, keyof typeof workspaceCardSelection>;
-
-const workspaceCommandSelection = {
-  id: s.workspaces.id,
-  title: s.workspaces.title,
-  slug: s.workspaces.slug,
-};
-
-export type WorkspaceCommandSelection = Pick<typeof s.workspaces.$inferSelect, keyof typeof workspaceCommandSelection>;
-
 type ListWorkspacesArgs = CommonArgs &
   Ordered<WorkspaceSortKey> &
   PaginationArgs & {
@@ -50,7 +47,7 @@ type ListWorkspacesArgs = CommonArgs &
 export async function listWorkspaces(args: Prettify<ListWorkspacesArgs>): Promise<Paginated<WorkspaceCardSelection>> {
   const db = args.db ?? mdb;
   const orderBy = [
-    sql`${desc(s.workspaces.pinnedAt)} nulls last`,
+    sql`${desc(s.pinnedWorkspaces.pinnedAt)} nulls last`,
     ...buildOrderClause(args, {
       columns: workspaceOrderColumns,
       defaultSortBy: "updatedAt",
@@ -64,6 +61,10 @@ export async function listWorkspaces(args: Prettify<ListWorkspacesArgs>): Promis
     db
       .select(workspaceCardSelection)
       .from(s.workspaces)
+      .leftJoin(
+        s.pinnedWorkspaces,
+        and(eq(s.pinnedWorkspaces.workspaceId, s.workspaces.id), eq(s.pinnedWorkspaces.userId, args.ownerId)),
+      )
       .where(where)
       .orderBy(...orderBy)
       .limit(pagination.limit)
@@ -73,6 +74,14 @@ export async function listWorkspaces(args: Prettify<ListWorkspacesArgs>): Promis
 
   return buildPaginatedResult(spaces, totalRows[0]?.total ?? 0, pagination);
 }
+
+const workspaceCommandSelection = {
+  id: s.workspaces.id,
+  title: s.workspaces.title,
+  slug: s.workspaces.slug,
+};
+
+export type WorkspaceCommandSelection = Pick<typeof s.workspaces.$inferSelect, keyof typeof workspaceCommandSelection>;
 
 type ListWorkspaceCommandsArgs = CommonArgs & {
   ownerId: typeof s.workspaces.$inferSelect.ownerId;
@@ -94,11 +103,13 @@ const recentWorkspaceSelection = {
   id: s.workspaces.id,
   title: s.workspaces.title,
   slug: s.workspaces.slug,
-  pinnedAt: s.workspaces.pinnedAt,
+  pinnedAt: s.pinnedWorkspaces.pinnedAt,
   updatedAt: s.workspaces.updatedAt,
 };
 
-export type RecentWorkspaceSelection = Pick<typeof s.workspaces.$inferSelect, keyof typeof recentWorkspaceSelection>;
+export type RecentWorkspaceSelection = Pick<typeof s.workspaces.$inferSelect, "id" | "title" | "slug" | "updatedAt"> & {
+  pinnedAt: Date | null;
+};
 
 type ListRecentWorkspacesArgs = CommonArgs & {
   ownerId: typeof s.workspaces.$inferSelect.ownerId;
@@ -116,6 +127,10 @@ export async function listRecentWorkspaces(
   return db
     .select(recentWorkspaceSelection)
     .from(s.workspaces)
+    .leftJoin(
+      s.pinnedWorkspaces,
+      and(eq(s.pinnedWorkspaces.workspaceId, s.workspaces.id), eq(s.pinnedWorkspaces.userId, args.ownerId)),
+    )
     .where(eq(s.workspaces.ownerId, args.ownerId))
     .orderBy(desc(s.workspaces.updatedAt))
     .limit(args.limit || 4);
@@ -132,6 +147,10 @@ export async function findWorkspaceBySlug(args: Prettify<FindWorkspaceBySlugArgs
   const [space] = await db
     .select(workspaceCardSelection)
     .from(s.workspaces)
+    .leftJoin(
+      s.pinnedWorkspaces,
+      and(eq(s.pinnedWorkspaces.workspaceId, s.workspaces.id), eq(s.pinnedWorkspaces.userId, args.ownerId)),
+    )
     .where(and(eq(s.workspaces.ownerId, args.ownerId), eq(s.workspaces.slug, args.slug)))
     .limit(1);
   return space ?? null;
@@ -305,25 +324,27 @@ export async function listRecentPinnedThings(args: ListRecentPinnedThingsArgs) {
         title: s.workspaces.title,
         workspaceSlug: s.workspaces.slug,
         documentSlug: sql<string | null>`null`,
-        pinnedAt: s.workspaces.pinnedAt,
+        pinnedAt: s.pinnedWorkspaces.pinnedAt,
         updatedAt: s.workspaces.updatedAt,
         type: sql<RecentPinnedThingType>`'workspace'`.as("type"),
       })
-      .from(s.workspaces)
-      .where(and(eq(s.workspaces.ownerId, args.userId), isNotNull(s.workspaces.pinnedAt))),
+      .from(s.pinnedWorkspaces)
+      .innerJoin(s.workspaces, eq(s.pinnedWorkspaces.workspaceId, s.workspaces.id))
+      .where(and(eq(s.workspaces.ownerId, args.userId), eq(s.pinnedWorkspaces.userId, args.userId))),
     db
       .select({
         id: s.documents.id,
         title: s.documents.title,
         workspaceSlug: s.workspaces.slug,
         documentSlug: s.documents.slug,
-        pinnedAt: s.documents.pinnedAt,
+        pinnedAt: s.pinnedDocuments.pinnedAt,
         updatedAt: s.documents.updatedAt,
         type: sql<RecentPinnedThingType>`'document'`.as("type"),
       })
-      .from(s.documents)
+      .from(s.pinnedDocuments)
+      .innerJoin(s.documents, eq(s.pinnedDocuments.documentId, s.documents.id))
       .innerJoin(s.workspaces, eq(s.documents.workspaceId, s.workspaces.id))
-      .where(and(eq(s.workspaces.ownerId, args.userId), isNotNull(s.documents.pinnedAt))),
+      .where(and(eq(s.workspaces.ownerId, args.userId), eq(s.pinnedDocuments.userId, args.userId))),
   )
     .orderBy(({ updatedAt }) => desc(updatedAt))
     .limit(5);
