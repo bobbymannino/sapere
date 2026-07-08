@@ -5,12 +5,10 @@
     import { setDocumentPinnedCommand } from "$lib/documents.remote";
     import { PinIcon, SpinnerIcon, UnpinIcon } from "$lib/icons";
     import type { DocumentCardSelection } from "$lib/server/db/documents";
-    import type { WorkspaceSelect } from "$lib/server/db/schema";
     import { cn, isTextFieldTarget, isUnmodifiedKey } from "$lib/utils";
 
     type Props = {
-        workspaceSlug: WorkspaceSelect["slug"];
-        documentSlug: DocumentCardSelection["slug"];
+        documentId: DocumentCardSelection["id"];
         documentTitle: DocumentCardSelection["title"];
         pinnedAt: DocumentCardSelection["pinnedAt"];
         class?: string | null;
@@ -21,8 +19,7 @@
     };
 
     let {
-        workspaceSlug,
-        documentSlug,
+        documentId,
         documentTitle,
         pinnedAt,
         class: className,
@@ -54,8 +51,7 @@
 
         try {
             await setDocumentPinnedCommand({
-                workspaceSlug,
-                documentSlug,
+                documentId,
                 pinned: !pinned,
             });
             await refreshAll({ includeLoadFunctions: true });

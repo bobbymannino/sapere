@@ -9,7 +9,7 @@
     import { marked } from "marked";
     import { onDestroy } from "svelte";
     import type { PageProps } from "./$types";
-    import { saveDocumentContent } from "$lib/documents.remote";
+    import { saveDocumentContentCommand } from "$lib/documents.remote";
     import { SpinnerIcon } from "$lib/icons";
     import { isTextFieldTarget, isUnmodifiedKey } from "$lib/utils";
     import { goto } from "$app/navigation";
@@ -102,9 +102,8 @@
         saveError = "";
 
         try {
-            const result = await saveDocumentContent({
-                workspaceSlug: data.workspace.slug,
-                documentSlug: data.document.slug,
+            const result = await saveDocumentContentCommand({
+                documentId: data.document.id,
                 content: contentAtSave,
             });
 
@@ -169,8 +168,7 @@
         {/if}
         <div class="ms-auto flex items-center gap-1">
             <DocumentPinButton
-                workspaceSlug={data.workspace.slug}
-                documentSlug={data.document.slug}
+                documentId={data.document.id}
                 documentTitle={data.document.title}
                 pinnedAt={data.document.pinnedAt}
                 keyboardShortcut="p"

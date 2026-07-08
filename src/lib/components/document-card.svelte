@@ -9,7 +9,7 @@
 
     type Props = DocumentCardSelection & { workspaceSlug: WorkspaceSelect["slug"] };
 
-    let { content, slug, title, pinnedAt, updatedAt, workspaceSlug }: Props = $props();
+    let { id, content, slug, title, pinnedAt, updatedAt, workspaceSlug }: Props = $props();
     let pinError = $state<string | null>(null);
 </script>
 
@@ -56,13 +56,6 @@
             {/if}
         </div>
 
-        <DocumentPinButton
-            {workspaceSlug}
-            documentSlug={slug}
-            documentTitle={title}
-            {pinnedAt}
-            bind:error={pinError}
-            hideLabel
-        />
+        <DocumentPinButton documentId={id} documentTitle={title} {pinnedAt} bind:error={pinError} hideLabel />
     </Card.Footer>
 </Card.Root>

@@ -15,7 +15,7 @@ const documentCardSelection = {
   id: s.documents.id,
   title: s.documents.title,
   slug: s.documents.slug,
-  pinnedAt: s.documents.pinnedAt,
+  pinnedAt: s.pinnedDocuments.pinnedAt,
   content: s.documents.content,
   updatedAt: s.documents.updatedAt,
   createdAt: s.documents.createdAt,
@@ -29,11 +29,17 @@ const documentOrderColumns = {
   updatedAt: s.documents.updatedAt,
 } satisfies Record<DocumentSortKey, OrderByTarget | OrderByTarget[]>;
 
-export type DocumentCardSelection = Pick<typeof s.documents.$inferSelect, keyof typeof documentCardSelection>;
+export type DocumentCardSelection = Pick<
+  typeof s.documents.$inferSelect,
+  "id" | "title" | "slug" | "content" | "updatedAt" | "createdAt"
+> & {
+  pinnedAt: Date | null;
+};
 
 type ListDocumentArgs = CommonArgs &
   Ordered<DocumentSortKey> &
   PaginationArgs & {
+    userId: typeof s.users.$inferSelect.id;
     workspaceId: typeof s.documents.$inferSelect.workspaceId;
     search?: Nullable<string>;
   };
@@ -41,7 +47,7 @@ type ListDocumentArgs = CommonArgs &
 export async function listDocuments(args: Prettify<ListDocumentArgs>): Promise<Paginated<DocumentCardSelection>> {
   const db = args.db ?? mdb;
   const orderBy = [
-    sql`${desc(s.documents.pinnedAt)} nulls last`,
+    sql`${desc(s.pinnedDocuments.pinnedAt)} nulls last`,
     ...buildOrderClause(args, {
       columns: documentOrderColumns,
       defaultSortBy: "updatedAt",
@@ -62,6 +68,10 @@ export async function listDocuments(args: Prettify<ListDocumentArgs>): Promise<P
     db
       .select(documentCardSelection)
       .from(s.documents)
+      .leftJoin(
+        s.pinnedDocuments,
+        and(eq(s.pinnedDocuments.documentId, s.documents.id), eq(s.pinnedDocuments.userId, args.userId)),
+      )
       .where(where)
       .orderBy(...orderBy)
       .limit(pagination.limit)
@@ -159,18 +169,22 @@ const documentSelection = {
   id: s.documents.id,
   title: s.documents.title,
   slug: s.documents.slug,
-  pinnedAt: s.documents.pinnedAt,
+  pinnedAt: s.pinnedDocuments.pinnedAt,
   content: s.documents.content,
   updatedAt: s.documents.updatedAt,
   createdAt: s.documents.createdAt,
 };
 
-export type DocumentSelection = Pick<typeof s.documents.$inferSelect, keyof typeof documentSelection>;
+export type DocumentSelection = Pick<
+  typeof s.documents.$inferSelect,
+  "id" | "title" | "slug" | "content" | "updatedAt" | "createdAt"
+> & {
+  pinnedAt: Date | null;
+};
 
 type UpdateDocumentContentArgs = CommonArgs & {
   userId: typeof s.users.$inferSelect.id;
-  workspaceSlug: typeof s.workspaces.$inferSelect.slug;
-  documentSlug: typeof s.documents.$inferSelect.slug;
+  documentId: typeof s.documents.$inferSelect.id;
   content: typeof s.documents.$inferInsert.content;
 };
 
@@ -182,13 +196,7 @@ export async function updateDocumentContent(args: Prettify<UpdateDocumentContent
       .select({ id: s.documents.id, workspaceId: s.documents.workspaceId })
       .from(s.documents)
       .innerJoin(s.workspaces, eq(s.documents.workspaceId, s.workspaces.id))
-      .where(
-        and(
-          eq(s.workspaces.slug, args.workspaceSlug),
-          eq(s.documents.slug, args.documentSlug),
-          eq(s.workspaces.ownerId, args.userId),
-        ),
-      )
+      .where(and(eq(s.documents.id, args.documentId), eq(s.workspaces.ownerId, args.userId)))
       .limit(1);
     if (!document) return null;
 
@@ -323,6 +331,10 @@ export async function findDocumentBySlug(args: FindDocumentBySlugArgs) {
     .select(documentSelection)
     .from(s.documents)
     .innerJoin(s.workspaces, eq(s.documents.workspaceId, s.workspaces.id))
+    .leftJoin(
+      s.pinnedDocuments,
+      and(eq(s.pinnedDocuments.documentId, s.documents.id), eq(s.pinnedDocuments.userId, args.userId)),
+    )
     .where(
       and(
         eq(s.workspaces.slug, args.workspaceSlug),

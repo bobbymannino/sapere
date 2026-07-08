@@ -4,12 +4,13 @@ import { listDocuments } from "$db/documents";
 import type { PageServerLoad } from "./$types";
 
 export const load: PageServerLoad = async ({ parent, url }) => {
-  const { workspace } = await parent();
+  const { workspace, user } = await parent();
 
   const sortBy = url.searchParams.get("sortBy") ?? undefined;
   const sortDir = url.searchParams.get("sortDir") ?? undefined;
   const search = url.searchParams.get("search")?.trim() || undefined;
   const documents = await listDocuments({
+    userId: user.id,
     workspaceId: workspace.id,
     sortBy,
     sortDir,

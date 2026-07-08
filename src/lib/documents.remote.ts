@@ -42,25 +42,20 @@ export const deleteDocumentCommand = command(DeleteDocumentSchema, async ({ work
 });
 
 const SaveDocumentContentSchema = v.object({
-  workspaceSlug: WorkspaceSlugSchema,
-  documentSlug: DocumentSlugSchema,
+  documentId: DocumentIdSchema,
   content: DocumentContentSchema,
 });
 
-export const saveDocumentContent = command(
-  SaveDocumentContentSchema,
-  async ({ workspaceSlug, documentSlug, content }) => {
-    const { user } = requireUser();
-    const document = await updateDocumentContent({
-      userId: user.id,
-      workspaceSlug,
-      documentSlug,
-      content,
-    });
-    if (!document) error(404, "Document not found");
-    return {
-      content: document.content,
-      updatedAt: document.updatedAt.toISOString(),
-    };
-  },
-);
+export const saveDocumentContentCommand = command(SaveDocumentContentSchema, async ({ documentId, content }) => {
+  const { user } = requireUser();
+  const document = await updateDocumentContent({
+    userId: user.id,
+    documentId,
+    content,
+  });
+  if (!document) error(404, "Document not found");
+  return {
+    content: document.content,
+    updatedAt: document.updatedAt.toISOString(),
+  };
+});

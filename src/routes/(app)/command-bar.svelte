@@ -53,8 +53,7 @@
             switch (command.action.type) {
                 case "set-document-pinned":
                     await setDocumentPinnedCommand({
-                        workspaceSlug: command.action.workspaceSlug,
-                        documentSlug: command.action.documentSlug,
+                        documentId: command.action.documentId,
                         pinned: command.action.pinned,
                     });
                     await refreshAll({ includeLoadFunctions: true });

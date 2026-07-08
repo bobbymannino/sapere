@@ -1,11 +1,12 @@
+import type { DocumentSelect } from "$db/schema";
+
 export type CommandBarCommandIcon = "workspace" | "markdown" | "new" | "edit" | "pin" | "unpin" | "user" | "exit";
 
 type CommandBarSignOutAction = { type: "sign-out" };
 
 type CommandBarSetDocumentPinnedAction = {
   type: "set-document-pinned";
-  workspaceSlug: string;
-  documentSlug: string;
+  documentId: DocumentSelect["id"];
   pinned: boolean;
 };
 

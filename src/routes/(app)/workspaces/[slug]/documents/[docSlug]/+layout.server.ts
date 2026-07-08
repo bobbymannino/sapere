@@ -19,8 +19,7 @@ export const load: LayoutServerLoad = async ({ parent, params }) => {
     action: {
       type: "set-document-pinned",
       pinned: !document.pinnedAt,
-      documentSlug: params.docSlug,
-      workspaceSlug: params.slug,
+      documentId: document.id,
     },
     icon: document.pinnedAt ? "unpin" : "pin",
     id: `${document.slug}-${document.pinnedAt ? "unpin" : "pin"}`,
