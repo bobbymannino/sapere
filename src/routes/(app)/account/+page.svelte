@@ -1,52 +1,53 @@
 <script lang="ts">
-    import Meta from "$lib/components/meta.svelte";
-    import Card from "$lib/components/ui/card/card.svelte";
-    import CardContent from "$lib/components/ui/card/card-content.svelte";
-    import CardDescription from "$lib/components/ui/card/card-description.svelte";
-    import CardHeader from "$lib/components/ui/card/card-header.svelte";
-    import CardTitle from "$lib/components/ui/card/card-title.svelte";
-    import { formatDate, toIsoDate } from "$lib/date-format";
-    import type { PageProps } from "./$types";
-    import Passkeys from "./passkeys.svelte";
+  import Meta from "$lib/components/meta.svelte";
+  import CardContent from "$lib/components/ui/card/card-content.svelte";
+  import CardDescription from "$lib/components/ui/card/card-description.svelte";
+  import CardHeader from "$lib/components/ui/card/card-header.svelte";
+  import CardTitle from "$lib/components/ui/card/card-title.svelte";
+  import Card from "$lib/components/ui/card/card.svelte";
+  import { formatDate, toIsoDate } from "$lib/date-format";
 
-    let { data }: PageProps = $props();
+  import type { PageProps } from "./$types";
+  import Passkeys from "./passkeys.svelte";
 
-    let joinedAt = $derived(formatDate(data.session.user.createdAt));
-    let joinedAtIso = $derived(toIsoDate(data.session.user.createdAt));
+  let { data }: PageProps = $props();
+
+  let joinedAt = $derived(formatDate(data.session.user.createdAt));
+  let joinedAtIso = $derived(toIsoDate(data.session.user.createdAt));
 </script>
 
 <Meta title="Account" description="Manage your account details and passkeys." robots="noindex,nofollow" />
 
 <div>
-    <section class="flex-center p-5">
-        <Card class="max-w-lg w-full">
-            <CardHeader>
-                <CardTitle>Account</CardTitle>
-                <CardDescription>Your account details.</CardDescription>
-            </CardHeader>
+  <section class="flex-center p-5">
+    <Card class="w-full max-w-lg">
+      <CardHeader>
+        <CardTitle>Account</CardTitle>
+        <CardDescription>Your account details.</CardDescription>
+      </CardHeader>
 
-            <CardContent>
-                <dl class="flex flex-col gap-4">
-                    <div class="grid gap-1">
-                        <dt class="text-muted-foreground text-sm">Email</dt>
-                        <dd class="font-medium">{data.session.user.email}</dd>
-                    </div>
-                    <div class="grid gap-1">
-                        <dt class="text-muted-foreground text-sm">Username</dt>
-                        <dd class="font-medium">{data.session.user.username}</dd>
-                    </div>
-                    <div class="grid gap-1">
-                        <dt class="text-muted-foreground text-sm">Joined at</dt>
-                        <dd class="font-medium">
-                            <time datetime={joinedAtIso}>{joinedAt}</time>
-                        </dd>
-                    </div>
-                </dl>
-            </CardContent>
-        </Card>
-    </section>
+      <CardContent>
+        <dl class="flex flex-col gap-4">
+          <div class="grid gap-1">
+            <dt class="text-muted-foreground text-sm">Email</dt>
+            <dd class="font-medium">{data.session.user.email}</dd>
+          </div>
+          <div class="grid gap-1">
+            <dt class="text-muted-foreground text-sm">Username</dt>
+            <dd class="font-medium">{data.session.user.username}</dd>
+          </div>
+          <div class="grid gap-1">
+            <dt class="text-muted-foreground text-sm">Joined at</dt>
+            <dd class="font-medium">
+              <time datetime={joinedAtIso}>{joinedAt}</time>
+            </dd>
+          </div>
+        </dl>
+      </CardContent>
+    </Card>
+  </section>
 
-    <section class="p-5 pbs-0 flex-center">
-        <Passkeys />
-    </section>
+  <section class="flex-center p-5 pbs-0">
+    <Passkeys />
+  </section>
 </div>

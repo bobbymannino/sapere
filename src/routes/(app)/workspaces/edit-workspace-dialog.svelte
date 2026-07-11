@@ -1,43 +1,44 @@
 <script lang="ts">
-    import { pushState, refreshAll } from "$app/navigation";
-    import { page } from "$app/state";
-    import DialogContent from "$lib/components/ui/dialog/dialog-content.svelte";
-    import DialogHeader from "$lib/components/ui/dialog/dialog-header.svelte";
-    import DialogTitle from "$lib/components/ui/dialog/dialog-title.svelte";
-    import Dialog from "$lib/components/ui/dialog/dialog.svelte";
-    import EditWorkspaceForm from "./[slug]/edit/edit-workspace-form.svelte";
+  import { pushState, refreshAll } from "$app/navigation";
+  import { page } from "$app/state";
+  import DialogContent from "$lib/components/ui/dialog/dialog-content.svelte";
+  import DialogHeader from "$lib/components/ui/dialog/dialog-header.svelte";
+  import DialogTitle from "$lib/components/ui/dialog/dialog-title.svelte";
+  import Dialog from "$lib/components/ui/dialog/dialog.svelte";
 
-    type Props = { postUpdatePath: string };
+  import EditWorkspaceForm from "./[slug]/edit/edit-workspace-form.svelte";
 
-    let { postUpdatePath }: Props = $props();
+  type Props = { postUpdatePath: string };
 
-    function closeEditDialog() {
-        history.back();
-    }
+  let { postUpdatePath }: Props = $props();
 
-    async function handleEditSuccess() {
-        pushState(postUpdatePath, {});
-        await refreshAll({ includeLoadFunctions: true });
-    }
+  function closeEditDialog() {
+    history.back();
+  }
+
+  async function handleEditSuccess() {
+    pushState(postUpdatePath, {});
+    await refreshAll({ includeLoadFunctions: true });
+  }
 </script>
 
 {#if page.state.editWorkspace}
-    <Dialog
-        open
-        onOpenChange={(open) => {
-            if (!open) closeEditDialog();
-        }}
-    >
-        <DialogContent class="sm:max-w-lg">
-            <DialogHeader>
-                <DialogTitle>Edit workspace</DialogTitle>
-            </DialogHeader>
+  <Dialog
+    open
+    onOpenChange={(open) => {
+      if (!open) closeEditDialog();
+    }}
+  >
+    <DialogContent class="sm:max-w-lg">
+      <DialogHeader>
+        <DialogTitle>Edit workspace</DialogTitle>
+      </DialogHeader>
 
-            <EditWorkspaceForm
-                workspace={page.state.editWorkspace}
-                onSuccess={handleEditSuccess}
-                onCancel={closeEditDialog}
-            />
-        </DialogContent>
-    </Dialog>
+      <EditWorkspaceForm
+        workspace={page.state.editWorkspace}
+        onSuccess={handleEditSuccess}
+        onCancel={closeEditDialog}
+      />
+    </DialogContent>
+  </Dialog>
 {/if}

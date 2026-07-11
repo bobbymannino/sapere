@@ -1,142 +1,138 @@
 <script lang="ts">
-    import { ErrorIcon, PictureIcon, SpinnerIcon } from "$lib/icons";
-    import { cn, type WithElementRef, type WithoutChildren } from "$lib/utils";
-    import { onMount } from "svelte";
-    import type { ClassValue, HTMLImgAttributes } from "svelte/elements";
+  import { ErrorIcon, PictureIcon, SpinnerIcon } from "$lib/icons";
+  import { cn, type WithElementRef, type WithoutChildren } from "$lib/utils";
+  import { onMount } from "svelte";
+  import type { ClassValue, HTMLImgAttributes } from "svelte/elements";
 
-    type ImageEvent = Event & { currentTarget: EventTarget & Element };
-    type ImageProps = Omit<
-        WithoutChildren<WithElementRef<HTMLImgAttributes, HTMLImageElement>>,
-        "alt" | "onerror" | "onload" | "src"
-    >;
+  type ImageEvent = Event & { currentTarget: EventTarget & Element };
+  type ImageProps = Omit<
+    WithoutChildren<WithElementRef<HTMLImgAttributes, HTMLImageElement>>,
+    "alt" | "onerror" | "onload" | "src"
+  >;
 
-    type Props = ImageProps & {
-        src?: string | null;
-        alt?: string;
-        imageClass?: ClassValue;
-        emptyLabel?: string;
-        loadingLabel?: string;
-        errorLabel?: string;
-        showErrorLabel?: boolean;
-        onload?: (event: ImageEvent) => void;
-        onerror?: (event: ImageEvent) => void;
-    };
+  type Props = ImageProps & {
+    src?: string | null;
+    alt?: string;
+    imageClass?: ClassValue;
+    emptyLabel?: string;
+    loadingLabel?: string;
+    errorLabel?: string;
+    showErrorLabel?: boolean;
+    onload?: (event: ImageEvent) => void;
+    onerror?: (event: ImageEvent) => void;
+  };
 
-    let {
-        ref = $bindable(null),
-        src,
-        alt = "",
-        class: className,
-        imageClass,
-        loading = "lazy",
-        decoding = "async",
-        emptyLabel = "No image",
-        loadingLabel = "Loading image",
-        errorLabel = "Image failed to load",
-        showErrorLabel = true,
-        onload,
-        onerror,
-        ...restProps
-    }: Props = $props();
+  let {
+    ref = $bindable(null),
+    src,
+    alt = "",
+    class: className,
+    imageClass,
+    loading = "lazy",
+    decoding = "async",
+    emptyLabel = "No image",
+    loadingLabel = "Loading image",
+    errorLabel = "Image failed to load",
+    showErrorLabel = true,
+    onload,
+    onerror,
+    ...restProps
+  }: Props = $props();
 
-    let loadedSrc = $state<string | null>(null);
-    let failedSrc = $state<string | null>(null);
-    let imageSrc = $derived(typeof src === "string" && src.length > 0 ? src : null);
-    let isLoaded = $derived(imageSrc !== null && loadedSrc === imageSrc);
-    let isFailed = $derived(imageSrc !== null && failedSrc === imageSrc);
-    let isLoading = $derived(imageSrc !== null && !isLoaded && !isFailed);
+  let loadedSrc = $state<string | null>(null);
+  let failedSrc = $state<string | null>(null);
+  let imageSrc = $derived(typeof src === "string" && src.length > 0 ? src : null);
+  let isLoaded = $derived(imageSrc !== null && loadedSrc === imageSrc);
+  let isFailed = $derived(imageSrc !== null && failedSrc === imageSrc);
+  let isLoading = $derived(imageSrc !== null && !isLoaded && !isFailed);
 
-    async function markLoaded(image: HTMLImageElement, loaded: string) {
-        try {
-            await image.decode();
-        } catch {
-            // The load event succeeded; decode can reject if the image is already decoded or interrupted.
-        }
-
-        if (loaded === src) {
-            failedSrc = null;
-            loadedSrc = loaded;
-        }
+  async function markLoaded(image: HTMLImageElement, loaded: string) {
+    try {
+      await image.decode();
+    } catch {
+      // The load event succeeded; decode can reject if the image is already decoded or interrupted.
     }
 
-    function markFailed(failed: string) {
-        loadedSrc = null;
-        failedSrc = failed;
+    if (loaded === src) {
+      failedSrc = null;
+      loadedSrc = loaded;
     }
+  }
 
-    onMount(() => {
-        const image = ref;
-        const currentSrc = imageSrc;
+  function markFailed(failed: string) {
+    loadedSrc = null;
+    failedSrc = failed;
+  }
 
-        if (!currentSrc || !image?.complete) return;
+  onMount(() => {
+    const image = ref;
+    const currentSrc = imageSrc;
 
-        if (image.naturalWidth > 0) {
-            void markLoaded(image, currentSrc);
-        } else {
-            markFailed(currentSrc);
-        }
-    });
+    if (!currentSrc || !image?.complete) return;
 
-    async function handleLoad(event: ImageEvent) {
-        if (!imageSrc) return;
-        onload?.(event);
-        await markLoaded(event.currentTarget as HTMLImageElement, imageSrc);
+    if (image.naturalWidth > 0) {
+      void markLoaded(image, currentSrc);
+    } else {
+      markFailed(currentSrc);
     }
+  });
 
-    function handleError(event: ImageEvent) {
-        if (!imageSrc) return;
-        onerror?.(event);
-        markFailed(imageSrc);
-    }
+  async function handleLoad(event: ImageEvent) {
+    if (!imageSrc) return;
+    onload?.(event);
+    await markLoaded(event.currentTarget as HTMLImageElement, imageSrc);
+  }
+
+  function handleError(event: ImageEvent) {
+    if (!imageSrc) return;
+    onerror?.(event);
+    markFailed(imageSrc);
+  }
 </script>
 
 <div
-    data-slot="optimized-image"
-    aria-busy={isLoading ? "true" : undefined}
-    class={cn("bg-muted relative overflow-hidden", className)}
+  data-slot="optimized-image"
+  aria-busy={isLoading ? "true" : undefined}
+  class={cn("bg-muted relative overflow-hidden", className)}
 >
-    {#if !imageSrc}
-        <div class="absolute inset-0 flex-center bg-muted text-muted-foreground" role="img" aria-label={emptyLabel}>
-            <PictureIcon aria-hidden="true" />
-        </div>
-    {:else}
-        {#if isLoading}
-            <div
-                class="absolute inset-0 flex-center bg-muted text-muted-foreground"
-                role="status"
-                aria-label={loadingLabel}
-            >
-                <SpinnerIcon class="animate-spin" aria-hidden="true" />
-            </div>
-        {/if}
-
-        {#if isFailed}
-            <div
-                class="absolute inset-0 flex-center flex-col gap-2 bg-muted px-3 text-center text-sm text-destructive-muted"
-                role="img"
-                aria-label={errorLabel}
-            >
-                <ErrorIcon aria-hidden="true" />
-                {#if showErrorLabel}
-                    <span>{errorLabel}</span>
-                {/if}
-            </div>
-        {/if}
-
-        <img
-            bind:this={ref}
-            {...restProps}
-            src={imageSrc}
-            {alt}
-            {loading}
-            {decoding}
-            onload={handleLoad}
-            onerror={handleError}
-            class={cn(
-                "absolute inset-0 size-full object-cover transition-opacity duration-200",
-                isLoaded ? "opacity-100" : "opacity-0",
-                imageClass,
-            )}
-        />
+  {#if !imageSrc}
+    <div class="flex-center bg-muted text-muted-foreground absolute inset-0" role="img" aria-label={emptyLabel}>
+      <PictureIcon aria-hidden="true" />
+    </div>
+  {:else}
+    {#if isLoading}
+      <div class="flex-center bg-muted text-muted-foreground absolute inset-0" role="status" aria-label={loadingLabel}>
+        <SpinnerIcon class="animate-spin" aria-hidden="true" />
+      </div>
     {/if}
+
+    {#if isFailed}
+      <div
+        class="flex-center bg-muted text-destructive-muted absolute inset-0 flex-col gap-2 px-3 text-center text-sm"
+        role="img"
+        aria-label={errorLabel}
+      >
+        <ErrorIcon aria-hidden="true" />
+        {#if showErrorLabel}
+          <span>{errorLabel}</span>
+        {/if}
+      </div>
+    {/if}
+
+    <img
+      bind:this={ref}
+      {...restProps}
+      src={imageSrc}
+      {alt}
+      {loading}
+      {decoding}
+      onload={handleLoad}
+      onerror={handleError}
+      class={cn(
+        "absolute inset-0 size-full object-cover transition-opacity duration-200",
+        isLoaded ? "opacity-100" : "opacity-0",
+        imageClass,
+      )}
+    />
+  {/if}
 </div>

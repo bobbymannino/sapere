@@ -1,39 +1,39 @@
 <script lang="ts">
-    import type { SVGAttributes } from "svelte/elements";
+  import type { SVGAttributes } from "svelte/elements";
 
-    type Props = SVGAttributes<SVGElement>;
+  type Props = SVGAttributes<SVGElement>;
 
-    let props: Props = $props();
+  let props: Props = $props();
 </script>
 
 <svg
-    viewBox="0 0 900 600"
-    version="1.1"
-    xmlns="http://www.w3.org/2000/svg"
-    xmlns:xlink="http://www.w3.org/1999/xlink"
-    xml:space="preserve"
-    style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;"
-    {...props}
+  viewBox="0 0 900 600"
+  version="1.1"
+  xmlns="http://www.w3.org/2000/svg"
+  xmlns:xlink="http://www.w3.org/1999/xlink"
+  xml:space="preserve"
+  style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;"
+  {...props}
 >
-    <g transform="matrix(0.408163,0,0,0.408163,-123.673469,271.836735)">
-        <circle cx="425.5" cy="436.5" r="122.5" style="fill:currentColor;" />
-    </g>
-    <g transform="matrix(0.408163,0,0,0.408163,676.326531,271.836735)">
-        <circle cx="425.5" cy="436.5" r="122.5" style="fill:currentColor;" />
-    </g>
-    <g transform="matrix(0.408163,0,0,0.408163,276.326531,-128.163265)">
-        <circle cx="425.5" cy="436.5" r="122.5" style="fill:currentColor;" />
-    </g>
-    <g transform="matrix(0.816327,0,0,0.816327,-147.346939,93.673469)">
-        <circle cx="425.5" cy="436.5" r="122.5" style="fill:currentColor;" />
-    </g>
-    <g transform="matrix(0.816327,0,0,0.816327,102.653061,-156.326531)">
-        <circle cx="425.5" cy="436.5" r="122.5" style="fill:currentColor;" />
-    </g>
-    <g transform="matrix(0.816327,0,0,0.816327,352.653061,93.673469)">
-        <circle cx="425.5" cy="436.5" r="122.5" style="fill:currentColor;" />
-    </g>
-    <g transform="matrix(1.22449,0,0,1.22449,-71.020408,-84.489796)">
-        <circle cx="425.5" cy="436.5" r="122.5" style="fill:currentColor;" />
-    </g>
+  <g transform="matrix(0.408163,0,0,0.408163,-123.673469,271.836735)">
+    <circle cx="425.5" cy="436.5" r="122.5" style="fill:currentColor;" />
+  </g>
+  <g transform="matrix(0.408163,0,0,0.408163,676.326531,271.836735)">
+    <circle cx="425.5" cy="436.5" r="122.5" style="fill:currentColor;" />
+  </g>
+  <g transform="matrix(0.408163,0,0,0.408163,276.326531,-128.163265)">
+    <circle cx="425.5" cy="436.5" r="122.5" style="fill:currentColor;" />
+  </g>
+  <g transform="matrix(0.816327,0,0,0.816327,-147.346939,93.673469)">
+    <circle cx="425.5" cy="436.5" r="122.5" style="fill:currentColor;" />
+  </g>
+  <g transform="matrix(0.816327,0,0,0.816327,102.653061,-156.326531)">
+    <circle cx="425.5" cy="436.5" r="122.5" style="fill:currentColor;" />
+  </g>
+  <g transform="matrix(0.816327,0,0,0.816327,352.653061,93.673469)">
+    <circle cx="425.5" cy="436.5" r="122.5" style="fill:currentColor;" />
+  </g>
+  <g transform="matrix(1.22449,0,0,1.22449,-71.020408,-84.489796)">
+    <circle cx="425.5" cy="436.5" r="122.5" style="fill:currentColor;" />
+  </g>
 </svg>

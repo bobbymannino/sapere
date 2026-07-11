@@ -25,13 +25,13 @@ When an `await` expression depends on a particular piece of state, changes to th
 
 ```svelte
 <script>
-	let a = $state(1);
-	let b = $state(2);
+  let a = $state(1);
+  let b = $state(2);
 
-	async function add(a, b) {
-		await new Promise((f) => setTimeout(f, 500)); // artificial delay
-		return a + b;
-	}
+  async function add(a, b) {
+    await new Promise((f) => setTimeout(f, 500)); // artificial delay
+    return a + b;
+  }
 </script>
 
 <input type="number" bind:value={a} />
@@ -129,45 +129,45 @@ The [`fork(...)`](svelte#fork) API, added in 5.42, makes it possible to run `awa
 
 ```svelte
 <script>
-	import { fork } from 'svelte';
-	import Menu from './Menu.svelte';
+  import { fork } from "svelte";
+  import Menu from "./Menu.svelte";
 
-	let open = $state(false);
+  let open = $state(false);
 
-	/** @type {import('svelte').Fork | null} */
-	let pending = null;
+  /** @type {import('svelte').Fork | null} */
+  let pending = null;
 
-	function preload() {
-		pending ??= fork(() => {
-			open = true;
-		});
-	}
+  function preload() {
+    pending ??= fork(() => {
+      open = true;
+    });
+  }
 
-	function discard() {
-		pending?.discard();
-		pending = null;
-	}
+  function discard() {
+    pending?.discard();
+    pending = null;
+  }
 </script>
 
 <button
-	onfocusin={preload}
-	onfocusout={discard}
-	onpointerenter={preload}
-	onpointerleave={discard}
-	onclick={() => {
-		pending?.commit();
-		pending = null;
+  onfocusin={preload}
+  onfocusout={discard}
+  onpointerenter={preload}
+  onpointerleave={discard}
+  onclick={() => {
+    pending?.commit();
+    pending = null;
 
-		// in case `pending` didn't exist
-		// (if it did, this is a no-op)
-		open = true;
-	}}>open menu</button
+    // in case `pending` didn't exist
+    // (if it did, this is a no-op)
+    open = true;
+  }}>open menu</button
 >
 
 {#if open}
-	<!-- any async work inside this component will start
+  <!-- any async work inside this component will start
 	     as soon as the fork is created -->
-	<Menu onclose={() => (open = false)} />
+  <Menu onclose={() => (open = false)} />
 {/if}
 ```
 

@@ -1,10 +1,11 @@
 <script lang="ts">
-    import Analytics from "./analytics.svelte";
-    import "./layout.css";
-    import Meta from "./meta.svelte";
-    import { ModeWatcher } from "mode-watcher";
+  import { ModeWatcher } from "mode-watcher";
 
-    let { children } = $props();
+  import "./layout.css";
+  import Analytics from "./analytics.svelte";
+  import Meta from "./meta.svelte";
+
+  let { children } = $props();
 </script>
 
 <Meta />
