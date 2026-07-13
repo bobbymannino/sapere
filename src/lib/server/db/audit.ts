@@ -65,3 +65,26 @@ function tryGetRequestEvent() {
     return null;
   }
 }
+
+type ListActorsLogsArgs = {
+  db?: BunSQLDatabase;
+  /** Defaults to the current request's user. */
+  actorId?: typeof s.users.$inferSelect.id;
+};
+
+export async function listActorsLogs(args: ListActorsLogsArgs) {
+  const db = args.db ?? mdb;
+  const actorId = args.actorId ?? tryGetRequestEvent()?.locals.session?.user.id;
+  if (!actorId) throw new Error("actorId is missing");
+
+  return db
+    .select({
+      id: s.auditLogs.id,
+      action: s.auditLogs.action,
+      userAgent: s.auditLogs.userAgent,
+      createdAt: s.auditLogs.createdAt,
+    })
+    .from(s.auditLogs)
+    .where(and(eq(s.auditLogs.actorId, actorId), eq(s.auditLogs.actorType, "user")))
+    .orderBy(desc(s.auditLogs.createdAt));
+}
