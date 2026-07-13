@@ -19,6 +19,12 @@ const AUTHENTICATION_ACTIONS: Record<string, AuditAction> = {
   "/passkey/verify-authentication": "user.login.passkey",
 };
 
+/** Passkey endpoints that change the user's registered credentials. */
+const PASSKEY_ACTIONS: Record<string, AuditAction> = {
+  "/passkey/verify-registration": "user.passkey.added",
+  "/passkey/delete-passkey": "user.passkey.removed",
+};
+
 export const auth = betterAuth({
   database: drizzleAdapter(db, {
     provider: "pg",
@@ -55,13 +61,28 @@ export const auth = betterAuth({
     }),
     after: createAuthMiddleware(async (ctx) => {
       const action = AUTHENTICATION_ACTIONS[ctx.path];
-      if (!action) return;
+      if (action) {
+        // Only set once the endpoint actually authenticated the user; a failed attempt leaves it null.
+        const user = ctx.context.newSession?.user;
+        if (!user) return;
 
-      // Only set once the endpoint actually authenticated the user; a failed attempt leaves it null.
-      const user = ctx.context.newSession?.user;
-      if (!user) return;
+        await recordAuditEvent({ action, actorId: user.id, userId: user.id });
+        return;
+      }
 
-      await recordAuditEvent({ action, actorId: user.id, userId: user.id });
+      const passkeyAction = PASSKEY_ACTIONS[ctx.path];
+      if (!passkeyAction) return;
+
+      // These run on an existing session, and a rejected request returns an APIError instead of a result.
+      const userId = ctx.context.session?.user.id;
+      if (!userId || ctx.context.returned instanceof APIError) return;
+
+      await recordAuditEvent({
+        action: passkeyAction,
+        actorId: userId,
+        userId,
+        metadata: { passkeyId: ctx.body?.id ?? null, name: ctx.body?.name ?? null },
+      });
     }),
   },
 });

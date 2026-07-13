@@ -3,6 +3,8 @@ export const AUDIT_ACTIONS = {
   "user.login.email": "Logged In with Email",
   "user.login.username": "Logged In with Username",
   "user.login.passkey": "Logged In with Passkey",
+  "user.passkey.added": "Added Passkey",
+  "user.passkey.removed": "Removed Passkey",
   "workspace.created": "Created Workspace",
   "workspace.updated": "Updated Workspace",
   "workspace.deleted": "Deleted Workspace",

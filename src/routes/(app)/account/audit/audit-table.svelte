@@ -30,6 +30,8 @@
             Workspace: {l.metadata.title}
           {:else if l.action === "workspace.updated" && l.metadata.title}
             Workspace: {l.metadata.title}
+          {:else if l.action === "user.passkey.added" && l.metadata.name}
+            Passkey: {l.metadata.name}
           {/if}
         </Table.Cell>
         <Table.Cell>{l.userAgent}</Table.Cell>
