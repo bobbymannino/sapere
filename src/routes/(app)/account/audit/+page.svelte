@@ -2,6 +2,7 @@
   import { resolve } from "$app/paths";
   import { auditActionTitle } from "$lib/audit-actions";
   import Empty from "$lib/components/empty.svelte";
+  import Meta from "$lib/components/meta.svelte";
   import * as Button from "$lib/components/ui/button";
   import * as Table from "$lib/components/ui/table";
   import { formatDateTime, formatShortDateTime, toIsoDate } from "$lib/date-format";
@@ -11,6 +12,13 @@
 
   let { data }: PageProps = $props();
 </script>
+
+<Meta
+  title="Audit Logs"
+  description="View your accounts audit logs."
+  tags={["account", "audit", "logs"]}
+  robots="noindex,nofollow"
+/>
 
 {#await data.logs}
   <Empty icon={SpinnerIcon} spinningIcon title="Loading Logs" color="primary" />
