@@ -304,13 +304,32 @@ type DeleteWorkspaceArgs = CommonArgs & {
 export async function deleteWorkspace(args: Prettify<DeleteWorkspaceArgs>) {
   const db = args.db ?? mdb;
 
-  const [workspace] = await db
-    .delete(s.workspaces)
-    .where(and(eq(s.workspaces.ownerId, args.ownerId), eq(s.workspaces.id, args.workspaceId)))
-    .returning({ id: s.workspaces.id, image: s.workspaces.image });
+  const workspace = await db.transaction(async (tx) => {
+    const [deleted] = await tx
+      .delete(s.workspaces)
+      .where(and(eq(s.workspaces.ownerId, args.ownerId), eq(s.workspaces.id, args.workspaceId)))
+      .returning({
+        id: s.workspaces.id,
+        title: s.workspaces.title,
+        slug: s.workspaces.slug,
+        image: s.workspaces.image,
+      });
+    if (!deleted) return null;
+
+    // The workspace row is gone, so it can't be referenced; keep its identity in metadata.
+    await recordAuditEvent({
+      db: tx,
+      action: "workspace.deleted",
+      actorId: args.ownerId,
+      metadata: { workspaceId: deleted.id, title: deleted.title, slug: deleted.slug },
+    });
+
+    return deleted;
+  });
+
   if (!workspace) return null;
   if (workspace.image) void deleteFileIfExists(workspace.image);
-  return workspace;
+  return { id: workspace.id, image: workspace.image };
 }
 
 function isWorkspaceSlugUniqueError(error: unknown) {

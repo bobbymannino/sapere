@@ -82,6 +82,7 @@ export async function listActorsLogs(args: ListActorsLogsArgs) {
       id: s.auditLogs.id,
       action: s.auditLogs.action,
       userAgent: s.auditLogs.userAgent,
+      metadata: s.auditLogs.metadata,
       createdAt: s.auditLogs.createdAt,
     })
     .from(s.auditLogs)

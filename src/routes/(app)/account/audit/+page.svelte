@@ -17,6 +17,7 @@
         <Table.Header>
             <Table.Row>
                 <Table.Head>Action</Table.Head>
+                <Table.Head>Metadata</Table.Head>
                 <Table.Head>User Agent</Table.Head>
                 <Table.Head>Timestamp</Table.Head>
             </Table.Row>
@@ -25,6 +26,13 @@
             {#each logs as l (l.id)}
                 <Table.Row>
                     <Table.Cell>{auditActionTitle(l.action)}</Table.Cell>
+                    <Table.Cell>
+                        {#if l.action === "workspace.created" && l.metadata.title}
+                            Workspace: {l.metadata.title}
+                        {:else if l.action === "workspace.deleted" && l.metadata.title}
+                            Workspace: {l.metadata.title}
+                        {/if}
+                    </Table.Cell>
                     <Table.Cell>{l.userAgent}</Table.Cell>
                     <Table.Cell>
                         <time datetime={toIsoDate(l.createdAt)}>{formatDateTime(l.createdAt)}</time>

@@ -1,4 +1,7 @@
-export const AUDIT_ACTIONS = { "workspace.created": "Created Workspace" } as const;
+export const AUDIT_ACTIONS = {
+  "workspace.created": "Created Workspace",
+  "workspace.deleted": "Deleted Workspace",
+} as const;
 
 export type AuditAction = keyof typeof AUDIT_ACTIONS;
 
