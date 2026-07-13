@@ -1,12 +1,10 @@
 <script lang="ts">
   import { resolve } from "$app/paths";
-  import { auditActionTitle } from "$lib/audit-actions";
   import Empty from "$lib/components/empty.svelte";
   import Meta from "$lib/components/meta.svelte";
   import * as Button from "$lib/components/ui/button";
-  import * as Table from "$lib/components/ui/table";
-  import { formatDateTime, formatShortDateTime, toIsoDate } from "$lib/date-format";
   import { SpinnerIcon, ClockIcon, WorkspaceIcon } from "$lib/icons";
+  import AuditTable from './audit-table.svelte'
 
   import type { PageProps } from "./$types";
 
@@ -35,33 +33,6 @@
       </Button.Root>
     </Empty>
   {:else}
-    <Table.Root>
-      <Table.Caption>A list of your accounts audit logs</Table.Caption>
-      <Table.Header>
-        <Table.Row>
-          <Table.Head>Action</Table.Head>
-          <Table.Head>Metadata</Table.Head>
-          <Table.Head>User Agent</Table.Head>
-          <Table.Head>Timestamp</Table.Head>
-        </Table.Row>
-      </Table.Header>
-      <Table.Body>
-        {#each logs as l (l.id)}
-          <Table.Row>
-            <Table.Cell>{auditActionTitle(l.action)}</Table.Cell>
-            <Table.Cell>
-              {#if l.action === "workspace.created" && l.metadata.title}
-                Workspace: {l.metadata.title}
-              {:else if l.action === "workspace.deleted" && l.metadata.title}
-                Workspace: {l.metadata.title}
-              {/if}
-            </Table.Cell>
-            <Table.Cell>{l.userAgent}</Table.Cell>
-            <Table.Cell>
-              <time datetime={toIsoDate(l.createdAt)}>{formatDateTime(l.createdAt)}</time>
-            </Table.Cell>
-          </Table.Row>
-        {/each}
-      </Table.Body>
-    </Table.Root>
-  {/if}{/await}
+    <AuditTable {logs} />
+  {/if}
+{/await}

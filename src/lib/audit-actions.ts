@@ -4,6 +4,7 @@ export const AUDIT_ACTIONS = {
   "user.login.username": "Logged In with Username",
   "user.login.passkey": "Logged In with Passkey",
   "workspace.created": "Created Workspace",
+  "workspace.updated": "Updated Workspace",
   "workspace.deleted": "Deleted Workspace",
 } as const;
 

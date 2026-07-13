@@ -228,6 +228,13 @@ export async function updateWorkspace(args: Prettify<UpdateWorkspaceArgs>) {
 
   try {
     const result = await db.transaction(async (tx) => {
+      const [previous] = await tx
+        .select({ title: s.workspaces.title, slug: s.workspaces.slug, description: s.workspaces.description })
+        .from(s.workspaces)
+        .where(and(eq(s.workspaces.ownerId, args.ownerId), eq(s.workspaces.slug, args.currentSlug)))
+        .limit(1);
+      if (!previous) return null;
+
       const [updated] = await tx
         .update(s.workspaces)
         .set({ title: args.title, slug: args.slug, description: args.description })
@@ -252,6 +259,21 @@ export async function updateWorkspace(args: Prettify<UpdateWorkspaceArgs>) {
         imageChanged = true;
         await tx.update(s.workspaces).set({ image: null }).where(eq(s.workspaces.id, updated.id));
       }
+
+      const changed = [
+        previous.title !== args.title && "title",
+        previous.slug !== args.slug && "slug",
+        previous.description !== args.description && "description",
+        imageChanged && "image",
+      ].filter((field): field is string => Boolean(field));
+
+      await recordAuditEvent({
+        db: tx,
+        action: "workspace.updated",
+        actorId: args.ownerId,
+        workspaceId: updated.id,
+        metadata: { title: args.title, slug: args.slug, changed },
+      });
 
       return {
         imageChanged,
