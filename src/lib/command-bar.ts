@@ -1,6 +1,15 @@
 import type { DocumentSelect } from "$db/schema";
 
-export type CommandBarCommandIcon = "workspace" | "markdown" | "new" | "edit" | "pin" | "unpin" | "user" | "exit";
+export type CommandBarCommandIcon =
+  | "workspace"
+  | "markdown"
+  | "new"
+  | "edit"
+  | "pin"
+  | "unpin"
+  | "user"
+  | "clock"
+  | "exit";
 
 type CommandBarSignOutAction = { type: "sign-out" };
 

@@ -2,6 +2,7 @@
   import type { CommandBarActionCommand, CommandBarCommand } from "$lib/command-bar";
   import * as Command from "$lib/components/ui/command";
   import {
+    ClockIcon,
     ExitIcon,
     MarkdownIcon,
     PencilIcon,
@@ -46,6 +47,8 @@
         return UnpinIcon;
       case "user":
         return UserIcon;
+      case "clock":
+        return ClockIcon;
       case "exit":
         return ExitIcon;
     }
