@@ -1,4 +1,5 @@
 import { db as mdb } from "$db";
+import { recordAuditEvent } from "$db/audit";
 import { isUniqueConstraintError } from "$db/errors";
 import type { OrderByTarget, Ordered, PaginationArgs, Paginated } from "$db/pagination";
 import { buildOrderClause, buildPaginatedResult, buildPagination } from "$db/pagination";
@@ -195,6 +196,14 @@ export async function createWorkspace(args: Prettify<CreateWorkspaceArgs>) {
 
         await tx.update(s.workspaces).set({ image: image.key }).where(eq(s.workspaces.id, space.id));
       }
+
+      await recordAuditEvent({
+        db: tx,
+        action: "workspace.created",
+        actorId: args.ownerId,
+        workspaceId: space.id,
+        metadata: { title: args.title, slug: args.slug, hasImage: Boolean(args.image) },
+      });
 
       return space;
     });

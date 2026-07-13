@@ -13,6 +13,8 @@ import {
   jsonb,
 } from "drizzle-orm/pg-core";
 
+import type { AuditAction } from "./audit";
+
 export const users = pgTable("users", {
   id: text("id").primaryKey(),
   name: text("name").notNull(),
@@ -263,7 +265,7 @@ export const auditLogs = pgTable(
       .primaryKey()
       .default(sql`uuidv7()`),
 
-    action: text().notNull(),
+    action: text().$type<AuditAction>().notNull(),
     status: text().$type<AuditStatus>().notNull().default("success"),
 
     ipAddress: text("ip_address"),
