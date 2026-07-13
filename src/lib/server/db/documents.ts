@@ -1,4 +1,5 @@
 import { db as mdb } from "$db";
+import { recordAuditEvent } from "$db/audit";
 import { isUniqueConstraintError } from "$db/errors";
 import type { OrderByTarget, Ordered, PaginationArgs, Paginated } from "$db/pagination";
 import { buildOrderClause, buildPaginatedResult, buildPagination } from "$db/pagination";
@@ -123,6 +124,7 @@ export async function listRecentDocuments(args: Prettify<ListRecentDocumentsArgs
 }
 
 type CreateDocumentArgs = CommonArgs & {
+  userId: typeof s.users.$inferSelect.id;
   workspaceId: typeof s.documents.$inferSelect.workspaceId;
   title: typeof s.documents.$inferInsert.title;
   slug: typeof s.documents.$inferInsert.slug;
@@ -153,6 +155,16 @@ export async function createDocument(args: Prettify<CreateDocumentArgs>) {
         tx.update(s.workspaces).set({ updatedAt: sqlNow }).where(eq(s.workspaces.id, args.workspaceId)),
       ]);
       if (!document) throw new Error("Failed to create document");
+
+      await recordAuditEvent({
+        db: tx,
+        action: "document.created",
+        actorId: args.userId,
+        workspaceId: args.workspaceId,
+        documentId: document.id,
+        metadata: { title: args.title, slug: args.slug },
+      });
+
       return document;
     });
   } catch (error) {
@@ -276,6 +288,15 @@ export async function updateDocument(args: Prettify<UpdateDocumentArgs>) {
       ]);
       if (!updated) throw new Error("Failed to update document");
 
+      await recordAuditEvent({
+        db: tx,
+        action: "document.updated",
+        actorId: args.userId,
+        workspaceId: document.workspaceId,
+        documentId: document.id,
+        metadata: { title: args.title, slug: args.slug },
+      });
+
       return updated;
     });
   } catch (error) {
@@ -295,7 +316,7 @@ export async function deleteDocument(args: Prettify<DeleteDocumentArgs>) {
 
   return db.transaction(async (tx) => {
     const [document] = await tx
-      .select({ id: s.documents.id, workspaceId: s.documents.workspaceId })
+      .select({ id: s.documents.id, workspaceId: s.documents.workspaceId, title: s.documents.title })
       .from(s.documents)
       .innerJoin(s.workspaces, eq(s.documents.workspaceId, s.workspaces.id))
       .where(
@@ -313,6 +334,15 @@ export async function deleteDocument(args: Prettify<DeleteDocumentArgs>) {
       tx.update(s.workspaces).set({ updatedAt: sqlNow }).where(eq(s.workspaces.id, document.workspaceId)),
     ]);
     if (!deleted) throw new Error("Failed to delete document");
+
+    // The document row is gone, so it can't be referenced; keep its identity in metadata.
+    await recordAuditEvent({
+      db: tx,
+      action: "document.deleted",
+      actorId: args.userId,
+      workspaceId: document.workspaceId,
+      metadata: { documentId: document.id, title: document.title, slug: args.documentSlug },
+    });
 
     return deleted;
   });

@@ -32,6 +32,7 @@
                 "rounded-full p-2",
                 l.action.startsWith("user.") && "bg-primary/15 text-primary",
                 l.action.startsWith("workspace.") && "bg-emerald-500/15 text-emerald-500",
+                l.action.startsWith("document.") && "bg-purple-400/15 text-purple-400",
                 isDestructive && "bg-destructive/15! text-destructive!",
               ]}
             >
@@ -41,12 +42,10 @@
           </span>
         </Table.Cell>
         <Table.Cell>
-          {#if l.action === "workspace.created" && l.metadata.title}
+          {#if l.action.startsWith("workspace.") && l.metadata.title}
             Workspace: {l.metadata.title}
-          {:else if l.action === "workspace.deleted" && l.metadata.title}
-            Workspace: {l.metadata.title}
-          {:else if l.action === "workspace.updated" && l.metadata.title}
-            Workspace: {l.metadata.title}
+          {:else if l.action.startsWith("document.") && l.metadata.title}
+            Document: {l.metadata.title}
           {:else if l.action === "user.passkey.added" && l.metadata.name}
             Passkey: {l.metadata.name}
           {/if}

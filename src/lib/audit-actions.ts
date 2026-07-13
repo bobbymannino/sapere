@@ -1,4 +1,13 @@
-import { EnterIcon, type IconComponent, KeyIcon, PencilIcon, TrashIcon, UserIcon, WorkspaceIcon } from "$lib/icons";
+import {
+  EnterIcon,
+  type IconComponent,
+  KeyIcon,
+  MarkdownIcon,
+  PencilIcon,
+  TrashIcon,
+  UserIcon,
+  WorkspaceIcon,
+} from "$lib/icons";
 
 type AuditActionDetails = {
   title: string;
@@ -50,6 +59,21 @@ export const AUDIT_ACTIONS = {
   "workspace.deleted": {
     title: "Deleted Workspace",
     description: "A workspace and its documents were deleted.",
+    icon: TrashIcon,
+  },
+  "document.created": {
+    title: "Created Document",
+    description: "A new document was created in a workspace.",
+    icon: MarkdownIcon,
+  },
+  "document.updated": {
+    title: "Updated Document",
+    description: "A document's title or slug was changed.",
+    icon: PencilIcon,
+  },
+  "document.deleted": {
+    title: "Deleted Document",
+    description: "A document was deleted from a workspace.",
     icon: TrashIcon,
   },
 } as const satisfies Record<string, AuditActionDetails>;

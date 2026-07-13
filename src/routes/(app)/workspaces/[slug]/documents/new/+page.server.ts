@@ -46,7 +46,7 @@ export const actions: Actions = {
 
     const { title, slug } = parsedResult.output;
     try {
-      await createDocument({ workspaceId: workspace.id, title, slug });
+      await createDocument({ userId: user.id, workspaceId: workspace.id, title, slug });
       redirect(303, resolve("/(app)/workspaces/[slug]/documents/[docSlug]", { slug: workspace.slug, docSlug: slug }));
     } catch (error) {
       if (error instanceof DocumentSlugUsedError) {
