@@ -1,11 +1,9 @@
 import { getRequestEvent } from "$app/server";
 import { db as mdb } from "$db";
+import type { AuditAction } from "$lib/audit-actions";
 import * as s from "$lib/server/db/schema";
+import { and, eq, desc } from "drizzle-orm";
 import { BunSQLDatabase } from "drizzle-orm/bun-sql/postgres";
-
-export const AUDIT_ACTIONS = ["workspace.created"] as const;
-
-export type AuditAction = (typeof AUDIT_ACTIONS)[number];
 
 type RecordAuditEventArgs = {
   db?: BunSQLDatabase;
@@ -15,6 +13,7 @@ type RecordAuditEventArgs = {
 
   /** Defaults to the current request's user. */
   actorId?: typeof s.users.$inferSelect.id;
+  /** @default user */
   actorType?: s.ActorType;
 
   /** Subjects of the event; set whichever the action touches. */

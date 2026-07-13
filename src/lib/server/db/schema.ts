@@ -1,3 +1,4 @@
+import type { AuditAction } from "$lib/audit-actions";
 import { SQL, sql } from "drizzle-orm";
 import { relations } from "drizzle-orm/_relations";
 import {
@@ -12,8 +13,6 @@ import {
   uuid,
   jsonb,
 } from "drizzle-orm/pg-core";
-
-import type { AuditAction } from "./audit";
 
 export const users = pgTable("users", {
   id: text("id").primaryKey(),
@@ -266,7 +265,7 @@ export const auditLogs = pgTable(
       .default(sql`uuidv7()`),
 
     action: text().$type<AuditAction>().notNull(),
-    status: text().$type<AuditStatus>().notNull().default("success"),
+    status: text().$type<AuditStatus>().notNull(),
 
     ipAddress: text("ip_address"),
     userAgent: text("user_agent"),
