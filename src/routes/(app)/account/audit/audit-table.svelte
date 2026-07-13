@@ -1,8 +1,9 @@
 <script lang="ts">
   import type { ActorAuditLog } from "$db/audit";
-  import { auditActionTitle } from "$lib/audit-actions";
+  import { auditAction } from "$lib/audit-actions";
   import * as Table from "$lib/components/ui/table";
   import { formatDateTime, formatShortDateTime, toIsoDate } from "$lib/date-format";
+  import clsx from "clsx";
 
   type Props = { logs: ActorAuditLog[] };
 
@@ -21,8 +22,24 @@
   </Table.Header>
   <Table.Body>
     {#each logs as l (l.id)}
+      {@const action = auditAction(l.action)}
+      {@const isDestructive = /\.(deleted|removed)/.test(l.action)}
       <Table.Row>
-        <Table.Cell>{auditActionTitle(l.action)}</Table.Cell>
+        <Table.Cell>
+          <span class="flex items-center gap-2">
+            <div
+              class={[
+                "rounded-full p-2",
+                l.action.startsWith("user.") && "bg-primary/15 text-primary",
+                l.action.startsWith("workspace.") && "bg-emerald-500/15 text-emerald-500",
+                isDestructive && "bg-destructive/15! text-destructive!",
+              ]}
+            >
+              <action.icon class="size-4" />
+            </div>
+            <span title={action.description}>{action.title}</span>
+          </span>
+        </Table.Cell>
         <Table.Cell>
           {#if l.action === "workspace.created" && l.metadata.title}
             Workspace: {l.metadata.title}
