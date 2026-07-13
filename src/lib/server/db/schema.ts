@@ -1,6 +1,17 @@
 import { SQL, sql } from "drizzle-orm";
 import { relations } from "drizzle-orm/_relations";
-import { pgTable, text, timestamp, boolean, integer, index, check, uniqueIndex, uuid } from "drizzle-orm/pg-core";
+import {
+  pgTable,
+  text,
+  timestamp,
+  boolean,
+  integer,
+  index,
+  check,
+  uniqueIndex,
+  uuid,
+  jsonb,
+} from "drizzle-orm/pg-core";
 
 export const users = pgTable("users", {
   id: text("id").primaryKey(),
@@ -241,3 +252,43 @@ export const pinnedDocuments = pgTable(
     index("pinned_documents_user_id_idx").on(t.userId),
   ],
 );
+
+export type AuditStatus = "success" | "failure";
+export type ActorType = "user" | "admin";
+
+export const auditLogs = pgTable(
+  "audit_logs",
+  {
+    id: uuid()
+      .primaryKey()
+      .default(sql`uuidv7()`),
+
+    action: text().notNull(),
+    status: text().$type<AuditStatus>().notNull().default("success"),
+
+    ipAddress: text("ip_address"),
+    userAgent: text("user_agent"),
+
+    actorId: text("actor_id")
+      .notNull()
+      .references(() => users.id),
+    actorType: text("actor_type").$type<ActorType>().notNull(),
+
+    workspaceId: uuid("workspace_id").references(() => workspaces.id, { onDelete: "set null" }),
+    documentId: uuid("document_id").references(() => documents.id, { onDelete: "set null" }),
+    userId: text("user_id").references(() => users.id, { onDelete: "set null" }),
+
+    metadata: jsonb().$type<Record<string, unknown>>().notNull().default({}),
+
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [
+    index("audit_logs_user_id_created_at_idx").on(t.userId, t.createdAt),
+    check(`chk_audit_logs_action_length`, sql`char_length(${t.action}) >= 3 and char_length(${t.action}) <= 64`),
+    check(`chk_audit_logs_status_valid`, sql`${t.status} in ('success', 'failure')`),
+    check("chk_audit_logs_actor_type_valid", sql`${t.actorType} in ('user', 'admin')`),
+  ],
+);
+
+export type AuditLogSelect = typeof auditLogs.$inferSelect;
+export type AuditLogInsert = typeof auditLogs.$inferInsert;
