@@ -1,11 +1,15 @@
 <script lang="ts">
+  import { resolve } from "$app/paths";
   import Meta from "$lib/components/meta.svelte";
+  import Button from "$lib/components/ui/button/button.svelte";
   import CardContent from "$lib/components/ui/card/card-content.svelte";
   import CardDescription from "$lib/components/ui/card/card-description.svelte";
+  import CardFooter from "$lib/components/ui/card/card-footer.svelte";
   import CardHeader from "$lib/components/ui/card/card-header.svelte";
   import CardTitle from "$lib/components/ui/card/card-title.svelte";
   import Card from "$lib/components/ui/card/card.svelte";
   import { formatDate, toIsoDate } from "$lib/date-format";
+  import { ClockIcon } from "$lib/icons";
 
   import type { PageProps } from "./$types";
   import Passkeys from "./passkeys.svelte";
@@ -44,6 +48,13 @@
           </div>
         </dl>
       </CardContent>
+
+      <CardFooter>
+        <Button variant="outline" class="w-full" href={resolve("/(app)/account/audit")}>
+          <ClockIcon />
+          <span>Audit Logs</span>
+        </Button>
+      </CardFooter>
     </Card>
   </section>
 
