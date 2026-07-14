@@ -7,6 +7,7 @@
   import { formatDateTime, toIsoDate } from "$lib/date-format";
 
   import type { PageProps } from "./$types";
+  import RecentDocuments from "./recent-documents.svelte";
 
   let { data }: PageProps = $props();
   let formattedUpdatedAt = $derived(formatDateTime(data.workspace.updatedAt));
@@ -53,4 +54,6 @@
       </Button>
     </div>
   </header>
+
+  <RecentDocuments documentsPromise={data.documentsPromise} workspaceSlug={data.workspace.slug} />
 </section>
