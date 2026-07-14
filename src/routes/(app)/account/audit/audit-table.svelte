@@ -3,7 +3,7 @@
   import { auditAction } from "$lib/audit-actions";
   import * as Table from "$lib/components/ui/table";
   import { formatDateTime, formatShortDateTime, toIsoDate } from "$lib/date-format";
-  import clsx from "clsx";
+  import { UAParser } from "ua-parser-js";
 
   type Props = { logs: ActorAuditLog[] };
 
@@ -14,18 +14,22 @@
   <Table.Caption>A list of your accounts audit logs</Table.Caption>
   <Table.Header>
     <Table.Row>
-      <Table.Head>Action</Table.Head>
+      <Table.Head class="max-w-40">Action</Table.Head>
       <Table.Head>Metadata</Table.Head>
       <Table.Head>User Agent</Table.Head>
-      <Table.Head>Timestamp</Table.Head>
+      <Table.Head class="max-w-24">Timestamp</Table.Head>
     </Table.Row>
   </Table.Header>
   <Table.Body>
     {#each logs as l (l.id)}
       {@const action = auditAction(l.action)}
       {@const isDestructive = /\.(deleted|removed)/.test(l.action)}
+      {@const ua = new UAParser(l.userAgent).getResult()}
+      {@const device = `${ua.device.model ?? ""} ${ua.device.type ?? ""} ${ua.device.vendor ?? ""}`}
+      {@const browser = `${ua.browser.name ?? ""} ${ua.browser.major ? "v" : ""}${ua.browser.major ?? ""}`}
+      {@const os = `${ua.os.name ?? ""} ${ua.os.version ?? ""}`}
       <Table.Row>
-        <Table.Cell>
+        <Table.Cell class="max-w-40">
           <span class="flex items-center gap-2">
             <div
               class={[
@@ -50,8 +54,14 @@
             Passkey: {l.metadata.name}
           {/if}
         </Table.Cell>
-        <Table.Cell>{l.userAgent}</Table.Cell>
-        <Table.Cell>
+        <Table.Cell title={l.userAgent}>
+          {device}
+          {#if /\w/.test(device) && (/\w/.test(os) || /\w/.test(browser))}•{/if}
+          {os}
+          {#if /\w/.test(browser) && (/\w/.test(os) || /\w/.test(device))}•{/if}
+          {browser}
+        </Table.Cell>
+        <Table.Cell class="max-w-24">
           <time datetime={toIsoDate(l.createdAt)}>{formatDateTime(l.createdAt)}</time>
         </Table.Cell>
       </Table.Row>

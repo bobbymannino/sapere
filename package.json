@@ -32,6 +32,7 @@
     "marked": "^18.0.6",
     "mode-watcher": "^1.1.0",
     "svelte-easy-crop": "^5.0.1",
+    "ua-parser-js": "^2.0.10",
     "valibot": "^1.4.2"
   },
   "devDependencies": {
