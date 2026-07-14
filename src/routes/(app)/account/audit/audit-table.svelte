@@ -24,10 +24,10 @@
     {#each logs as l (l.id)}
       {@const action = auditAction(l.action)}
       {@const isDestructive = /\.(deleted|removed)/.test(l.action)}
-      {@const ua = new UAParser(l.userAgent).getResult()}
-      {@const device = `${ua.device.model ?? ""} ${ua.device.type ?? ""} ${ua.device.vendor ?? ""}`}
-      {@const browser = `${ua.browser.name ?? ""} ${ua.browser.major ? "v" : ""}${ua.browser.major ?? ""}`}
-      {@const os = `${ua.os.name ?? ""} ${ua.os.version ?? ""}`}
+      {@const ua = l.userAgent ? new UAParser(l.userAgent).getResult() : null}
+      {@const device = `${ua?.device.vendor ?? ""} ${ua?.device.model ?? ""}`}
+      {@const browser = `${ua?.browser.name ?? ""} ${ua?.browser.major ? "v" : ""}${ua?.browser.major ?? ""}`}
+      {@const os = `${ua?.os.name ?? ""} ${ua?.os.version ?? ""}`}
       <Table.Row>
         <Table.Cell class="max-w-40">
           <span class="flex items-center gap-2">
