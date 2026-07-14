@@ -49,7 +49,7 @@
               {:else}
                 <MarkdownIcon class="size-5" />
               {/if}
-              <span class="truncate">{doc.title}</span>
+              <span class="truncate" title={doc.title}>{doc.title}</span>
               <time datetime={toIsoDate(doc.updatedAt)} class="text-muted-foreground ms-auto text-xs">
                 {formatShortDateTime(doc.updatedAt)}
               </time>
