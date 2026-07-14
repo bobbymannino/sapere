@@ -20,7 +20,7 @@
     </Card.Header>
 
     <Card.Content>
-      <EditWorkspaceForm workspace={data.workspace} />
+      <EditWorkspaceForm workspace={data.workspace} showDelete />
     </Card.Content>
   </Card.Root>
 </main>

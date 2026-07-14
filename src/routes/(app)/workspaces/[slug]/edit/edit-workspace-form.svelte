@@ -1,28 +1,36 @@
 <script lang="ts">
   import { applyAction, enhance } from "$app/forms";
+  import { goto } from "$app/navigation";
   import { resolve } from "$app/paths";
   import { page } from "$app/state";
   import OptimizedImage from "$lib/components/optimized-image.svelte";
   import { Button } from "$lib/components/ui/button";
+  import * as Dialog from "$lib/components/ui/dialog";
   import * as Field from "$lib/components/ui/field";
   import { Input } from "$lib/components/ui/input";
+  import * as Separator from "$lib/components/ui/separator";
   import { Slider } from "$lib/components/ui/slider";
   import { Textarea } from "$lib/components/ui/textarea";
   import { SpinnerIcon, TrashIcon } from "$lib/icons";
   import type { WorkspaceCardSelection } from "$lib/server/db/workspaces";
   import { slugify } from "$lib/utils";
+  import { deleteWorkspaceCommand } from "$lib/workspaces.remote";
   import { onDestroy } from "svelte";
   import Cropper, { type CropArea } from "svelte-easy-crop";
 
   type FieldName = "title" | "slug" | "description" | "image";
   type Props = {
     workspace: WorkspaceCardSelection;
+    showDelete?: boolean;
     onSuccess?: () => void | Promise<void>;
     onCancel?: () => void;
   };
 
-  let { workspace, onSuccess, onCancel }: Props = $props();
+  let { workspace, showDelete = false, onSuccess, onCancel }: Props = $props();
   let pending = $state(false);
+  let deleteDialogOpen = $state(false);
+  let deleteError = $state(null as string | null);
+  let deleting = $derived(deleteWorkspaceCommand.pending > 0);
   let title = $derived(workspace.title);
   let slug = $derived(workspace.slug);
   let description = $derived(workspace.description ?? "");
@@ -116,6 +124,23 @@
       return new File([blob], file.name, { type: mimeType });
     } finally {
       URL.revokeObjectURL(url);
+    }
+  }
+
+  function openDeleteDialog() {
+    deleteError = null;
+    deleteDialogOpen = true;
+  }
+
+  async function confirmDelete() {
+    deleteError = null;
+
+    try {
+      await deleteWorkspaceCommand(workspace.id);
+      deleteDialogOpen = false;
+      await goto(resolve("/(app)/workspaces"), { invalidateAll: true });
+    } catch (error) {
+      deleteError = error instanceof Error ? error.message : "Failed to delete workspace";
     }
   }
 
@@ -280,9 +305,50 @@
         Cancel
       </Button>
     {/if}
-    <Button type="submit" disabled={pending}>
+    <Button type="submit" disabled={pending || deleting}>
       {#if pending}<SpinnerIcon data-icon="inline-start" class="animate-spin" />{/if}
       Save changes
     </Button>
   </div>
 </form>
+
+{#if showDelete}
+  <Separator.Root class="my-6" />
+
+  <div class="flex flex-col items-center gap-3">
+    <small class="text-muted-foreground text-center">
+      This permanently removes the workspace and all of its documents.
+    </small>
+    <Button type="button" variant="destructive" disabled={pending || deleting} onclick={openDeleteDialog}>
+      <TrashIcon data-icon="inline-start" />
+      Delete workspace
+    </Button>
+  </div>
+
+  <Dialog.Root bind:open={deleteDialogOpen}>
+    <Dialog.Content>
+      <Dialog.Header>
+        <Dialog.Title>Delete workspace</Dialog.Title>
+        <Dialog.Description>This action cannot be undone.</Dialog.Description>
+      </Dialog.Header>
+
+      {#if deleteError}
+        <p class="text-destructive text-sm">{deleteError}</p>
+      {/if}
+
+      <Dialog.Footer>
+        <Button type="button" variant="outline" disabled={deleting} onclick={() => (deleteDialogOpen = false)}>
+          Cancel
+        </Button>
+        <Button type="button" variant="destructive" disabled={deleting} onclick={confirmDelete}>
+          {#if deleting}
+            <SpinnerIcon data-icon="inline-start" class="animate-spin" />
+          {:else}
+            <TrashIcon data-icon="inline-start" />
+          {/if}
+          Delete workspace
+        </Button>
+      </Dialog.Footer>
+    </Dialog.Content>
+  </Dialog.Root>
+{/if}
