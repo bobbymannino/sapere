@@ -24,6 +24,7 @@
     "@aws-sdk/s3-presigned-post": "^3.1085.0",
     "@aws-sdk/s3-request-presigner": "^3.1085.0",
     "@better-auth/passkey": "^1.6.23",
+    "@sentry/sveltekit": "^10.65.0",
     "better-auth": "^1.6.23",
     "central-icons": "npm:@central-icons-svelte/round-filled-radius-3-stroke-1.5",
     "dompurify": "^3.4.12",

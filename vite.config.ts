@@ -1,3 +1,4 @@
+import { sentrySvelteKit } from "@sentry/sveltekit";
 import adapter from "@sveltejs/adapter-node";
 import { sveltekit } from "@sveltejs/kit/vite";
 import tailwindcss from "@tailwindcss/vite";
@@ -5,6 +6,7 @@ import { defineConfig } from "vite";
 
 export default defineConfig({
   plugins: [
+    sentrySvelteKit({ telemetry: false }),
     tailwindcss(),
     sveltekit({
       compilerOptions: {
@@ -21,6 +23,9 @@ export default defineConfig({
       },
       experimental: {
         explicitEnvironmentVariables: true,
+        instrumentation: {
+          server: true,
+        },
         remoteFunctions: true,
       },
     }),

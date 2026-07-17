@@ -19,6 +19,8 @@ const MinioEndpointUrlSchema = v.pipe(v.string(), v.url());
 const MinioAccessKeyIdSchema = v.pipe(v.string(), v.minLength(16));
 const MinioSecretAccessKeySchema = v.pipe(v.string(), v.minLength(16));
 
+const SentryDsnSchema = v.pipe(v.string(), v.url());
+
 const UuidV4Schema = v.pipe(v.string(), v.uuid());
 
 export const variables = defineEnvVars({
@@ -70,5 +72,10 @@ export const variables = defineEnvVars({
     description: "The website ID for your Umami project",
     public: true,
     schema: v.optional(UuidV4Schema),
+  },
+  SENTRY_DSN: {
+    description: "The DSN url for a Sentry compatible service",
+    public: true,
+    schema: v.optional(SentryDsnSchema),
   },
 });
