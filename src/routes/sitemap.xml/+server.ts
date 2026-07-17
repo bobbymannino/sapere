@@ -1,5 +1,5 @@
+import { dev } from "$app/env";
 import { PUBLIC_URL } from "$app/env/public";
-import { dev } from "$app/environment";
 import { resolve } from "$app/paths";
 
 import type { RequestHandler } from "./$types";
