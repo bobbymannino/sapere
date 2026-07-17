@@ -2,7 +2,7 @@
   import { resolve } from "$app/paths";
   import OptimizedImage from "$lib/components/optimized-image.svelte";
   import * as Card from "$lib/components/ui/card";
-  import { formatShortDateTime, toIsoDate } from "$lib/date-format";
+  import { formatShortDateTime, formatRelativeDate, toIsoDate } from "$lib/date-format";
   import { ClockIcon, PictureIcon, PinIcon } from "$lib/icons";
   import type { WorkspaceCardSelection } from "$lib/server/db/workspaces";
 
@@ -13,7 +13,8 @@
   };
 
   let workspace: Props = $props();
-  let formattedUpdatedAt = $derived(formatShortDateTime(workspace.updatedAt));
+  let formattedUpdatedAt = $derived(formatRelativeDate(workspace.updatedAt));
+  let absoluteUpdatedAt = $derived(formatShortDateTime(workspace.updatedAt));
   let updatedAtIso = $derived(toIsoDate(workspace.updatedAt));
   let imageUrl = $derived(
     `${resolve("/(app)/workspaces/[slug]/image", { slug: workspace.slug })}?v=${workspace.updatedAt.getTime()}`,
@@ -55,7 +56,7 @@
   <Card.Footer class="mbs-auto flex items-center justify-between">
     <Card.Description class="flex items-center gap-1 text-xs">
       <ClockIcon class="size-3" />
-      <time datetime={updatedAtIso}>{formattedUpdatedAt}</time>
+      <time datetime={updatedAtIso} title={absoluteUpdatedAt}>{formattedUpdatedAt}</time>
     </Card.Description>
 
     <WorkspaceCardOptions {...workspace} />

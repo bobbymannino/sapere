@@ -2,7 +2,7 @@
   import { resolve } from "$app/paths";
   import DocumentPinButton from "$lib/components/document-pin-button.svelte";
   import * as Card from "$lib/components/ui/card";
-  import { toIsoDate, formatShortDateTime } from "$lib/date-format";
+  import { toIsoDate, formatShortDateTime, formatRelativeDate } from "$lib/date-format";
   import { ClockIcon, MarkdownIcon } from "$lib/icons";
   import type { DocumentCardSelection } from "$lib/server/db/documents";
   import type { WorkspaceSelect } from "$lib/server/db/schema";
@@ -49,7 +49,9 @@
     <div class="min-w-0">
       <Card.Description class="flex items-center gap-1 text-xs">
         <ClockIcon class="size-3" />
-        <time datetime={toIsoDate(updatedAt)}>{formatShortDateTime(updatedAt)}</time>
+        <time datetime={toIsoDate(updatedAt)} title={formatShortDateTime(updatedAt)}>
+          {formatRelativeDate(updatedAt)}
+        </time>
       </Card.Description>
       {#if pinError}
         <Card.Description class="text-destructive text-xs" aria-live="polite">{pinError}</Card.Description>
