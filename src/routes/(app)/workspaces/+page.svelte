@@ -20,10 +20,6 @@
     const url = resolve("/(app)/workspaces/[slug]/edit", { slug: workspace.slug });
     pushState(url, { editWorkspace: workspace });
   }
-
-  function tempError() {
-    throw new Error("this is my error");
-  }
 </script>
 
 <Meta
@@ -49,8 +45,6 @@
           </li>
         {/each}
       </ul>
-
-      <button id="error-button" onclick={tempError}>error</button>
     </section>
 
     {#if workspaces.totalPages > 1}
