@@ -6,7 +6,9 @@ import { defineConfig } from "vite";
 
 export default defineConfig({
   plugins: [
-    sentrySvelteKit({ telemetry: false }),
+    sentrySvelteKit({
+      telemetry: false,
+    }),
     tailwindcss(),
     sveltekit({
       compilerOptions: {
@@ -30,4 +32,7 @@ export default defineConfig({
       },
     }),
   ],
+  build: {
+    sourcemap: "hidden",
+  },
 });
