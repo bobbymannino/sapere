@@ -4,9 +4,9 @@
   import Meta from "$lib/components/meta.svelte";
   import * as Button from "$lib/components/ui/button";
   import { SpinnerIcon, ClockIcon, WorkspaceIcon } from "$lib/icons";
-  import AuditTable from './audit-table.svelte'
 
   import type { PageProps } from "./$types";
+  import AuditTable from "./audit-table.svelte";
 
   let { data }: PageProps = $props();
 </script>

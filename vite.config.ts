@@ -1,5 +1,6 @@
 import { sentrySvelteKit } from "@sentry/sveltekit";
 import adapter from "@sveltejs/adapter-node";
+import { enhancedImages } from "@sveltejs/enhanced-img";
 import { sveltekit } from "@sveltejs/kit/vite";
 import tailwindcss from "@tailwindcss/vite";
 import { defineConfig, loadEnv } from "vite";
@@ -21,6 +22,7 @@ export default defineConfig(({ mode }) => {
         authToken: env.SENTRY_AUTH_TOKEN,
       }),
       tailwindcss(),
+      enhancedImages(),
       sveltekit({
         compilerOptions: {
           // Force runes mode for the project, except for libraries. Can be removed in svelte 6.
