@@ -6,6 +6,7 @@ import { version } from "../package.json";
 Sentry.init({
   dsn: SENTRY_DSN,
   enabled: Boolean(SENTRY_DSN),
+  tunnel: "/api/rt",
   environment: process.env.NODE_ENV,
   release: version,
   enableLogs: true,
