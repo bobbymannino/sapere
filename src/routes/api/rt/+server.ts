@@ -4,7 +4,7 @@ import { error } from "@sveltejs/kit";
 import type { RequestHandler } from "./$types";
 
 export const POST: RequestHandler = async ({ request, fetch }) => {
-  if (!SENTRY_DSN) error(404, "Not Found");
+  if (!SENTRY_DSN) error(404);
 
   const dsn = new URL(SENTRY_DSN);
   const projectId = dsn.pathname.replace(/^\//, "");
