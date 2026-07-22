@@ -3,7 +3,7 @@
 </script>
 
 <svelte:head>
-  {#if UMAMI_WEBSITE_ID && process.env.NODE_ENV === "production"}
+  {#if UMAMI_WEBSITE_ID && process.env.NODE_ENV !== "development"}
     <script
       defer
       src="https://analytics.bobman.dev/script.js"
