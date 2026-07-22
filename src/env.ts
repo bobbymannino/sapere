@@ -54,6 +54,7 @@ export const variables = defineEnvVars({
   },
   BODY_SIZE_LIMIT: {
     schema: v.optional(BodySizeLimitSchema, "10M"),
+    static: true,
     description: "Node adapter request body limit. Keep this above the 5MB workspace image validation limit.",
   },
   MINIO_ENDPOINT_URL: {
@@ -71,11 +72,13 @@ export const variables = defineEnvVars({
   UMAMI_WEBSITE_ID: {
     description: "The website ID for your Umami project",
     public: true,
+    static: true,
     schema: v.optional(UuidV4Schema),
   },
   SENTRY_DSN: {
     description: "The DSN url for a Sentry compatible service",
     public: true,
+    static: true,
     schema: v.optional(SentryDsnSchema),
   },
 });
