@@ -1,5 +1,5 @@
 import { dev } from "$app/env";
-import { defineEnvVars } from "@sveltejs/kit/hooks";
+import { defineEnvVars } from "@sveltejs/kit/env";
 import * as v from "valibot";
 
 const AppNameSchema = v.pipe(v.string(), v.minLength(1));
