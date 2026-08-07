@@ -12,10 +12,6 @@ export default defineConfig(({ mode }) => {
     plugins: [
       sentrySvelteKit({
         telemetry: false,
-        release: {
-          create: false,
-          finalize: false,
-        },
         sentryUrl: env.SENTRY_URL,
         org: env.SENTRY_ORG,
         project: env.SENTRY_PROJECT,
