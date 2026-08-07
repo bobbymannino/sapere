@@ -8,7 +8,7 @@
   import CardHeader from "$lib/components/ui/card/card-header.svelte";
   import CardTitle from "$lib/components/ui/card/card-title.svelte";
   import Card from "$lib/components/ui/card/card.svelte";
-  import { formatDate, formatShortDateTime, toIsoDate } from "$lib/date-format";
+  import { formatDate, formatDateTime, formatRelativeDate, formatShortDateTime, toIsoDate } from "$lib/date-format";
   import { ClockIcon } from "$lib/icons";
 
   import { version } from "../../../../package.json";
@@ -66,6 +66,11 @@
   </section>
 
   <section class="flex-center p-5 pbs-0">
-    <small class="opacity-50">{formatShortDateTime(builtAt)} • v{version}</small>
+    <small class="opacity-50">
+      <time datetime={toIsoDate(builtAt)} title="Built at {formatDateTime(builtAt)} ({formatRelativeDate(builtAt)})">
+        {formatShortDateTime(builtAt)}
+      </time>
+      • v{version}</small
+    >
   </section>
 </div>
