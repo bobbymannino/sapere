@@ -2,7 +2,7 @@ import { getRequestEvent } from "$app/server";
 import { db as mdb } from "$db";
 import type { AuditAction } from "$lib/audit-actions";
 import * as s from "$lib/server/db/schema";
-import { and, eq, desc } from "drizzle-orm";
+import { and, eq, desc, sql } from "drizzle-orm";
 import { BunSQLDatabase } from "drizzle-orm/bun-sql/postgres";
 
 type RecordAuditEventArgs = {
@@ -70,6 +70,8 @@ type ListActorsLogsArgs = {
   db?: BunSQLDatabase;
   /** Defaults to the current request's user. */
   actorId?: typeof s.users.$inferSelect.id;
+  /** Case-insensitive substring match against the log's metadata. */
+  metadata?: Nullable<string>;
 };
 
 export type ActorAuditLog = {
@@ -85,6 +87,11 @@ export async function listActorsLogs(args: ListActorsLogsArgs): Promise<ActorAud
   const actorId = args.actorId ?? tryGetRequestEvent()?.locals.session?.user.id;
   if (!actorId) throw new Error("actorId is missing");
 
+  const metadata = args.metadata?.trim();
+  const metadataFilter = metadata
+    ? sql`position(lower(${metadata}) in lower(${s.auditLogs.metadata}::text)) > 0`
+    : undefined;
+
   return db
     .select({
       id: s.auditLogs.id,
@@ -94,6 +101,6 @@ export async function listActorsLogs(args: ListActorsLogsArgs): Promise<ActorAud
       createdAt: s.auditLogs.createdAt,
     })
     .from(s.auditLogs)
-    .where(and(eq(s.auditLogs.actorId, actorId), eq(s.auditLogs.actorType, "user")))
+    .where(and(eq(s.auditLogs.actorId, actorId), eq(s.auditLogs.actorType, "user"), metadataFilter))
     .orderBy(desc(s.auditLogs.createdAt));
 }

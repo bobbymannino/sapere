@@ -3,7 +3,8 @@
   import Empty from "$lib/components/empty.svelte";
   import Meta from "$lib/components/meta.svelte";
   import * as Button from "$lib/components/ui/button";
-  import { SpinnerIcon, ClockIcon, WorkspaceIcon } from "$lib/icons";
+  import * as InputGroup from "$lib/components/ui/input-group";
+  import { SpinnerIcon, ClockIcon, WorkspaceIcon, SearchIcon } from "$lib/icons";
 
   import type { PageProps } from "./$types";
   import AuditTable from "./audit-table.svelte";
@@ -21,7 +22,7 @@
 {#await data.logs}
   <Empty icon={SpinnerIcon} spinningIcon title="Loading Logs" color="primary" />
 {:then logs}
-  {#if logs.length === 0}
+  {#if logs.length === 0 && !data.metadata}
     <Empty
       icon={ClockIcon}
       title="No Audit Logs"
@@ -33,6 +34,25 @@
       </Button.Root>
     </Empty>
   {:else}
-    <AuditTable {logs} />
+    <div>
+      <form class="p-4" method="get">
+        <label for="metadata" class="sr-only">Metadata</label>
+        <InputGroup.Root>
+          <InputGroup.Input placeholder="Search metadata" name="metadata" id="metadata" value={data.metadata ?? ""} />
+          <InputGroup.Addon align="inline-end">
+            <InputGroup.Button type="submit">
+              <SearchIcon />
+            </InputGroup.Button>
+          </InputGroup.Addon>
+        </InputGroup.Root>
+      </form>
+      {#if logs.length === 0}
+        <Empty icon={SearchIcon} title="No Matching Logs" description="No audit logs match that metadata search">
+          <Button.Root variant="outline" href={resolve("/(app)/account/audit")}>Clear search</Button.Root>
+        </Empty>
+      {:else}
+        <AuditTable {logs} />
+      {/if}
+    </div>
   {/if}
 {/await}
