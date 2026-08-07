@@ -8,7 +8,7 @@
   import * as Kbd from "$lib/components/ui/kbd";
   import * as Textarea from "$lib/components/ui/textarea";
   import { saveDocumentContentCommand } from "$lib/documents.remote";
-  import { SpinnerIcon } from "$lib/icons";
+  import { MarkdownIcon, SpinnerIcon } from "$lib/icons";
   import { isTextFieldTarget, isUnmodifiedKey } from "$lib/utils";
   import dompurify from "dompurify";
   import { marked } from "marked";
@@ -30,6 +30,7 @@
   let saveError = $state("");
   let saveTimer: ReturnType<typeof setTimeout> | null = null;
   let pinError = $state<string | null>(null);
+  let exportLink: Nullable<HTMLElement> = $state(null);
   let saveInFlight = false;
   let saveQueued = false;
   let destroyed = false;
@@ -133,6 +134,14 @@
   });
 
   function onkeydown(e: KeyboardEvent) {
+    // Checked before the text field guard so export still works from the editor.
+    const exportModifier = data.isMac ? e.metaKey : e.ctrlKey;
+    if (exportModifier && e.key.toLocaleLowerCase() === "e") {
+      e.preventDefault();
+      exportLink?.click();
+      return;
+    }
+
     if (e.defaultPrevented || isTextFieldTarget(e.target)) return;
     if (isUnmodifiedKey(e, "e")) {
       e.preventDefault();
@@ -176,6 +185,23 @@
         bind:error={pinError}
         outline
       />
+      <Button.Root
+        variant="outline"
+        download="{data.document.slug}.md"
+        bind:ref={exportLink}
+        aria-keyshortcuts="Meta+E Control+E"
+        href={resolve("/(app)/workspaces/[slug]/documents/[docSlug]/export", {
+          slug: data.workspace.slug,
+          docSlug: data.document.slug,
+        })}
+      >
+        <MarkdownIcon />
+        <span>Export</span>
+        <Kbd.Group class="can-hover:flex hidden">
+          <Kbd.Root>{data.isMac ? "⌘" : "Ctrl"}</Kbd.Root>
+          <Kbd.Root>E</Kbd.Root>
+        </Kbd.Group>
+      </Button.Root>
       <Button.Root
         variant="outline"
         href={resolve("/(app)/workspaces/[slug]/documents/[docSlug]/edit", {
