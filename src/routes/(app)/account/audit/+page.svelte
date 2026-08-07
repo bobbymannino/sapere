@@ -22,7 +22,7 @@
 {#await data.logs}
   <Empty icon={SpinnerIcon} spinningIcon title="Loading Logs" color="primary" />
 {:then logs}
-  {#if logs.length === 0 && !data.metadata}
+  {#if logs.length === 0 && !data.search}
     <Empty
       icon={ClockIcon}
       title="No Audit Logs"
@@ -36,9 +36,9 @@
   {:else}
     <div>
       <form class="p-4" method="get">
-        <label for="metadata" class="sr-only">Metadata</label>
+        <label for="q" class="sr-only">Search</label>
         <InputGroup.Root>
-          <InputGroup.Input placeholder="Search metadata" name="metadata" id="metadata" value={data.metadata ?? ""} />
+          <InputGroup.Input placeholder="Search actions and metadata" name="q" id="q" value={data.search ?? ""} />
           <InputGroup.Addon align="inline-end">
             <InputGroup.Button type="submit">
               <SearchIcon />
@@ -47,7 +47,7 @@
         </InputGroup.Root>
       </form>
       {#if logs.length === 0}
-        <Empty icon={SearchIcon} title="No Matching Logs" description="No audit logs match that metadata search">
+        <Empty icon={SearchIcon} title="No Matching Logs" description="No audit logs match that search">
           <Button.Root variant="outline" href={resolve("/(app)/account/audit")}>Clear search</Button.Root>
         </Empty>
       {:else}
