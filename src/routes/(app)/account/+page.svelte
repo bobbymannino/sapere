@@ -8,9 +8,10 @@
   import CardHeader from "$lib/components/ui/card/card-header.svelte";
   import CardTitle from "$lib/components/ui/card/card-title.svelte";
   import Card from "$lib/components/ui/card/card.svelte";
-  import { formatDate, toIsoDate } from "$lib/date-format";
+  import { formatDate, formatShortDateTime, toIsoDate } from "$lib/date-format";
   import { ClockIcon } from "$lib/icons";
 
+  import { version } from "../../../../package.json";
   import type { PageProps } from "./$types";
   import Passkeys from "./passkeys.svelte";
 
@@ -18,6 +19,8 @@
 
   let joinedAt = $derived(formatDate(data.session.user.createdAt));
   let joinedAtIso = $derived(toIsoDate(data.session.user.createdAt));
+
+  const builtAt = new Date(__BUILD_DATE__);
 </script>
 
 <Meta title="Account" description="Manage your account details and passkeys." robots="noindex,nofollow" />
@@ -60,5 +63,9 @@
 
   <section class="flex-center p-5 pbs-0">
     <Passkeys />
+  </section>
+
+  <section class="flex-center p-5 pbs-0">
+    <small class="opacity-50">{formatShortDateTime(builtAt)} • v{version}</small>
   </section>
 </div>
