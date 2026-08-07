@@ -22,7 +22,7 @@
 </script>
 
 <Card.Root
-  class="group/card focus-within:border-ring focus-within:ring-ring/30 relative h-full pt-0 focus-within:ring-3 hover:scale-101 hover:shadow-lg motion-safe:hover:transition-transform"
+  class="group/card focus-within:border-ring focus-within:ring-ring/30 relative h-full pt-0 focus-within:ring-3 hover:scale-101 hover:shadow-sm motion-safe:hover:transition-transform"
 >
   <a href={resolve("/(app)/workspaces/[slug]", { slug: workspace.slug })} class="rounded-inherit absolute inset-0 z-10">
     <span class="sr-only">Open {workspace.title} workspace</span>

@@ -14,7 +14,7 @@
 </script>
 
 <Card.Root
-  class="group/card focus-within:border-ring focus-within:ring-ring/30 relative h-full focus-within:ring-3 hover:scale-101 hover:shadow-lg motion-safe:hover:transition-transform"
+  class="group/card focus-within:border-ring focus-within:ring-ring/30 relative h-full focus-within:ring-3 hover:scale-101 hover:shadow-sm motion-safe:hover:transition-transform"
 >
   <a
     href={resolve("/(app)/workspaces/[slug]/documents/[docSlug]", { slug: workspaceSlug, docSlug: slug })}
