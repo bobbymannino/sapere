@@ -6,6 +6,9 @@
 # Commits are listed as "- <title> — @handle". A trailing "(#123)" becomes a
 # link to the PR; commits without one link to their SHA instead.
 #
+# A "New contributors" section lists authors whose email has no commit anywhere
+# before this range.
+#
 # GitHub handles are resolved via `gh api`, so this needs an authenticated gh
 # (GH_TOKEN in CI, `gh auth login` locally). Commits whose author can't be
 # resolved to an account fall back to the plain git author name.
@@ -50,6 +53,19 @@ handle_for() {
   cat "$cache_file"
 }
 
+# Emails that already appear in history before this range. Authors missing from
+# it are first-time contributors.
+PRIOR_EMAILS="$CACHE_DIR/prior-emails"
+if [ -n "$PREV_TAG" ]; then
+  git log --pretty=tformat:'%ae' "$PREV_TAG" | sort -u > "$PRIOR_EMAILS"
+else
+  : > "$PRIOR_EMAILS"
+fi
+
+# The commit loop runs in a subshell, so it records new contributors on disk.
+NEW_CONTRIBUTORS="$CACHE_DIR/new-contributors"
+: > "$NEW_CONTRIBUTORS"
+
 echo "## What's changed"
 echo
 
@@ -62,8 +78,28 @@ git log --no-merges --pretty=tformat:'%s%x09%an%x09%ae%x09%h' "$RANGE" | while I
   else
     subject="$subject ([\`$hash\`]($REPO_URL/commit/$hash))"
   fi
-  echo "- $subject — $(handle_for "$hash" "$email" "$author")"
+  handle=$(handle_for "$hash" "$email" "$author")
+  echo "- $subject — $handle"
+
+  if ! grep -qxF "$email" "$PRIOR_EMAILS"; then
+    if [ -n "$pr" ]; then
+      where="[#$pr]($REPO_URL/pull/$pr)"
+    else
+      where="[\`$hash\`]($REPO_URL/commit/$hash)"
+    fi
+    echo "$handle	$where" >> "$NEW_CONTRIBUTORS"
+    echo "$email" >> "$PRIOR_EMAILS"
+  fi
 done
+
+if [ -s "$NEW_CONTRIBUTORS" ]; then
+  echo
+  echo "## New contributors"
+  echo
+  while IFS=$'\t' read -r handle where; do
+    echo "- $handle made their first contribution in $where"
+  done < "$NEW_CONTRIBUTORS"
+fi
 
 echo
 if [ -n "$PREV_TAG" ]; then
