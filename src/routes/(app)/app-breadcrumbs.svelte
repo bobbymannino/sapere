@@ -19,7 +19,7 @@
       </Breadcrumb.Item>
       {#each page.data.breadcrumbs as b, index (b)}
         {#if index > 0}
-          <Breadcrumb.Separator />
+          <Breadcrumb.Separator {index} />
         {/if}
         <Breadcrumb.Item {index}>
           {#if b.href}

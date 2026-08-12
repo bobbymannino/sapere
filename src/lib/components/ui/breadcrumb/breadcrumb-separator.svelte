@@ -1,9 +1,16 @@
 <script lang="ts">
+  import { slideInDown } from "$lib/actions/slide-in";
   import { ChevronRightIcon } from "$lib/icons";
   import { cn, type WithElementRef } from "$lib/utils.js";
   import type { HTMLLiAttributes } from "svelte/elements";
 
-  let { ref = $bindable(null), class: className, children, ...restProps }: WithElementRef<HTMLLiAttributes> = $props();
+  let {
+    ref = $bindable(null),
+    class: className,
+    children,
+    index,
+    ...restProps
+  }: WithElementRef<HTMLLiAttributes> & { index?: number } = $props();
 </script>
 
 <li
@@ -12,6 +19,7 @@
   role="presentation"
   aria-hidden="true"
   class={cn("[&>svg]:size-3.5", className)}
+  use:slideInDown={index}
   {...restProps}
 >
   {#if children}
