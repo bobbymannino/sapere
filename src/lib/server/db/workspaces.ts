@@ -372,8 +372,8 @@ export async function listRecentPinnedThings(args: ListRecentPinnedThingsArgs) {
       .select({
         id: s.workspaces.id,
         title: s.workspaces.title,
-        workspaceSlug: s.workspaces.slug,
-        documentSlug: sql<string | null>`null`,
+        workspaceSlug: s.workspaces.slug.as("workspace_slug"),
+        documentSlug: sql<string | null>`null`.as("document_slug"),
         pinnedAt: s.pinnedWorkspaces.pinnedAt,
         updatedAt: s.workspaces.updatedAt,
         type: sql<RecentPinnedThingType>`'workspace'`.as("type"),
@@ -385,8 +385,8 @@ export async function listRecentPinnedThings(args: ListRecentPinnedThingsArgs) {
       .select({
         id: s.documents.id,
         title: s.documents.title,
-        workspaceSlug: s.workspaces.slug,
-        documentSlug: s.documents.slug,
+        workspaceSlug: s.workspaces.slug.as("workspace_slug"),
+        documentSlug: s.documents.slug.as("document_slug"),
         pinnedAt: s.pinnedDocuments.pinnedAt,
         updatedAt: s.documents.updatedAt,
         type: sql<RecentPinnedThingType>`'document'`.as("type"),

@@ -34,7 +34,7 @@
         "bits-ui": "^2.18.1",
         "clsx": "^2.1.1",
         "drizzle-kit": "^1.0.0-rc.4-ca0f029",
-        "oxfmt": "0.62.0",
+        "oxfmt": "^0.62.0",
         "oxlint": "^1.77.0",
         "oxlint-tsgolint": "^7.0.2001",
         "shadcn-svelte": "^1.5.0",
