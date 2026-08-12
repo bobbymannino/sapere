@@ -1,8 +1,13 @@
 <script lang="ts">
   import * as ToggleGroup from "$lib/components/ui/toggle-group";
+  import { pop } from "$lib/actions/pop";
   import { DarkModeIcon, MoonIcon, SunIcon } from "$lib/icons";
   import { isThemeMode, type ThemeMode } from "$lib/theme";
   import { setMode, userPrefersMode } from "mode-watcher";
+
+  let systemIcon: HTMLElement | null = $state(null);
+  let darkIcon: HTMLElement | null = $state(null);
+  let lightIcon: HTMLElement | null = $state(null);
 
   function selectThemeMode(mode: string) {
     if (isThemeMode(mode)) {
@@ -31,27 +36,36 @@
   onValueChange={selectThemeMode}
 >
   <ToggleGroup.Item
-    onclick={(event) => keepSelectedThemeMode(event, "system")}
+    onclick={(event) => {
+      keepSelectedThemeMode(event, "system");
+      if (systemIcon) pop(systemIcon);
+    }}
     onkeydown={(event) => keepSelectedThemeModeFromKeyboard(event, "system")}
     aria-label="Use system theme"
     value="system"
   >
-    <DarkModeIcon />
+    <span bind:this={systemIcon} class="inline-flex"><DarkModeIcon /></span>
   </ToggleGroup.Item>
   <ToggleGroup.Item
-    onclick={(event) => keepSelectedThemeMode(event, "dark")}
+    onclick={(event) => {
+      keepSelectedThemeMode(event, "dark");
+      if (darkIcon) pop(darkIcon);
+    }}
     onkeydown={(event) => keepSelectedThemeModeFromKeyboard(event, "dark")}
     aria-label="Use dark theme"
     value="dark"
   >
-    <MoonIcon />
+    <span bind:this={darkIcon} class="inline-flex"><MoonIcon /></span>
   </ToggleGroup.Item>
   <ToggleGroup.Item
-    onclick={(event) => keepSelectedThemeMode(event, "light")}
+    onclick={(event) => {
+      keepSelectedThemeMode(event, "light");
+      if (lightIcon) pop(lightIcon);
+    }}
     onkeydown={(event) => keepSelectedThemeModeFromKeyboard(event, "light")}
     aria-label="Use light theme"
     value="light"
   >
-    <SunIcon />
+    <span bind:this={lightIcon} class="inline-flex"><SunIcon /></span>
   </ToggleGroup.Item>
 </ToggleGroup.Root>
