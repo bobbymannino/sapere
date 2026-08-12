@@ -1,5 +1,6 @@
 <script lang="ts">
   import { refreshAll } from "$app/navigation";
+  import { pop } from "$lib/actions/pop";
   import { Button } from "$lib/components/ui/button";
   import * as Kbd from "$lib/components/ui/kbd";
   import { setDocumentPinnedCommand } from "$lib/documents.remote";
@@ -34,6 +35,14 @@
   let pinLabel = $derived(pinned ? "Unpin" : "Pin");
   let pinActionLabel = $derived(pinned ? `Unpin ${documentTitle}` : `Pin ${documentTitle}`);
   let visibleKeyboardShortcut = $derived(keyboardShortcut?.toLocaleUpperCase() ?? null);
+
+  let iconWrapper: HTMLElement | null = $state(null);
+  let previousPinned = pinned;
+
+  $effect(() => {
+    if (pinned !== previousPinned && iconWrapper) pop(iconWrapper);
+    previousPinned = pinned;
+  });
 
   function onkeydown(e: KeyboardEvent) {
     if (!keyboardShortcut || e.defaultPrevented || e.repeat || isTextFieldTarget(e.target)) return;
@@ -74,13 +83,15 @@
   disabled={pinning}
   onclick={togglePinned}
 >
-  {#if pinning}
-    <SpinnerIcon class="size-3 animate-spin" />
-  {:else if pinned}
-    <UnpinIcon class="size-3" />
-  {:else}
-    <PinIcon class="size-3" />
-  {/if}
+  <span bind:this={iconWrapper} class="inline-flex">
+    {#if pinning}
+      <SpinnerIcon class="size-3 animate-spin" />
+    {:else if pinned}
+      <UnpinIcon class="size-3" />
+    {:else}
+      <PinIcon class="size-3" />
+    {/if}
+  </span>
   {#if !hideLabel}
     <span>{pinLabel}</span>
   {/if}
