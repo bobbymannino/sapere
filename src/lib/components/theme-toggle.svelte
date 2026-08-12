@@ -1,13 +1,13 @@
 <script lang="ts">
-  import * as ToggleGroup from "$lib/components/ui/toggle-group";
   import { pop } from "$lib/actions/pop";
+  import * as ToggleGroup from "$lib/components/ui/toggle-group";
   import { DarkModeIcon, MoonIcon, SunIcon } from "$lib/icons";
   import { isThemeMode, type ThemeMode } from "$lib/theme";
   import { setMode, userPrefersMode } from "mode-watcher";
 
-  let systemIcon: HTMLElement | null = $state(null);
-  let darkIcon: HTMLElement | null = $state(null);
-  let lightIcon: HTMLElement | null = $state(null);
+  let systemIcon: HTMLElement;
+  let darkIcon: HTMLElement;
+  let lightIcon: HTMLElement;
 
   function selectThemeMode(mode: string) {
     if (isThemeMode(mode)) {
