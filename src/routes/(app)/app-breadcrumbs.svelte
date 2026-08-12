@@ -17,7 +17,7 @@
       <Breadcrumb.Item>
         <SidebarTrigger />
       </Breadcrumb.Item>
-      {#each page.data.breadcrumbs as b, index (b)}
+      {#each page.data.breadcrumbs as b, index (b.label)}
         {#if index > 0}
           <Breadcrumb.Separator {index} />
         {/if}
