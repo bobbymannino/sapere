@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { slideInX } from "$lib/actions/slide-in";
+  import { slideInRight } from "$lib/actions/slide-in";
   import { cn, type WithElementRef } from "$lib/utils.js";
   import type { HTMLAttributes } from "svelte/elements";
 
@@ -17,7 +17,7 @@
   data-slot="sidebar-menu-sub-item"
   data-sidebar="menu-sub-item"
   class={cn("group/menu-sub-item relative", className)}
-  use:slideInX={index}
+  use:slideInRight={index}
   {...restProps}
 >
   {@render children?.()}
