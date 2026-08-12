@@ -57,8 +57,8 @@
               </Sidebar.MenuSubItem>
             {/each}
           {:then recentPinnedThings}
-            {#each recentPinnedThings as item (`${item.type}-${item.id}`)}
-              <Sidebar.MenuSubItem>
+            {#each recentPinnedThings as item, index (`${item.type}-${item.id}`)}
+              <Sidebar.MenuSubItem {index}>
                 <Sidebar.MenuSubButton isActive={isPinnedActive(item)} href={getPinnedHref(item)}>
                   {#if item.type === "workspace"}
                     <WorkspaceIcon />

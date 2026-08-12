@@ -41,8 +41,8 @@
               </Sidebar.MenuSubItem>
             {/each}
           {:then recentDocuments}
-            {#each recentDocuments as document (document.id)}
-              <Sidebar.MenuSubItem>
+            {#each recentDocuments as document, index (document.id)}
+              <Sidebar.MenuSubItem {index}>
                 <Sidebar.MenuSubButton
                   isActive={page.url.pathname === `/workspaces/${document.workspaceSlug}/documents/${document.slug}`}
                   href={resolve("/(app)/workspaces/[slug]/documents/[docSlug]", {

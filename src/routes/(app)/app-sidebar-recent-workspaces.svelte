@@ -45,8 +45,8 @@
               </Sidebar.MenuSubItem>
             {/each}
           {:then recentWorkspaces}
-            {#each recentWorkspaces as w (w.id)}
-              <AppSidebarRecentWorkspace {...w} />
+            {#each recentWorkspaces as w, index (w.id)}
+              <AppSidebarRecentWorkspace {...w} {index} />
             {/each}
           {/await}
           <Sidebar.MenuSubItem>
