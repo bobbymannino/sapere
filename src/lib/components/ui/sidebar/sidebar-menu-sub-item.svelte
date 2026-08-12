@@ -9,7 +9,7 @@
     class: className,
     index,
     ...restProps
-  }: WithElementRef<HTMLAttributes<HTMLLIElement>> & { index?: number } = $props();
+  }: WithElementRef<HTMLAttributes<HTMLLIElement>> & { index?: number | false } = $props();
 </script>
 
 <li

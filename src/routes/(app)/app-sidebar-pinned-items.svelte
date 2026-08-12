@@ -12,6 +12,14 @@
 
   let { recentPinnedThings }: Props = $props();
 
+  const animatedItems = new Set<string>();
+
+  function isNewItem(key: string) {
+    const isNew = !animatedItems.has(key);
+    animatedItems.add(key);
+    return isNew;
+  }
+
   function getPinnedHref(item: RecentPinnedThingSelection) {
     if (item.type === "workspace") return resolve("/(app)/workspaces/[slug]", { slug: item.workspaceSlug });
     if (item.type === "document" && item.documentSlug)
@@ -58,7 +66,8 @@
             {/each}
           {:then recentPinnedThings}
             {#each recentPinnedThings as item, index (`${item.type}-${item.id}`)}
-              <Sidebar.MenuSubItem {index}>
+              {@const isNew = isNewItem(`${item.type}-${item.id}`)}
+              <Sidebar.MenuSubItem index={isNew && index}>
                 <Sidebar.MenuSubButton isActive={isPinnedActive(item)} href={getPinnedHref(item)}>
                   {#if item.type === "workspace"}
                     <WorkspaceIcon />

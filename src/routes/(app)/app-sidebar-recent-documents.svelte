@@ -9,6 +9,14 @@
   type Props = { recentDocuments: Promise<RecentDocumentSelection[]> };
 
   let { recentDocuments }: Props = $props();
+
+  const animatedItems = new Set<string>();
+
+  function isNewItem(key: string) {
+    const isNew = !animatedItems.has(key);
+    animatedItems.add(key);
+    return isNew;
+  }
 </script>
 
 <Collapsible.Root open class="group/collapsible">
@@ -42,7 +50,8 @@
             {/each}
           {:then recentDocuments}
             {#each recentDocuments as document, index (document.id)}
-              <Sidebar.MenuSubItem {index}>
+              {@const isNew = isNewItem(document.id)}
+              <Sidebar.MenuSubItem index={isNew && index}>
                 <Sidebar.MenuSubButton
                   isActive={page.url.pathname === `/workspaces/${document.workspaceSlug}/documents/${document.slug}`}
                   href={resolve("/(app)/workspaces/[slug]/documents/[docSlug]", {

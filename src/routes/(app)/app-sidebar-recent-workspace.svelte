@@ -7,7 +7,7 @@
   import { getRecentWorkspaceDocuments } from "$lib/documents.remote";
   import { EllipsisIcon, MarkdownIcon, PencilIcon, SpinnerIcon } from "$lib/icons";
 
-  let { slug, title, id, index }: RecentWorkspaceSelection & { index?: number } = $props();
+  let { slug, title, id, index }: RecentWorkspaceSelection & { index?: number | false } = $props();
 
   let hasOpenedDropdown = $state(false);
 
