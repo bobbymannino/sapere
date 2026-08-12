@@ -9,3 +9,12 @@ export const slideInRight: Action<HTMLElement, number | undefined> = (node, inde
     { duration: 0.25, delay: index * 0.045, ease: "easeOut" },
   );
 };
+
+/** Animates a sidebar link/item in on mount, staggered by its list index. */
+export const slideInDown: Action<HTMLElement, number | undefined> = (node, index = 0) => {
+  animate(
+    node,
+    { opacity: [0, 1], transform: ["translateY(-12px)", "translateY(0)"] },
+    { duration: 0.25, delay: index * 0.045, ease: "easeOut" },
+  );
+};
