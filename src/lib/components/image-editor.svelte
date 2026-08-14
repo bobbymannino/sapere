@@ -121,20 +121,30 @@
     event.currentTarget.value = "";
   }
 
+  /** Depth of nested elements the drag is currently over, so child boundaries don't flicker the overlay. */
+  let dragDepth = 0;
+
   function ondrop(event: DragEvent) {
     event.preventDefault();
+    dragDepth = 0;
     isDraggingOver = false;
     if (isPending) return;
     setImage(event.dataTransfer?.files?.[0]);
   }
 
+  function ondragenter(event: DragEvent) {
+    event.preventDefault();
+    dragDepth += 1;
+    if (!isPending) isDraggingOver = true;
+  }
+
   function ondragover(event: DragEvent) {
     event.preventDefault();
-    isDraggingOver = true;
   }
 
   function ondragleave() {
-    isDraggingOver = false;
+    dragDepth = Math.max(0, dragDepth - 1);
+    if (dragDepth === 0) isDraggingOver = false;
   }
 </script>
 
@@ -158,10 +168,20 @@
     </Dialog.Header>
 
     <!-- svelte-ignore a11y_no_static_element_interactions -->
-    <div {ondrop} {ondragover} {ondragleave}>
+    <div {ondrop} {ondragenter} {ondragover} {ondragleave}>
       {#if imageUrl}
         <div class="relative aspect-video overflow-hidden rounded-xl">
           <Cropper image={imageUrl} bind:zoom aspect={aspectRatio} {oncropcomplete} />
+
+          {#if isDraggingOver}
+            <div
+              class="border-primary bg-background/80 text-foreground pointer-events-none absolute inset-0 z-10 flex flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed backdrop-blur-sm"
+            >
+              <PictureIcon class="text-muted-foreground size-8" />
+              <span class="text-sm font-medium">Drop to replace this image</span>
+              <span class="text-muted-foreground text-xs">JPEG, PNG, BMP or GIF</span>
+            </div>
+          {/if}
         </div>
         <Slider bind:value={zoom} type="single" min={1} step={0.1} max={5} class="mt-4" />
       {:else}
