@@ -11,7 +11,7 @@
 </script>
 
 <Table.Root>
-  <Table.Caption>A list of your accounts audit logs</Table.Caption>
+  <Table.Caption class="sr-only">A list of your accounts audit logs</Table.Caption>
   <Table.Header>
     <Table.Row>
       <Table.Head class="max-w-40">Action</Table.Head>
