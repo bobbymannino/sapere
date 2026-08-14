@@ -1,6 +1,8 @@
 import DarkModeIconComponent from "central-icons/IconAppearanceDarkMode";
 import ExitIconComponent from "central-icons/IconArrowBoxLeft";
 import EnterIconComponent from "central-icons/IconArrowBoxRight";
+import LeftRightArrowIconComponent from "central-icons/IconArrowLeftRight";
+import UpDownArrowIconComponent from "central-icons/IconArrowTopBottom";
 import WorkspaceIconComponent from "central-icons/IconBlock";
 import CheckmarkIconComponent from "central-icons/IconCheckmark2Medium";
 import ChevronDownIconComponent from "central-icons/IconChevronDownMedium";
@@ -79,3 +81,5 @@ export const TrashIcon = asIcon(TrashIconComponent);
 export const UnpinIcon = asIcon(UnpinIconComponent);
 export const UserIcon = asIcon(UserIconComponent);
 export const WorkspaceIcon = asIcon(WorkspaceIconComponent);
+export const LeftRightArrowIcon = asIcon(LeftRightArrowIconComponent);
+export const UpDownArrowIcon = asIcon(UpDownArrowIconComponent);
