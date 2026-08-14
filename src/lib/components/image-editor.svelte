@@ -5,7 +5,7 @@
   import { PictureIcon, SpinnerIcon } from "$lib/icons";
   import init, { crop, isImageFile } from "@bobbymannino/image-tools";
   import { onMount } from "svelte";
-  import Cropper, { type CropArea, type OnCropCompleteEvent } from "svelte-easy-crop";
+  import Cropper, { type CropArea, type OnCropCompleteEvent, type Point } from "svelte-easy-crop";
 
   type Props = {
     inputImage?: File;
@@ -35,6 +35,7 @@
   let isDraggingOver = $state(false);
   let error = $state<string>();
   let zoom = $state(1);
+  let cropPosition = $state<Point>({ x: 0, y: 0 });
   let input: HTMLInputElement;
 
   /** The image currently being edited, either the provided one or a newly picked one. */
@@ -74,6 +75,7 @@
 
     error = undefined;
     zoom = 1;
+    cropPosition = { x: 0, y: 0 };
     image = newImage;
   }
 
@@ -171,7 +173,7 @@
     <div {ondrop} {ondragenter} {ondragover} {ondragleave}>
       {#if imageUrl}
         <div class="relative aspect-video overflow-hidden rounded-xl">
-          <Cropper image={imageUrl} bind:zoom aspect={aspectRatio} {oncropcomplete} />
+          <Cropper image={imageUrl} bind:zoom bind:crop={cropPosition} aspect={aspectRatio} {oncropcomplete} />
 
           {#if isDraggingOver}
             <div
