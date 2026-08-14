@@ -12,6 +12,9 @@ export type WithoutChildren<T> = T extends { children?: any } ? Omit<T, "childre
 export type WithoutChildrenOrChild<T> = WithoutChildren<WithoutChild<T>>;
 export type WithElementRef<T, U extends HTMLElement = HTMLElement> = T & { ref?: U | null };
 
+/**
+ * Set via env.BODY_SIZE_LIMIT using an int + K/M/G, example: 1M, 2G, 512K
+ */
 export function isBodySizeLimitError(error: unknown) {
   return typeof error === "object" && error !== null && "status" in error && error.status === 413;
 }
