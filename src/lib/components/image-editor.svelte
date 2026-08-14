@@ -2,8 +2,8 @@
   import * as Button from "$lib/components/ui/button";
   import * as Dialog from "$lib/components/ui/dialog";
   import { Slider } from "$lib/components/ui/slider";
-  import { PictureIcon, SpinnerIcon } from "$lib/icons";
-  import init, { crop, isImageFile } from "@bobbymannino/image-tools";
+  import { UpDownArrowIcon, LeftRightArrowIcon, PictureIcon, SpinnerIcon } from "$lib/icons";
+  import init, { crop, isImageFile, mirror } from "@bobbymannino/image-tools";
   import { onMount } from "svelte";
   import Cropper, { type CropArea, type OnCropCompleteEvent, type Point } from "svelte-easy-crop";
 
@@ -79,6 +79,26 @@
     image = newImage;
   }
 
+  /** Which flip is in flight, so its button can show a spinner. */
+  let flipping = $state<"horizontal" | "vertical">();
+
+  /** Flips the working image itself, so the cropper stays in sync with what's shown. */
+  async function flip(x: boolean, y: boolean) {
+    if (!image || isPending || flipping) return;
+
+    flipping = x ? "vertical" : "horizontal";
+
+    try {
+      const flipped = mirror(await image.bytes(), x, y);
+      image = new File([flipped as BlobPart], image.name, { type: image.type });
+    } catch (e) {
+      console.error("Failed to flip image", e);
+      error = "Failed to flip image, please try again.";
+    } finally {
+      flipping = undefined;
+    }
+  }
+
   /** Set while closing after a save so the close handler doesn't also report a cancel. */
   let isSaving = false;
 
@@ -99,8 +119,9 @@
 
     try {
       const bytes = await image.bytes();
-      const cropped = crop(bytes, cropArea.x, cropArea.y, cropArea.width, cropArea.height);
-      const file = new File([cropped as BlobPart], image.name, {
+      const output = crop(bytes, cropArea.x, cropArea.y, cropArea.width, cropArea.height);
+
+      const file = new File([output as BlobPart], image.name, {
         type: image.type,
         lastModified: Date.now(),
       });
@@ -172,6 +193,35 @@
     <!-- svelte-ignore a11y_no_static_element_interactions -->
     <div {ondrop} {ondragenter} {ondragover} {ondragleave}>
       {#if imageUrl}
+        <div class="mb-2 flex justify-end gap-1">
+          <Button.Root
+            variant="outline"
+            size="icon"
+            disabled={isPending || !!flipping}
+            onclick={() => flip(false, true)}
+          >
+            {#if flipping === "horizontal"}
+              <SpinnerIcon class="animate-spin" />
+            {:else}
+              <LeftRightArrowIcon />
+            {/if}
+            <span class="sr-only">Flip horizontally</span>
+          </Button.Root>
+          <Button.Root
+            variant="outline"
+            size="icon"
+            disabled={isPending || !!flipping}
+            onclick={() => flip(true, false)}
+          >
+            {#if flipping === "vertical"}
+              <SpinnerIcon class="animate-spin" />
+            {:else}
+              <UpDownArrowIcon />
+            {/if}
+            <span class="sr-only">Flip vertically</span>
+          </Button.Root>
+        </div>
+
         <div class="relative aspect-video overflow-hidden rounded-xl">
           <Cropper image={imageUrl} bind:zoom bind:crop={cropPosition} aspect={aspectRatio} {oncropcomplete} />
 
@@ -210,7 +260,7 @@
         {image ? "Change Image" : "Upload Image"}
       </Button.Root>
       <Button.Root variant="ghost" onclick={cancel} disabled={isPending}>Cancel</Button.Root>
-      <Button.Root onclick={saveAndClose} disabled={isPending || !image}>
+      <Button.Root onclick={saveAndClose} disabled={isPending || !!flipping || !image}>
         {#if isPending}<SpinnerIcon class="animate-spin" />{/if}
         <span>Save</span>
       </Button.Root>
