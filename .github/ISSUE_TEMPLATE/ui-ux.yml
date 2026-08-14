@@ -1,0 +1,20 @@
+name: UI/UX Improvement
+description: Improving the user experience or user interface
+labels: ["type:ui/ux"]
+assignees:
+  - bobbymannino
+body:
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: What should be improved?
+    validations:
+      required: true
+  - type: textarea
+    id: current
+    attributes:
+      label: Current behaviour
+      description: How does it currently look or work?
+    validations:
+      required: false
