@@ -17,7 +17,7 @@ export const DocumentSlugSchema = v.pipe(
   v.trim(),
   v.nonEmpty("Please enter a document slug"),
   v.minLength(3, "Document slug must be at least 3 characters long"),
-  v.maxLength(32, "Document slug must be at most 32 characters long"),
+  v.maxLength(64, "Document slug must be at most 64 characters long"),
   v.regex(
     /^[a-z0-9_.-]+$/,
     "Document slug must only contain lowercase letters, numbers, underscores, dots and hyphens",

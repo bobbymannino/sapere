@@ -229,7 +229,7 @@ export const documents = pgTable(
     index("workspaces_workspace_orderable_title_idx").on(t.workspaceId, t.orderableTitle),
     index("workspaces_workspace_title_idx").on(t.workspaceId, t.title),
     check(`chk_documents_title_length`, sql`char_length(${t.title}) >= 3 and char_length(${t.title}) <= 64`),
-    check(`chk_documents_slug_length`, sql`char_length(${t.slug}) >= 3 and char_length(${t.slug}) <= 32`),
+    check(`chk_documents_slug_length`, sql`char_length(${t.slug}) >= 3 and char_length(${t.slug}) <= 64`),
     check(`chk_documents_slug_valid`, sql`${t.slug} ~ '^[a-z0-9_\.-]+$'`),
   ],
 );

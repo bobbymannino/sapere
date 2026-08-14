@@ -1,0 +1,1 @@
+ALTER TABLE "documents" DROP CONSTRAINT "chk_documents_slug_length", ADD CONSTRAINT "chk_documents_slug_length" CHECK (char_length("slug") >= 3 and char_length("slug") <= 64);
