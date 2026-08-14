@@ -28,7 +28,7 @@
     onCancel,
   }: Props = $props();
 
-  const acceptedTypes = "image/jpeg,image/png,image/bmp,image/gif";
+  const acceptedTypes = "image/jpeg,image/png,image/webp,image/bmp,image/gif";
 
   let cropArea: CropArea = $state({ x: 0, y: 0, width: 0, height: 0 });
   let isPending = $state(false);
@@ -231,7 +231,7 @@
             >
               <PictureIcon class="text-muted-foreground size-8" />
               <span class="text-sm font-medium">Drop to replace this image</span>
-              <span class="text-muted-foreground text-xs">JPEG, PNG, BMP or GIF</span>
+              <span class="text-muted-foreground text-xs">JPEG, PNG, WebP, BMP or GIF</span>
             </div>
           {/if}
         </div>
@@ -245,7 +245,7 @@
         >
           <PictureIcon class="text-muted-foreground size-8" />
           <span class="text-sm font-medium">Drop an image here, or click to browse</span>
-          <span class="text-muted-foreground text-xs">JPEG, PNG, BMP or GIF</span>
+          <span class="text-muted-foreground text-xs">JPEG, PNG, WebP, BMP or GIF</span>
         </button>
       {/if}
     </div>
