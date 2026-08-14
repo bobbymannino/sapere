@@ -13,6 +13,14 @@
   };
 
   let { recentWorkspaces }: Props = $props();
+
+  const animatedItems = new Set<string>();
+
+  function isNewItem(key: string) {
+    const isNew = !animatedItems.has(key);
+    animatedItems.add(key);
+    return isNew;
+  }
 </script>
 
 <Collapsible.Root open class="group/collapsible">
@@ -45,8 +53,9 @@
               </Sidebar.MenuSubItem>
             {/each}
           {:then recentWorkspaces}
-            {#each recentWorkspaces as w (w.id)}
-              <AppSidebarRecentWorkspace {...w} />
+            {#each recentWorkspaces as w, index (w.id)}
+              {@const isNew = isNewItem(w.id)}
+              <AppSidebarRecentWorkspace {...w} index={isNew && index} />
             {/each}
           {/await}
           <Sidebar.MenuSubItem>

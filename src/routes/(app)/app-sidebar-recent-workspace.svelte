@@ -7,7 +7,7 @@
   import { getRecentWorkspaceDocuments } from "$lib/documents.remote";
   import { EllipsisIcon, MarkdownIcon, PencilIcon, SpinnerIcon } from "$lib/icons";
 
-  let { slug, title, id }: RecentWorkspaceSelection = $props();
+  let { slug, title, id, index }: RecentWorkspaceSelection & { index?: number | false } = $props();
 
   let hasOpenedDropdown = $state(false);
 
@@ -16,7 +16,7 @@
   }
 </script>
 
-<Sidebar.MenuSubItem class="group/menu-item">
+<Sidebar.MenuSubItem class="group/menu-item" {index}>
   <Sidebar.MenuSubButton
     isActive={page.url.pathname === `/workspaces/${slug}`}
     href={resolve("/(app)/workspaces/[slug]", { slug })}
