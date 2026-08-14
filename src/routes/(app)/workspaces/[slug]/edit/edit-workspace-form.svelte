@@ -3,20 +3,19 @@
   import { goto } from "$app/navigation";
   import { resolve } from "$app/paths";
   import { page } from "$app/state";
+  import ImageEditor from "$lib/components/image-editor.svelte";
   import OptimizedImage from "$lib/components/optimized-image.svelte";
   import { Button } from "$lib/components/ui/button";
   import * as Dialog from "$lib/components/ui/dialog";
   import * as Field from "$lib/components/ui/field";
   import { Input } from "$lib/components/ui/input";
   import * as Separator from "$lib/components/ui/separator";
-  import { Slider } from "$lib/components/ui/slider";
   import { Textarea } from "$lib/components/ui/textarea";
   import { SpinnerIcon, TrashIcon } from "$lib/icons";
   import type { WorkspaceCardSelection } from "$lib/server/db/workspaces";
   import { slugify } from "$lib/utils";
   import { deleteWorkspaceCommand } from "$lib/workspaces.remote";
   import { onDestroy } from "svelte";
-  import Cropper, { type CropArea } from "svelte-easy-crop";
 
   type FieldName = "title" | "slug" | "description" | "image";
   type Props = {
@@ -34,12 +33,11 @@
   let title = $derived(workspace.title);
   let slug = $derived(workspace.slug);
   let description = $derived(workspace.description ?? "");
+  /** Already cropped by the image editor, so it can be submitted as-is. */
   let image: File | null = $state(null);
-  let imageInput: HTMLInputElement | null = $state(null);
   let imagePreviewUrl: string | null = $state(null);
   let removeImage = $state(false);
-  let zoom = $state(1);
-  let crop: CropArea = $state({ height: 0, width: 0, x: 0, y: 0 });
+  let imageEditorOpen = $state(false);
 
   let currentImageUrl = $derived(
     workspace.image && !image && !removeImage
@@ -57,11 +55,6 @@
     return fieldErrors(field).length > 0 ? "true" : undefined;
   }
 
-  function resetCrop() {
-    zoom = 1;
-    crop = { height: 0, width: 0, x: 0, y: 0 };
-  }
-
   function clearImagePreview() {
     if (imagePreviewUrl) URL.revokeObjectURL(imagePreviewUrl);
     imagePreviewUrl = null;
@@ -70,17 +63,13 @@
   function clearSelectedImage() {
     clearImagePreview();
     image = null;
-    resetCrop();
-    if (imageInput) imageInput.value = "";
   }
 
-  function onImageChange(event: Event & { currentTarget: HTMLInputElement }) {
-    const selectedImage = event.currentTarget.files?.[0] ?? null;
+  function onImageSave(cropped: File) {
     clearImagePreview();
-    image = selectedImage;
-    imagePreviewUrl = selectedImage ? URL.createObjectURL(selectedImage) : null;
+    image = cropped;
+    imagePreviewUrl = URL.createObjectURL(cropped);
     removeImage = false;
-    resetCrop();
   }
 
   function removeCurrentImage() {
@@ -90,41 +79,6 @@
 
   function keepCurrentImage() {
     removeImage = false;
-  }
-
-  /**
-   * Crops an image file to the given pixel area using the Canvas API.
-   * Falls back to `image/webp` for AVIF inputs since canvas cannot encode AVIF.
-   */
-  async function cropImageFile(file: File, area: CropArea): Promise<File> {
-    const url = URL.createObjectURL(file);
-    try {
-      const img = await new Promise<HTMLImageElement>((resolve, reject) => {
-        const el = document.createElement("img");
-        el.onload = () => resolve(el);
-        el.onerror = reject;
-        el.src = url;
-      });
-
-      const canvas = document.createElement("canvas");
-      canvas.width = area.width;
-      canvas.height = area.height;
-
-      const ctx = canvas.getContext("2d");
-      if (!ctx) throw new Error("Canvas 2D context unavailable");
-
-      ctx.drawImage(img, area.x, area.y, area.width, area.height, 0, 0, area.width, area.height);
-
-      const mimeType = file.type === "image/avif" ? "image/webp" : file.type;
-
-      const blob = await new Promise<Blob>((resolve, reject) => {
-        canvas.toBlob((b) => (b ? resolve(b) : reject(new Error("Failed to encode cropped image"))), mimeType, 0.9);
-      });
-
-      return new File([blob], file.name, { type: mimeType });
-    } finally {
-      URL.revokeObjectURL(url);
-    }
   }
 
   function openDeleteDialog() {
@@ -157,15 +111,7 @@
     }
     pending = true;
 
-    try {
-      if (image && crop.width > 0 && crop.height > 0) {
-        const croppedFile = await cropImageFile(image, crop);
-        formData.set("image", croppedFile, image.name);
-      }
-    } catch (error) {
-      pending = false;
-      throw error;
-    }
+    if (image) formData.set("image", image, image.name);
 
     return async ({ result }) => {
       try {
@@ -239,7 +185,7 @@
     </Field.Field>
 
     <Field.Field data-invalid={fieldInvalid("image")}>
-      <Field.FieldLabel for="image">Image</Field.FieldLabel>
+      <Field.FieldLabel>Image</Field.FieldLabel>
       <Field.FieldDescription>Upload a new thumbnail or remove the current one.</Field.FieldDescription>
 
       {#if currentImageUrl}
@@ -259,33 +205,22 @@
         </div>
       {/if}
 
-      <Input
-        bind:ref={imageInput}
-        aria-invalid={fieldErrors("image").length > 0}
-        disabled={pending}
-        type="file"
-        id="image"
-        name="image"
-        accept="image/png, image/jpeg, image/avif, image/webp"
-        onchange={onImageChange}
-      />
-
       {#if image && imagePreviewUrl}
-        <div class="relative aspect-video overflow-hidden rounded-3xl">
-          <Cropper
-            image={imagePreviewUrl}
-            bind:zoom
-            aspect={16 / 9}
-            oncropcomplete={(event) => (crop = event.pixels)}
-          />
-        </div>
-        <Slider bind:value={zoom} type="single" min={1} step={0.1} max={5} disabled={pending} />
-        <div>
-          <Button type="button" variant="outline" disabled={pending} onclick={clearSelectedImage}>
+        <img src={imagePreviewUrl} alt="" class="aspect-video w-full rounded-3xl object-cover" />
+      {/if}
+
+      <div class="flex gap-2">
+        <Button type="button" variant="outline" disabled={pending} onclick={() => (imageEditorOpen = true)}>
+          {image ? "Change new image" : "Upload new image"}
+        </Button>
+        {#if image}
+          <Button type="button" variant="ghost" disabled={pending} onclick={clearSelectedImage}>
             Clear selected image
           </Button>
-        </div>
-      {/if}
+        {/if}
+      </div>
+
+      <ImageEditor bind:open={imageEditorOpen} inputImage={image ?? undefined} onSave={onImageSave} />
 
       {#each fieldErrors("image") as error (error)}
         <Field.FieldError>{error}</Field.FieldError>

@@ -8,54 +8,30 @@
   import FieldDescription from "$lib/components/ui/field/field-description.svelte";
   import FieldLabel from "$lib/components/ui/field/field-label.svelte";
   import Field from "$lib/components/ui/field/field.svelte";
+  import ImageEditor from "$lib/components/image-editor.svelte";
   import Input from "$lib/components/ui/input/input.svelte";
-  import Slider from "$lib/components/ui/slider/slider.svelte";
   import Textarea from "$lib/components/ui/textarea/textarea.svelte";
   import { ErrorIcon, SpinnerIcon } from "$lib/icons";
   import { slugify } from "$lib/utils";
-  import Cropper, { type CropArea } from "svelte-easy-crop";
 
   let pending = $state(false);
   let slug = $state("");
+  /** Already cropped by the image editor, so it can be submitted as-is. */
   let image: File | null = $state(null);
-  let zoom = $state(1);
-  let crop: CropArea = $state({ height: 0, width: 0, x: 0, y: 0 });
+  let imageEditorOpen = $state(false);
 
-  /**
-   * Crops an image file to the given pixel area using the Canvas API.
-   * Falls back to `image/webp` for AVIF inputs since canvas cannot encode AVIF.
-   */
-  async function cropImageFile(file: File, area: CropArea): Promise<File> {
-    const url = URL.createObjectURL(file);
-    try {
-      const img = await new Promise<HTMLImageElement>((resolve, reject) => {
-        const el = document.createElement("img");
-        el.onload = () => resolve(el);
-        el.onerror = reject;
-        el.src = url;
-      });
-
-      const canvas = document.createElement("canvas");
-      canvas.width = area.width;
-      canvas.height = area.height;
-
-      const ctx = canvas.getContext("2d");
-      if (!ctx) throw new Error("Canvas 2D context unavailable");
-
-      ctx.drawImage(img, area.x, area.y, area.width, area.height, 0, 0, area.width, area.height);
-
-      // canvas.toBlob does not support avif encoding in most browsers
-      const mimeType = file.type === "image/avif" ? "image/webp" : file.type;
-
-      const blob = await new Promise<Blob>((resolve, reject) => {
-        canvas.toBlob((b) => (b ? resolve(b) : reject(new Error("Failed to encode cropped image"))), mimeType, 0.9);
-      });
-
-      return new File([blob], file.name, { type: mimeType });
-    } finally {
-      URL.revokeObjectURL(url);
+  let imageUrl = $state<string>();
+  $effect(() => {
+    if (!image) {
+      imageUrl = undefined;
+      return;
     }
-  }
+
+    const url = URL.createObjectURL(image);
+    imageUrl = url;
+
+    return () => URL.revokeObjectURL(url);
+  });
 </script>
 
 <form
@@ -68,10 +44,7 @@
     }
     pending = true;
 
-    if (image && crop.width > 0 && crop.height > 0) {
-      const croppedFile = await cropImageFile(image, crop);
-      formData.set("image", croppedFile, image.name);
-    }
+    if (image) formData.set("image", image, image.name);
 
     return async ({ result }) => {
       await applyAction(result);
@@ -141,28 +114,22 @@
   </Field>
 
   <Field>
-    <FieldLabel for="image">Image</FieldLabel>
+    <FieldLabel>Image</FieldLabel>
     <FieldDescription>An optional thumbnail for this workspace</FieldDescription>
-    <Input
-      aria-invalid={page.form?.valiErrors?.nested?.image?.length > 0}
-      disabled={pending}
-      type="file"
-      id="image"
-      name="image"
-      accept="image/png, image/jpeg, image/avif, image/webp"
-      onchange={(e) => (image = e.currentTarget.files?.[0] ?? null)}
-    />
-    {#if image}
-      <div class="relative aspect-video">
-        <Cropper
-          image={URL.createObjectURL(image)}
-          bind:zoom
-          aspect={16 / 9}
-          oncropcomplete={(e) => (crop = e.pixels)}
-        />
-      </div>
-      <Slider bind:value={zoom} type="single" min={1} step={0.1} max={5} />
+    {#if imageUrl}
+      <img src={imageUrl} alt="" class="aspect-video w-full rounded-3xl object-cover" />
     {/if}
+
+    <div class="flex gap-2">
+      <Button type="button" variant="outline" disabled={pending} onclick={() => (imageEditorOpen = true)}>
+        {image ? "Change image" : "Choose image"}
+      </Button>
+      {#if image}
+        <Button type="button" variant="ghost" disabled={pending} onclick={() => (image = null)}>Remove image</Button>
+      {/if}
+    </div>
+
+    <ImageEditor bind:open={imageEditorOpen} inputImage={image ?? undefined} onSave={(cropped) => (image = cropped)} />
     {#each page.form?.valiErrors?.nested?.image as error (error)}
       <Alert variant="destructive">
         <ErrorIcon />
