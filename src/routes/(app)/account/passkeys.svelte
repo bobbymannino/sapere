@@ -1,21 +1,11 @@
 <script lang="ts">
   import { authClient } from "$lib/auth-client";
   import FormInput from "$lib/components/form-input.svelte";
-  import AlertTitle from "$lib/components/ui/alert/alert-title.svelte";
-  import Alert from "$lib/components/ui/alert/alert.svelte";
-  import Button from "$lib/components/ui/button/button.svelte";
-  import CardContent from "$lib/components/ui/card/card-content.svelte";
-  import CardFooter from "$lib/components/ui/card/card-footer.svelte";
-  import CardHeader from "$lib/components/ui/card/card-header.svelte";
-  import CardTitle from "$lib/components/ui/card/card-title.svelte";
-  import Card from "$lib/components/ui/card/card.svelte";
-  import DialogContent from "$lib/components/ui/dialog/dialog-content.svelte";
-  import DialogDescription from "$lib/components/ui/dialog/dialog-description.svelte";
-  import DialogFooter from "$lib/components/ui/dialog/dialog-footer.svelte";
-  import DialogHeader from "$lib/components/ui/dialog/dialog-header.svelte";
-  import DialogTitle from "$lib/components/ui/dialog/dialog-title.svelte";
-  import Dialog from "$lib/components/ui/dialog/dialog.svelte";
-  import Input from "$lib/components/ui/input/input.svelte";
+  import * as Alert from "$lib/components/ui/alert";
+  import * as Button from "$lib/components/ui/button";
+  import * as Card from "$lib/components/ui/card";
+  import * as Dialog from "$lib/components/ui/dialog";
+  import * as Input from "$lib/components/ui/input";
   import { formatDateTime } from "$lib/date-format";
   import { ErrorIcon, SpinnerIcon, TrashIcon } from "$lib/icons";
   import type { Passkey } from "@better-auth/passkey";
@@ -65,9 +55,12 @@
 
     const { name } = parsedResult.output;
     const newPasskey = await authClient.passkey.addPasskey(name ? { name } : undefined);
-    if (newPasskey.data) await loadPasskeys(status);
-    else error = newPasskey.error.message ?? "Failed to add passkey";
-    if (newPasskey.data) formData.name = "";
+    if (newPasskey.data) {
+      await loadPasskeys(status);
+      formData.name = "";
+    } else {
+      error = newPasskey.error?.message ?? "Failed to add passkey";
+    }
     status = false;
   }
 
@@ -94,20 +87,20 @@
   onMount(() => loadPasskeys(false));
 </script>
 
-<Card class="w-full max-w-lg">
-  <CardHeader>
-    <CardTitle>Passkeys</CardTitle>
-  </CardHeader>
+<Card.Root class="w-full max-w-lg">
+  <Card.Header>
+    <Card.Title>Passkeys</Card.Title>
+  </Card.Header>
 
   {#if status === "loading"}
-    <CardContent>
+    <Card.Content>
       <span class="sr-only">Loading</span>
       <SpinnerIcon class="mx-auto animate-spin" aria-hidden="true" />
-    </CardContent>
+    </Card.Content>
   {/if}
 
   {#if passkeys.length}
-    <CardContent>
+    <Card.Content>
       <ul class="space-y-5">
         {#each passkeys as p (p.id)}
           <li class="flex items-center justify-between">
@@ -116,24 +109,24 @@
               <p>Name <b>{p.name || "Unnamed Passkey"}</b></p>
               <p>Created <b>{formatDateTime(p.createdAt)}</b></p>
             </div>
-            <Button variant="destructive" size="icon" disabled={!!status} onclick={() => openDeleteDialog(p)}>
+            <Button.Root variant="destructive" size="icon" disabled={!!status} onclick={() => openDeleteDialog(p)}>
               <span class="sr-only">Delete passkey</span>
               {#if deletingId === p.id}
                 <SpinnerIcon class="animate-spin" />
               {:else}
                 <TrashIcon />
               {/if}
-            </Button>
+            </Button.Root>
           </li>
         {/each}
       </ul>
-    </CardContent>
+    </Card.Content>
   {/if}
 
-  <CardFooter class="flex-col gap-5">
+  <Card.Footer class="flex-col gap-5">
     <form class="flex w-full flex-col gap-5" onsubmit={addPasskey}>
       <FormInput inputId="passkey-name" label="Passkey name" errors={valiErrors?.nested?.name}>
-        <Input
+        <Input.Root
           id="passkey-name"
           name="name"
           type="text"
@@ -145,52 +138,54 @@
         />
       </FormInput>
 
-      <Button type="submit" class="w-full" disabled={!!status}>
+      <Button.Root type="submit" class="w-full" disabled={!!status}>
         {#if status === "adding"}<SpinnerIcon class="animate-spin" />{/if}
         Add Passkey
-      </Button>
+      </Button.Root>
     </form>
     {#if error}
-      <Alert variant="destructive">
+      <Alert.Root variant="destructive">
         <ErrorIcon />
-        <AlertTitle>{error}</AlertTitle>
-      </Alert>
+        <Alert.Title>{error}</Alert.Title>
+      </Alert.Root>
     {/if}
-  </CardFooter>
+  </Card.Footer>
+</Card.Root>
 
-  <Dialog bind:open={deleteOpen}>
-    <DialogContent showCloseButton={!status}>
-      <DialogHeader>
-        <DialogTitle>Delete passkey?</DialogTitle>
-        <DialogDescription>
-          This will remove {passkeyToDelete?.name || "this passkey"} from your account. You will need to register it again
-          to use it for sign in.
-        </DialogDescription>
-      </DialogHeader>
+<Dialog.Root bind:open={deleteOpen}>
+  <Dialog.Content showCloseButton={!status}>
+    <Dialog.Header>
+      <Dialog.Title>Delete passkey?</Dialog.Title>
+      <Dialog.Description>
+        This will remove {passkeyToDelete?.name || "this passkey"} from your account. You will need to register it again to
+        use it for sign in.
+      </Dialog.Description>
+    </Dialog.Header>
 
-      {#if error}
-        <Alert variant="destructive">
-          <ErrorIcon />
-          <AlertTitle>{error}</AlertTitle>
-        </Alert>
-      {/if}
+    {#if error}
+      <Alert.Root variant="destructive">
+        <ErrorIcon />
+        <Alert.Title>{error}</Alert.Title>
+      </Alert.Root>
+    {/if}
 
-      <DialogFooter>
-        <Button type="button" variant="outline" disabled={!!status} onclick={() => (deleteOpen = false)}>Cancel</Button>
-        <Button
-          type="button"
-          variant="destructive"
-          disabled={!!status || !passkeyToDelete}
-          onclick={() => passkeyToDelete && deletePasskey(passkeyToDelete.id)}
-        >
-          {#if deletingId === passkeyToDelete?.id}
-            <SpinnerIcon class="animate-spin" />
-          {:else}
-            <TrashIcon />
-          {/if}
-          Delete
-        </Button>
-      </DialogFooter>
-    </DialogContent>
-  </Dialog>
-</Card>
+    <Dialog.Footer>
+      <Button.Root type="button" variant="outline" disabled={!!status} onclick={() => (deleteOpen = false)}>
+        Cancel
+      </Button.Root>
+      <Button.Root
+        type="button"
+        variant="destructive"
+        disabled={!!status || !passkeyToDelete}
+        onclick={() => passkeyToDelete && deletePasskey(passkeyToDelete.id)}
+      >
+        {#if deletingId === passkeyToDelete?.id}
+          <SpinnerIcon class="animate-spin" />
+        {:else}
+          <TrashIcon />
+        {/if}
+        Delete
+      </Button.Root>
+    </Dialog.Footer>
+  </Dialog.Content>
+</Dialog.Root>
