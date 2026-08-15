@@ -59,7 +59,11 @@
       await loadPasskeys(status);
       formData.name = "";
     } else {
-      error = newPasskey.error?.message ?? "Failed to add passkey";
+      if ("code" in newPasskey.error && newPasskey.error.code === "SESSION_NOT_FRESH") {
+        error = "Session not fresh, log out and log back in to add a passkey";
+      } else {
+        error = newPasskey.error?.message ?? "Failed to add passkey";
+      }
     }
     status = false;
   }
