@@ -2,7 +2,7 @@
   import * as Button from "$lib/components/ui/button";
   import * as Dialog from "$lib/components/ui/dialog";
   import { Slider } from "$lib/components/ui/slider";
-  import { UpDownArrowIcon, LeftRightArrowIcon, PictureIcon, SpinnerIcon } from "$lib/icons";
+  import { UpDownArrowIcon, LeftRightArrowIcon, PictureIcon, SpinnerIcon, TargetIcon } from "$lib/icons";
   import init, { crop, isImageFile, mirror } from "@bobbymannino/image-tools";
   import { onMount } from "svelte";
   import Cropper, { type CropArea, type OnCropCompleteEvent, type Point } from "svelte-easy-crop";
@@ -97,6 +97,11 @@
     } finally {
       flipping = undefined;
     }
+  }
+
+  /** Centers the image crop area */
+  function center() {
+    cropPosition = { x: 0, y: 0 };
   }
 
   /** Set while closing after a save so the close handler doesn't also report a cancel. */
@@ -198,7 +203,18 @@
             variant="outline"
             size="icon"
             disabled={isPending || !!flipping}
+            onclick={center}
+            title="Center image"
+          >
+            <TargetIcon />
+            <span class="sr-only">Center image</span>
+          </Button.Root>
+          <Button.Root
+            variant="outline"
+            size="icon"
+            disabled={isPending || !!flipping}
             onclick={() => flip(false, true)}
+            title="Flip horizontally"
           >
             {#if flipping === "horizontal"}
               <SpinnerIcon class="animate-spin" />
@@ -212,6 +228,7 @@
             size="icon"
             disabled={isPending || !!flipping}
             onclick={() => flip(true, false)}
+            title="Flip vertically"
           >
             {#if flipping === "vertical"}
               <SpinnerIcon class="animate-spin" />
