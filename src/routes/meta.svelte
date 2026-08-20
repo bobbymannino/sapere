@@ -13,7 +13,7 @@
   {#if process.env.NODE_ENV === "production"}
     <link rel="icon" href={faviconIco} sizes="144x144" type="image/x-icon" />
     <link rel="icon" href={faviconSvg} type="image/svg+xml" />
-  {:else if ["preview", "beta"].includes(process.env.NODE_ENV ?? "")}
+  {:else if process.env.NODE_ENV === "preview"}
     <link rel="icon" href={orangeFaviconIco} sizes="144x144" type="image/x-icon" />
     <link rel="icon" href={orangeFaviconSvg} type="image/svg+xml" />
   {:else}
