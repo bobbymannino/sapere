@@ -2,7 +2,7 @@
   import type { ActorAuditLog } from "$db/audit";
   import { auditAction } from "$lib/audit-actions";
   import * as Table from "$lib/components/ui/table";
-  import { formatDateTime, formatShortDateTime, toIsoDate } from "$lib/date-format";
+  import { formatDateTime, toIsoDate, formatRelativeDate } from "$lib/date-format";
   import { UAParser } from "ua-parser-js";
 
   type Props = { logs: ActorAuditLog[] };
@@ -28,6 +28,7 @@
       {@const device = `${ua?.device.vendor ?? ""} ${ua?.device.model ?? ""}`}
       {@const browser = `${ua?.browser.name ?? ""} ${ua?.browser.major ? "v" : ""}${ua?.browser.major ?? ""}`}
       {@const os = `${ua?.os.name ?? ""} ${ua?.os.version ?? ""}`}
+      {@const createdAtIso = toIsoDate(l.createdAt)}
       <Table.Row>
         <Table.Cell class="max-w-40">
           <span class="flex items-center gap-2">
@@ -62,7 +63,9 @@
           {browser}
         </Table.Cell>
         <Table.Cell class="max-w-24">
-          <time datetime={toIsoDate(l.createdAt)}>{formatDateTime(l.createdAt)}</time>
+          <time datetime={createdAtIso} title="{createdAtIso} ({formatRelativeDate(l.createdAt)})">
+            {formatDateTime(l.createdAt)}
+          </time>
         </Table.Cell>
       </Table.Row>
     {/each}
