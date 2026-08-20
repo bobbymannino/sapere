@@ -91,6 +91,7 @@ type ListActorsLogsArgs = PaginationArgs &
 export type ActorAuditLog = {
   id: typeof s.auditLogs.$inferSelect.id;
   action: typeof s.auditLogs.$inferSelect.action;
+  status: typeof s.auditLogs.$inferSelect.status;
   ipAddress: typeof s.auditLogs.$inferSelect.ipAddress;
   userAgent: typeof s.auditLogs.$inferSelect.userAgent;
   metadata: typeof s.auditLogs.$inferSelect.metadata;
@@ -124,6 +125,7 @@ export async function listActorsLogs(args: ListActorsLogsArgs): Promise<Paginate
       .select({
         id: s.auditLogs.id,
         action: s.auditLogs.action,
+        status: s.auditLogs.status,
         ipAddress: s.auditLogs.ipAddress,
         userAgent: s.auditLogs.userAgent,
         metadata: s.auditLogs.metadata,
