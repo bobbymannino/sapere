@@ -19,8 +19,11 @@
 
   let joinedAt = $derived(formatDate(data.session.user.createdAt));
   let joinedAtIso = $derived(toIsoDate(data.session.user.createdAt));
+  let joinedAtRelative = $derived(formatRelativeDate(joinedAt));
 
   const builtAt = new Date(__BUILD_DATE__);
+  let builtAtIso = $derived(toIsoDate(builtAt));
+  let builtAtRelative = $derived(formatRelativeDate(builtAt));
 </script>
 
 <Meta title="Account" description="Manage your account details and passkeys." robots="noindex,nofollow" />
@@ -46,7 +49,7 @@
           <div class="grid gap-1">
             <dt class="text-muted-foreground text-sm">Joined at</dt>
             <dd class="font-medium">
-              <time datetime={joinedAtIso}>{joinedAt}</time>
+              <time datetime={joinedAtIso} title="Joined at {joinedAtIso} ({joinedAtRelative})">{joinedAt}</time>
             </dd>
           </div>
         </dl>
@@ -67,7 +70,7 @@
 
   <section class="flex-center p-5 pbs-0">
     <small class="opacity-50">
-      <time datetime={toIsoDate(builtAt)} title="Built at {formatDateTime(builtAt)} ({formatRelativeDate(builtAt)})">
+      <time datetime={builtAtIso} title="Built at {builtAtIso} ({builtAtRelative})">
         {formatShortDateTime(builtAt)}
       </time>
       • v{version}</small
