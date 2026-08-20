@@ -1,6 +1,7 @@
 <script lang="ts">
   import type { ActorAuditLog } from "$db/audit";
   import * as Table from "$lib/components/ui/table";
+  import { CircleErrorIcon } from "$lib/icons";
 
   import ActionBadge from "./action-badge.svelte";
   import { metadataLabel, userAgentLabel } from "./audit-format";
@@ -14,24 +15,33 @@
 
 <ul class="flex flex-col lg:hidden" aria-label="A list of your accounts audit logs">
   {#each logs as l (l.id)}
-    {@const metadata = metadataLabel(l)}
-    {@const userAgent = userAgentLabel(l.userAgent)}
-    <li class="flex flex-col gap-1 border-b p-4 text-sm">
-      <ActionBadge action={l.action} />
-      {#if metadata}
-        <span class="wrap-break-word">{metadata}</span>
-      {/if}
-      <span class="text-muted-foreground flex flex-wrap items-center gap-x-2">
-        <AuditStatus status={l.status} />
-        <AuditTimestamp createdAt={l.createdAt} />
-        {#if userAgent}
-          <span title={l.userAgent}>• {userAgent}</span>
+    <svelte:boundary>
+      {@const metadata = metadataLabel(l)}
+      {@const userAgent = userAgentLabel(l.userAgent)}
+      <li class="flex flex-col gap-1 border-b p-4 text-sm">
+        <ActionBadge action={l.action} />
+        {#if metadata}
+          <span class="wrap-break-word">{metadata}</span>
         {/if}
-        {#if l.ipAddress}
-          <span title={l.ipAddress}>• {l.ipAddress}</span>
-        {/if}
-      </span>
-    </li>
+        <span class="text-muted-foreground flex flex-wrap items-center gap-x-2">
+          <AuditStatus status={l.status} />
+          <AuditTimestamp createdAt={l.createdAt} />
+          {#if userAgent}
+            <span title={l.userAgent}>• {userAgent}</span>
+          {/if}
+          {#if l.ipAddress}
+            <span title={l.ipAddress}>• {l.ipAddress}</span>
+          {/if}
+        </span>
+      </li>
+
+      {#snippet failed()}
+        <li class="bg-muted text-destructive flex items-center gap-1 border-b p-4 text-sm">
+          <CircleErrorIcon />
+          <span>Failed to retrieve log</span>
+        </li>
+      {/snippet}
+    </svelte:boundary>
   {/each}
 </ul>
 
@@ -49,20 +59,33 @@
   </Table.Header>
   <Table.Body>
     {#each logs as l (l.id)}
-      <Table.Row>
-        <Table.Cell class="max-w-40">
-          <ActionBadge action={l.action} />
-        </Table.Cell>
-        <Table.Cell class="w-16">
-          <AuditStatus status={l.status} />
-        </Table.Cell>
-        <Table.Cell>{metadataLabel(l)}</Table.Cell>
-        <Table.Cell class="w-22" title={l.ipAddress}>{l.ipAddress}</Table.Cell>
-        <Table.Cell title={l.userAgent}>{userAgentLabel(l.userAgent)}</Table.Cell>
-        <Table.Cell class="max-w-24">
-          <AuditTimestamp createdAt={l.createdAt} />
-        </Table.Cell>
-      </Table.Row>
+      <svelte:boundary>
+        <Table.Row>
+          <Table.Cell class="max-w-40">
+            <ActionBadge action={l.action} />
+          </Table.Cell>
+          <Table.Cell class="w-16">
+            <AuditStatus status={l.status} />
+          </Table.Cell>
+          <Table.Cell>{metadataLabel(l)}</Table.Cell>
+          <Table.Cell class="w-22" title={l.ipAddress}>{l.ipAddress}</Table.Cell>
+          <Table.Cell title={l.userAgent}>{userAgentLabel(l.userAgent)}</Table.Cell>
+          <Table.Cell class="max-w-24">
+            <AuditTimestamp createdAt={l.createdAt} />
+          </Table.Cell>
+        </Table.Row>
+
+        {#snippet failed()}
+          <Table.Row class="bg-muted">
+            <Table.Cell colspan={6}>
+              <div class="text-destructive flex items-center gap-2">
+                <CircleErrorIcon />
+                <span>Failed to retrieve log</span>
+              </div>
+            </Table.Cell>
+          </Table.Row>
+        {/snippet}
+      </svelte:boundary>
     {/each}
   </Table.Body>
 </Table.Root>
