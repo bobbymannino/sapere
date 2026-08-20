@@ -18,7 +18,7 @@
   data-slot="breadcrumb-separator"
   role="presentation"
   aria-hidden="true"
-  class={cn("[&>svg]:size-3.5", className)}
+  class={cn("motion-safe:opacity-0 [&>svg]:size-3.5", className)}
   use:slideInDown={index}
   {...restProps}
 >
