@@ -1,8 +1,10 @@
 import { getRequestEvent } from "$app/server";
 import { db as mdb } from "$db";
+import type { PaginationArgs, Paginated } from "$db/pagination";
+import { buildPaginatedResult, buildPagination } from "$db/pagination";
 import type { AuditAction } from "$lib/audit-actions";
 import * as s from "$lib/server/db/schema";
-import { and, eq, desc, inArray, or, sql } from "drizzle-orm";
+import { and, count, eq, desc, inArray, or, sql } from "drizzle-orm";
 import { BunSQLDatabase } from "drizzle-orm/bun-sql/postgres";
 
 type RecordAuditEventArgs = {
@@ -66,7 +68,7 @@ function tryGetRequestEvent() {
   }
 }
 
-type ListActorsLogsArgs = {
+type ListActorsLogsArgs = PaginationArgs & {
   db?: BunSQLDatabase;
   /** Defaults to the current request's user. */
   actorId?: typeof s.users.$inferSelect.id;
@@ -87,7 +89,7 @@ export type ActorAuditLog = {
   createdAt: typeof s.auditLogs.$inferSelect.createdAt;
 };
 
-export async function listActorsLogs(args: ListActorsLogsArgs): Promise<ActorAuditLog[]> {
+export async function listActorsLogs(args: ListActorsLogsArgs): Promise<Paginated<ActorAuditLog>> {
   const db = args.db ?? mdb;
   const actorId = args.actorId ?? tryGetRequestEvent()?.locals.session?.user.id;
   if (!actorId) throw new Error("actorId is missing");
@@ -101,15 +103,25 @@ export async function listActorsLogs(args: ListActorsLogsArgs): Promise<ActorAud
       )
     : undefined;
 
-  return db
-    .select({
-      id: s.auditLogs.id,
-      action: s.auditLogs.action,
-      userAgent: s.auditLogs.userAgent,
-      metadata: s.auditLogs.metadata,
-      createdAt: s.auditLogs.createdAt,
-    })
-    .from(s.auditLogs)
-    .where(and(eq(s.auditLogs.actorId, actorId), eq(s.auditLogs.actorType, "user"), searchFilter))
-    .orderBy(desc(s.auditLogs.createdAt));
+  const where = and(eq(s.auditLogs.actorId, actorId), eq(s.auditLogs.actorType, "user"), searchFilter);
+  const pagination = buildPagination(args, { perPage: 25 });
+
+  const [logs, totalRows] = await Promise.all([
+    db
+      .select({
+        id: s.auditLogs.id,
+        action: s.auditLogs.action,
+        userAgent: s.auditLogs.userAgent,
+        metadata: s.auditLogs.metadata,
+        createdAt: s.auditLogs.createdAt,
+      })
+      .from(s.auditLogs)
+      .where(where)
+      .orderBy(desc(s.auditLogs.createdAt))
+      .limit(pagination.limit)
+      .offset(pagination.offset),
+    db.select({ total: count() }).from(s.auditLogs).where(where),
+  ]);
+
+  return buildPaginatedResult(logs, totalRows[0]?.total ?? 0, pagination);
 }

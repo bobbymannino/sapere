@@ -2,6 +2,7 @@
   import { resolve } from "$app/paths";
   import Empty from "$lib/components/empty.svelte";
   import Meta from "$lib/components/meta.svelte";
+  import Pagination from "$lib/components/pagination.svelte";
   import * as Button from "$lib/components/ui/button";
   import * as InputGroup from "$lib/components/ui/input-group";
   import * as Kbd from "$lib/components/ui/kbd";
@@ -36,7 +37,7 @@
 {#await data.logs}
   <Empty icon={SpinnerIcon} spinningIcon title="Loading Logs" color="primary" />
 {:then logs}
-  {#if logs.length === 0 && !data.search}
+  {#if logs.total === 0 && !data.search}
     <Empty
       icon={ClockIcon}
       title="No Audit Logs"
@@ -48,7 +49,7 @@
       </Button.Root>
     </Empty>
   {:else}
-    <div>
+    <div class="flex flex-col">
       <form class="p-4" method="get">
         <label for="q" class="sr-only">Search</label>
         <InputGroup.Root>
@@ -70,12 +71,15 @@
           </InputGroup.Addon>
         </InputGroup.Root>
       </form>
-      {#if logs.length === 0}
+      {#if logs.results.length === 0}
         <Empty icon={SearchIcon} title="No Matching Logs" description="No audit logs match that search">
           <Button.Root variant="outline" href={resolve("/(app)/account/audit")}>Clear search</Button.Root>
         </Empty>
       {:else}
-        <AuditTable {logs} />
+        <AuditTable logs={logs.results} />
+        {#if logs.totalPages > 1}
+          <Pagination count={logs.total} perPage={logs.perPage} page={logs.page} class="pbe-5" />
+        {/if}
       {/if}
     </div>
   {/if}

@@ -20,6 +20,8 @@ export const load: PageServerLoad = ({ url }) => {
     actorId: user.id,
     search,
     actions: search ? actionsMatchingTitle(search) : undefined,
+    page: url.searchParams.get("page"),
+    perPage: url.searchParams.get("perPage"),
   });
   return {
     search,
