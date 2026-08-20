@@ -23,7 +23,7 @@ const Schema = v.object({
   title: WorkspaceTitleSchema,
   slug: WorkspaceSlugSchema,
   description: WorkspaceDescriptionSchema,
-  image: WorkspaceImageSchema,
+  image: v.nullable(WorkspaceImageSchema),
 });
 
 export const actions: Actions = {
