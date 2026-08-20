@@ -4,6 +4,7 @@
 
   import ActionBadge from "./action-badge.svelte";
   import { metadataLabel, userAgentLabel } from "./audit-format";
+  import AuditStatus from "./audit-status.svelte";
   import AuditTimestamp from "./audit-timestamp.svelte";
 
   type Props = { logs: ActorAuditLog[] };
@@ -21,6 +22,7 @@
         <span class="wrap-break-word">{metadata}</span>
       {/if}
       <span class="text-muted-foreground flex flex-wrap items-center gap-x-2">
+        <AuditStatus status={l.status} />
         <AuditTimestamp createdAt={l.createdAt} />
         {#if userAgent}
           <span title={l.userAgent}>• {userAgent}</span>
@@ -38,6 +40,7 @@
   <Table.Header>
     <Table.Row>
       <Table.Head class="max-w-40">Action</Table.Head>
+      <Table.Head class="w-16">Status</Table.Head>
       <Table.Head>Metadata</Table.Head>
       <Table.Head class="w-22">IP Address</Table.Head>
       <Table.Head>User Agent</Table.Head>
@@ -49,6 +52,9 @@
       <Table.Row>
         <Table.Cell class="max-w-40">
           <ActionBadge action={l.action} />
+        </Table.Cell>
+        <Table.Cell class="w-16">
+          <AuditStatus status={l.status} />
         </Table.Cell>
         <Table.Cell>{metadataLabel(l)}</Table.Cell>
         <Table.Cell class="w-22" title={l.ipAddress}>{l.ipAddress}</Table.Cell>
