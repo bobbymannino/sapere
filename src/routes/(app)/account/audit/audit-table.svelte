@@ -25,6 +25,9 @@
         {#if userAgent}
           <span title={l.userAgent}>• {userAgent}</span>
         {/if}
+        {#if l.ipAddress}
+          <span title={l.ipAddress}>• {l.ipAddress}</span>
+        {/if}
       </span>
     </li>
   {/each}
@@ -36,6 +39,7 @@
     <Table.Row>
       <Table.Head class="max-w-40">Action</Table.Head>
       <Table.Head>Metadata</Table.Head>
+      <Table.Head class="w-22">IP Address</Table.Head>
       <Table.Head>User Agent</Table.Head>
       <Table.Head class="max-w-24">Timestamp</Table.Head>
     </Table.Row>
@@ -47,6 +51,7 @@
           <ActionBadge action={l.action} />
         </Table.Cell>
         <Table.Cell>{metadataLabel(l)}</Table.Cell>
+        <Table.Cell class="w-22" title={l.ipAddress}>{l.ipAddress}</Table.Cell>
         <Table.Cell title={l.userAgent}>{userAgentLabel(l.userAgent)}</Table.Cell>
         <Table.Cell class="max-w-24">
           <AuditTimestamp createdAt={l.createdAt} />
