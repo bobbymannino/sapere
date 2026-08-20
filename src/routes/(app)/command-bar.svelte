@@ -152,6 +152,15 @@
           href: resolve("/(app)/workspaces"),
         }}
       />
+      <CommandBarItem
+        command={{
+          id: "new-workspace",
+          group: "Workspace",
+          label: "New Workspace",
+          icon: "new",
+          href: resolve("/(app)/workspaces/new"),
+        }}
+      />
       {#await workspaces}
         <Command.Item disabled>
           <SpinnerIcon class="animate-spin" />
