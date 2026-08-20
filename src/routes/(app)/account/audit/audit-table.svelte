@@ -1,6 +1,7 @@
 <script lang="ts">
   import type { ActorAuditLog } from "$db/audit";
   import * as Table from "$lib/components/ui/table";
+
   import ActionBadge from "./action-badge.svelte";
   import { metadataLabel, userAgentLabel } from "./audit-format";
   import AuditTimestamp from "./audit-timestamp.svelte";
@@ -10,8 +11,7 @@
   let { logs }: Props = $props();
 </script>
 
-<!-- Narrow viewports get a stacked list, the table's four columns do not fit -->
-<ul class="flex flex-col md:hidden" aria-label="A list of your accounts audit logs">
+<ul class="flex flex-col lg:hidden" aria-label="A list of your accounts audit logs">
   {#each logs as l (l.id)}
     {@const metadata = metadataLabel(l)}
     {@const userAgent = userAgentLabel(l.userAgent)}
@@ -30,7 +30,7 @@
   {/each}
 </ul>
 
-<Table.Root class="hidden md:table">
+<Table.Root class="hidden lg:table">
   <Table.Caption class="sr-only">A list of your accounts audit logs</Table.Caption>
   <Table.Header>
     <Table.Row>
