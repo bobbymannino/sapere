@@ -1,19 +1,21 @@
 /**
  * Seeds the database with a single test user owning a handful of workspaces,
- * each containing a varying number of documents. Realistic column values are
- * produced by `drizzle-seed`; slugs and pins are applied afterwards so they stay
- * consistent with the generated titles.
+ * each containing a varying number of documents. Titles, descriptions, content
+ * and quantities all come from `faker`, seeded with a fixed value so re-running
+ * the script produces the same data.
  *
  * Safe to re-run: existing seed rows are removed first.
  */
+import { faker } from "@faker-js/faker";
 import { hashPassword } from "better-auth/crypto";
 import { and, eq, inArray, isNotNull, sql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/bun-sql/postgres";
-import { seed } from "drizzle-seed";
 import { Files } from "files-sdk";
 import { fs } from "files-sdk/fs";
 
 import * as s from "../src/lib/server/db/schema.ts";
+
+faker.seed(20260820);
 
 const TEST_USER = {
   id: "seed-user-test",
@@ -23,64 +25,32 @@ const TEST_USER = {
   password: "password",
 };
 
-const WORKSPACE_TITLES = [
-  "Personal",
-  "Engineering",
-  "Product",
-  "Design System",
-  "Customer Success",
-  "Platform Infrastructure",
-  "Marketing",
-  "Security & Compliance",
-  "Research",
-  "Operations",
-];
+const WORKSPACE_COUNT = faker.number.int({ min: 13, max: 20 });
 
-/** Placeholder slugs; the real slug is derived from the title once the rows exist. */
-const WORKSPACE_SLUG_PLACEHOLDERS = WORKSPACE_TITLES.map((_, index) => `seed-workspace-${index}`);
+function slugify(value: string, maxLength: number) {
+  return value
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, maxLength);
+}
 
-/** Workspaces that get a thumbnail. */
-const WORKSPACES_WITH_IMAGES = new Set(["Engineering", "Product", "Design System", "Marketing", "Research"]);
+/** Slugs are unique per owner (workspaces) and per workspace (documents). */
+function uniqueSlug(title: string, maxLength: number, taken: Set<string>) {
+  const base = slugify(title, maxLength);
+  let slug = base;
+  for (let suffix = 2; taken.has(slug); suffix++) {
+    slug = `${base.slice(0, maxLength - String(suffix).length - 1)}-${suffix}`;
+  }
+  taken.add(slug);
+  return slug;
+}
 
-/** The workspace pinned for the test user. */
-const PINNED_WORKSPACE = "Engineering";
-
-const DOCUMENT_TOPICS = [
-  "Authentication",
-  "Billing",
-  "Onboarding",
-  "Search",
-  "Notifications",
-  "Data Retention",
-  "Rate Limiting",
-  "Mobile App",
-  "Design Tokens",
-  "Incident Response",
-  "Customer Feedback",
-  "Release Train",
-  "Cost Reporting",
-  "Accessibility",
-  "Localisation",
-  "Observability",
-  "Api Versioning",
-  "Offline Support",
-];
-
-const DOCUMENT_KINDS = [
-  "Design Doc",
-  "Runbook",
-  "Postmortem",
-  "Meeting Notes",
-  "Roadmap",
-  "Retrospective",
-  "Research Summary",
-  "Migration Plan",
-  "Style Guide",
-  "Weekly Update",
-];
-
-/** Every combination is unique, which keeps the derived slugs unique too. */
-const DOCUMENT_TITLES = DOCUMENT_TOPICS.flatMap((topic) => DOCUMENT_KINDS.map((kind) => `${topic} ${kind}`));
+/** Title cased, and kept inside the 3-64 character check constraint. */
+function titleCase(words: string) {
+  const cased = words.replace(/\b\w/g, (character) => character.toUpperCase());
+  return cased.length > 64 ? cased.slice(0, 64).trimEnd() : cased;
+}
 
 const databaseUrl = Bun.env.DATABASE_URL;
 if (!databaseUrl) throw new Error("DATABASE_URL is not set");
@@ -126,82 +96,73 @@ await db.insert(s.accounts).values({
   updatedAt: now,
 });
 
-// Slugs are derived from the generated titles afterwards, so they start out as a
-// placeholder that still satisfies the slug check constraints.
-await seed(db, { workspaces: s.workspaces, documents: s.documents }).refine((f) => ({
-  workspaces: {
-    count: WORKSPACE_TITLES.length,
-    columns: {
-      title: f.valuesFromArray({ values: WORKSPACE_TITLES, isUnique: true }),
-      slug: f.valuesFromArray({ values: WORKSPACE_SLUG_PLACEHOLDERS, isUnique: true }),
-      description: f.loremIpsum({ sentencesCount: 2 }),
-      image: f.default({ defaultValue: null }),
-      ownerId: f.default({ defaultValue: TEST_USER.id }),
-      createdAt: f.date({ minDate: "2025-01-01", maxDate: "2025-09-01" }),
-      updatedAt: f.date({ minDate: "2025-09-01", maxDate: "2026-08-01" }),
-    },
-    with: {
-      documents: [
-        { weight: 0.3, count: [4, 5, 6] },
-        { weight: 0.5, count: [8, 9, 10, 11] },
-        { weight: 0.2, count: [14, 16, 18] },
-      ],
-    },
-  },
-  documents: {
-    columns: {
-      title: f.valuesFromArray({ values: DOCUMENT_TITLES, isUnique: true }),
-      slug: f.uuid(),
-      content: f.loremIpsum({ sentencesCount: 12 }),
-      createdAt: f.date({ minDate: "2025-01-01", maxDate: "2025-09-01" }),
-      updatedAt: f.date({ minDate: "2025-09-01", maxDate: "2026-08-01" }),
-    },
-  },
-}));
+const workspaceSlugs = new Set<string>();
 
-// Derive readable slugs from the generated titles.
-await db
-  .update(s.workspaces)
-  .set({ slug: sql`left(regexp_replace(lower(${s.workspaces.title}), '[^a-z0-9]+', '-', 'g'), 32)` })
-  .where(eq(s.workspaces.ownerId, TEST_USER.id));
+const workspaceValues: s.WorkspaceInsert[] = Array.from({ length: WORKSPACE_COUNT }, () => {
+  const title = titleCase(`${faker.company.buzzAdjective()} ${faker.company.buzzNoun()}`);
+  const createdAt = faker.date.between({ from: "2025-01-01", to: "2025-09-01" });
+
+  return {
+    title,
+    slug: uniqueSlug(title, 32, workspaceSlugs),
+    description: faker.lorem.sentences(faker.number.int({ min: 1, max: 3 })).slice(0, 1000),
+    ownerId: TEST_USER.id,
+    createdAt,
+    updatedAt: faker.date.between({ from: createdAt, to: "2026-08-01" }),
+  };
+});
 
 const workspaces = await db
-  .select({ id: s.workspaces.id, title: s.workspaces.title, slug: s.workspaces.slug })
-  .from(s.workspaces)
-  .where(eq(s.workspaces.ownerId, TEST_USER.id));
+  .insert(s.workspaces)
+  .values(workspaceValues)
+  .returning({ id: s.workspaces.id, title: s.workspaces.title, slug: s.workspaces.slug });
 
 const workspaceIds = workspaces.map((workspace) => workspace.id);
 
-await db
-  .update(s.documents)
-  .set({
-    slug: sql`regexp_replace(lower(${s.documents.title}), '[^a-z0-9]+', '-', 'g')`,
-    content: sql`'# ' || ${s.documents.title} || E'\n\n' || ${s.documents.content}`,
-  })
-  .where(inArray(s.documents.workspaceId, workspaceIds));
+const documentValues: s.DocumentInsert[] = workspaces.flatMap((workspace) => {
+  const documentSlugs = new Set<string>();
 
-// Pin one workspace, and one document inside every workspace.
-const pinnedWorkspace = workspaces.find((workspace) => workspace.title === PINNED_WORKSPACE);
-if (pinnedWorkspace) {
-  await db.insert(s.pinnedWorkspaces).values({ workspaceId: pinnedWorkspace.id, userId: TEST_USER.id });
+  return Array.from({ length: faker.number.int({ min: 4, max: 20 }) }, () => {
+    const title = titleCase(faker.lorem.words({ min: 2, max: 5 }));
+    const createdAt = faker.date.between({ from: "2025-01-01", to: "2025-09-01" });
+
+    return {
+      workspaceId: workspace.id,
+      title,
+      slug: uniqueSlug(title, 64, documentSlugs),
+      content: `# ${title}\n\n${faker.lorem.paragraphs(faker.number.int({ min: 2, max: 5 }), "\n\n")}`,
+      createdAt,
+      updatedAt: faker.date.between({ from: createdAt, to: "2026-08-01" }),
+    };
+  });
+});
+
+await db.insert(s.documents).values(documentValues);
+
+for (const workspaceId of workspaceIds) {
+  if (!faker.datatype.boolean()) continue;
+  await db.insert(s.pinnedWorkspaces).values({ workspaceId, userId: TEST_USER.id });
 }
 
 for (const workspace of workspaces) {
-  const [document] = await db
+  const documents = await db
     .select({ id: s.documents.id })
     .from(s.documents)
     .where(eq(s.documents.workspaceId, workspace.id))
     .orderBy(sql`random()`)
-    .limit(1);
+    .limit(faker.number.int({ min: 0, max: 5 }));
 
-  if (document) await db.insert(s.pinnedDocuments).values({ documentId: document.id, userId: TEST_USER.id });
+  if (documents.length)
+    await db
+      .insert(s.pinnedDocuments)
+      .values(documents.map((document) => ({ documentId: document.id, userId: TEST_USER.id })));
 }
 
-// Thumbnails for a subset of the workspaces. Stored through the same file adapter
+// Thumbnails for a random subset of the workspaces. Stored through the same file adapter
 // the app uses in development, so the workspace image route can serve them.
-for (const workspace of workspaces) {
-  if (!WORKSPACES_WITH_IMAGES.has(workspace.title)) continue;
+const workspacesWithImages = faker.helpers.arrayElements(workspaces, { min: 3, max: 6 });
 
+for (const workspace of workspacesWithImages) {
   try {
     const response = await fetch(`https://picsum.photos/seed/${workspace.slug}/1200/675`);
     if (!response.ok) throw new Error(`${response.status} ${response.statusText}`);
@@ -252,7 +213,7 @@ const auditEvents: s.AuditLogInsert[] = (
     ...workspaces.map((workspace, index) => ({
       action: "workspace.created" as const,
       workspaceId: workspace.id,
-      createdAt: new Date(Date.UTC(2025, index, 6, 10, 15)),
+      createdAt: new Date(Date.UTC(2025, index % 12, 6, 10, 15)),
       metadata: { title: workspace.title, slug: workspace.slug, hasImage: false },
     })),
 
@@ -281,27 +242,8 @@ const auditEvents: s.AuditLogInsert[] = (
   ...event,
 }));
 
-if (pinnedWorkspace) {
-  auditEvents.push({
-    action: "workspace.updated",
-    status: "success",
-    actorId: TEST_USER.id,
-    actorType: "user",
-    ipAddress: SEED_IP,
-    userAgent: SEED_USER_AGENT,
-    workspaceId: pinnedWorkspace.id,
-    createdAt: new Date("2026-08-05T12:00:00Z"),
-    metadata: { title: pinnedWorkspace.title, slug: pinnedWorkspace.slug, changed: ["description", "image"] },
-  });
-}
-
 await db.insert(s.auditLogs).values(auditEvents);
 
-const [{ count: documentCount } = { count: 0 }] = await db
-  .select({ count: sql<number>`count(*)::int` })
-  .from(s.documents)
-  .where(inArray(s.documents.workspaceId, workspaceIds));
-
 console.log(
-  `Seeded ${TEST_USER.email} / ${TEST_USER.password} with ${workspaces.length} workspaces, ${documentCount} documents and ${auditEvents.length} audit events`,
+  `Seeded ${TEST_USER.email} / ${TEST_USER.password} with ${workspaces.length} workspaces, ${documentValues.length} documents and ${auditEvents.length} audit events`,
 );
