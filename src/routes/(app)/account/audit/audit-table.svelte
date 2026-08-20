@@ -1,70 +1,91 @@
 <script lang="ts">
   import type { ActorAuditLog } from "$db/audit";
-  import { auditAction } from "$lib/audit-actions";
   import * as Table from "$lib/components/ui/table";
-  import { formatDateTime, formatShortDateTime, toIsoDate } from "$lib/date-format";
-  import { UAParser } from "ua-parser-js";
+  import { CircleErrorIcon } from "$lib/icons";
+
+  import ActionBadge from "./action-badge.svelte";
+  import { metadataLabel, userAgentLabel } from "./audit-format";
+  import AuditStatus from "./audit-status.svelte";
+  import AuditTimestamp from "./audit-timestamp.svelte";
 
   type Props = { logs: ActorAuditLog[] };
 
   let { logs }: Props = $props();
 </script>
 
-<Table.Root>
+<ul class="flex flex-col lg:hidden" aria-label="A list of your accounts audit logs">
+  {#each logs as l (l.id)}
+    <svelte:boundary>
+      {@const metadata = metadataLabel(l)}
+      {@const userAgent = userAgentLabel(l.userAgent)}
+      <li class="flex flex-col gap-1 border-b p-4 text-sm">
+        <ActionBadge action={l.action} />
+        {#if metadata}
+          <span class="wrap-break-word">{metadata}</span>
+        {/if}
+        <span class="text-muted-foreground flex flex-wrap items-center gap-x-2">
+          <AuditStatus status={l.status} />
+          <AuditTimestamp createdAt={l.createdAt} />
+          {#if userAgent}
+            <span title={l.userAgent}>• {userAgent}</span>
+          {/if}
+          {#if l.ipAddress}
+            <span title={l.ipAddress}>• {l.ipAddress}</span>
+          {/if}
+        </span>
+      </li>
+
+      {#snippet failed()}
+        <li class="bg-muted text-destructive flex items-center gap-1 border-b p-4 text-sm">
+          <CircleErrorIcon />
+          <span>Failed to retrieve log</span>
+        </li>
+      {/snippet}
+    </svelte:boundary>
+  {/each}
+</ul>
+
+<Table.Root class="hidden lg:table">
   <Table.Caption class="sr-only">A list of your accounts audit logs</Table.Caption>
   <Table.Header>
     <Table.Row>
       <Table.Head class="max-w-40">Action</Table.Head>
+      <Table.Head class="w-16">Status</Table.Head>
       <Table.Head>Metadata</Table.Head>
+      <Table.Head class="w-22">IP Address</Table.Head>
       <Table.Head>User Agent</Table.Head>
       <Table.Head class="max-w-24">Timestamp</Table.Head>
     </Table.Row>
   </Table.Header>
   <Table.Body>
     {#each logs as l (l.id)}
-      {@const action = auditAction(l.action)}
-      {@const isDestructive = /\.(deleted|removed)/.test(l.action)}
-      {@const ua = l.userAgent ? new UAParser(l.userAgent).getResult() : null}
-      {@const device = `${ua?.device.vendor ?? ""} ${ua?.device.model ?? ""}`}
-      {@const browser = `${ua?.browser.name ?? ""} ${ua?.browser.major ? "v" : ""}${ua?.browser.major ?? ""}`}
-      {@const os = `${ua?.os.name ?? ""} ${ua?.os.version ?? ""}`}
-      <Table.Row>
-        <Table.Cell class="max-w-40">
-          <span class="flex items-center gap-2">
-            <div
-              class={[
-                "rounded-full p-2",
-                l.action.startsWith("user.") && "bg-primary/15 text-primary",
-                l.action.startsWith("workspace.") && "bg-emerald-500/15 text-emerald-500",
-                l.action.startsWith("document.") && "bg-purple-400/15 text-purple-400",
-                isDestructive && "bg-destructive/15! text-destructive!",
-              ]}
-            >
-              <action.icon class="size-4" />
-            </div>
-            <span title={action.description}>{action.title}</span>
-          </span>
-        </Table.Cell>
-        <Table.Cell>
-          {#if l.action.startsWith("workspace.") && l.metadata.title}
-            Workspace: {l.metadata.title}
-          {:else if l.action.startsWith("document.") && l.metadata.title}
-            Document: {l.metadata.title}
-          {:else if l.action === "user.passkey.added" && l.metadata.name}
-            Passkey: {l.metadata.name}
-          {/if}
-        </Table.Cell>
-        <Table.Cell title={l.userAgent}>
-          {device}
-          {#if /\w/.test(device) && (/\w/.test(os) || /\w/.test(browser))}•{/if}
-          {os}
-          {#if /\w/.test(browser) && (/\w/.test(os) || /\w/.test(device))}•{/if}
-          {browser}
-        </Table.Cell>
-        <Table.Cell class="max-w-24">
-          <time datetime={toIsoDate(l.createdAt)}>{formatDateTime(l.createdAt)}</time>
-        </Table.Cell>
-      </Table.Row>
+      <svelte:boundary>
+        <Table.Row>
+          <Table.Cell class="max-w-40">
+            <ActionBadge action={l.action} />
+          </Table.Cell>
+          <Table.Cell class="w-16">
+            <AuditStatus status={l.status} />
+          </Table.Cell>
+          <Table.Cell>{metadataLabel(l)}</Table.Cell>
+          <Table.Cell class="w-22" title={l.ipAddress}>{l.ipAddress}</Table.Cell>
+          <Table.Cell title={l.userAgent}>{userAgentLabel(l.userAgent)}</Table.Cell>
+          <Table.Cell class="max-w-24">
+            <AuditTimestamp createdAt={l.createdAt} />
+          </Table.Cell>
+        </Table.Row>
+
+        {#snippet failed()}
+          <Table.Row class="bg-muted">
+            <Table.Cell colspan={6}>
+              <div class="text-destructive flex items-center gap-2">
+                <CircleErrorIcon />
+                <span>Failed to retrieve log</span>
+              </div>
+            </Table.Cell>
+          </Table.Row>
+        {/snippet}
+      </svelte:boundary>
     {/each}
   </Table.Body>
 </Table.Root>

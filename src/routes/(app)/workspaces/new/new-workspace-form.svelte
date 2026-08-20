@@ -2,16 +2,16 @@
   import { applyAction, enhance } from "$app/forms";
   import { resolve } from "$app/paths";
   import { page } from "$app/state";
+  import ImageEditor from "$lib/components/image-editor.svelte";
   import AlertTitle from "$lib/components/ui/alert/alert-title.svelte";
   import Alert from "$lib/components/ui/alert/alert.svelte";
   import { Button } from "$lib/components/ui/button";
   import FieldDescription from "$lib/components/ui/field/field-description.svelte";
   import FieldLabel from "$lib/components/ui/field/field-label.svelte";
   import Field from "$lib/components/ui/field/field.svelte";
-  import ImageEditor from "$lib/components/image-editor.svelte";
   import Input from "$lib/components/ui/input/input.svelte";
   import Textarea from "$lib/components/ui/textarea/textarea.svelte";
-  import { ErrorIcon, SpinnerIcon } from "$lib/icons";
+  import { CircleErrorIcon, SpinnerIcon } from "$lib/icons";
   import { slugify } from "$lib/utils";
 
   let pending = $state(false);
@@ -68,7 +68,7 @@
     />
     {#each page.form?.valiErrors?.nested?.title as error (error)}
       <Alert variant="destructive">
-        <ErrorIcon />
+        <CircleErrorIcon />
         <AlertTitle>{error}</AlertTitle>
       </Alert>
     {/each}
@@ -88,7 +88,7 @@
     />
     {#each page.form?.valiErrors?.nested?.slug as error (error)}
       <Alert variant="destructive">
-        <ErrorIcon />
+        <CircleErrorIcon />
         <AlertTitle>{error}</AlertTitle>
       </Alert>
     {/each}
@@ -107,7 +107,7 @@
     />
     {#each page.form?.valiErrors?.nested?.description as error (error)}
       <Alert variant="destructive">
-        <ErrorIcon />
+        <CircleErrorIcon />
         <AlertTitle>{error}</AlertTitle>
       </Alert>
     {/each}
@@ -132,7 +132,7 @@
     <ImageEditor bind:open={imageEditorOpen} inputImage={image ?? undefined} onSave={(cropped) => (image = cropped)} />
     {#each page.form?.valiErrors?.nested?.image as error (error)}
       <Alert variant="destructive">
-        <ErrorIcon />
+        <CircleErrorIcon />
         <AlertTitle>{error}</AlertTitle>
       </Alert>
     {/each}

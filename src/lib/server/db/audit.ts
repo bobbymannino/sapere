@@ -1,8 +1,10 @@
 import { getRequestEvent } from "$app/server";
 import { db as mdb } from "$db";
+import type { OrderByTarget, Ordered, PaginationArgs, Paginated } from "$db/pagination";
+import { buildOrderClause, buildPaginatedResult, buildPagination } from "$db/pagination";
 import type { AuditAction } from "$lib/audit-actions";
 import * as s from "$lib/server/db/schema";
-import { and, eq, desc, inArray, or, sql } from "drizzle-orm";
+import { and, count, eq, inArray, or, sql } from "drizzle-orm";
 import { BunSQLDatabase } from "drizzle-orm/bun-sql/postgres";
 
 type RecordAuditEventArgs = {
@@ -66,28 +68,39 @@ function tryGetRequestEvent() {
   }
 }
 
-type ListActorsLogsArgs = {
-  db?: BunSQLDatabase;
-  /** Defaults to the current request's user. */
-  actorId?: typeof s.users.$inferSelect.id;
-  /** Case-insensitive substring match against the log's action and metadata. */
-  search?: Nullable<string>;
-  /**
-   * Extra actions to match, on top of what `search` matches against the raw action key.
-   * Lets callers search the human-readable action titles the UI actually renders.
-   */
-  actions?: AuditAction[];
+export type AuditSortKey = "createdAt";
+
+const auditOrderColumns = {
+  createdAt: s.auditLogs.createdAt,
+} satisfies Record<AuditSortKey, OrderByTarget | OrderByTarget[]>;
+
+type ListActorsLogsArgs = PaginationArgs &
+  Ordered<AuditSortKey> & {
+    db?: BunSQLDatabase;
+    /** Defaults to the current request's user. */
+    actorId?: typeof s.users.$inferSelect.id;
+    /** Case-insensitive substring match against the log's action and metadata. */
+    search?: Nullable<string>;
+    /**
+     * Extra actions to match, on top of what `search` matches against the raw action key.
+     * Lets callers search the human-readable action titles the UI actually renders.
+     */
+    actions?: AuditAction[];
+  };
+
+const auditLogSelection = {
+  id: s.auditLogs.id,
+  action: s.auditLogs.action,
+  status: s.auditLogs.status,
+  ipAddress: s.auditLogs.ipAddress,
+  userAgent: s.auditLogs.userAgent,
+  metadata: s.auditLogs.metadata,
+  createdAt: s.auditLogs.createdAt,
 };
 
-export type ActorAuditLog = {
-  id: typeof s.auditLogs.$inferSelect.id;
-  action: typeof s.auditLogs.$inferSelect.action;
-  userAgent: typeof s.auditLogs.$inferSelect.userAgent;
-  metadata: typeof s.auditLogs.$inferSelect.metadata;
-  createdAt: typeof s.auditLogs.$inferSelect.createdAt;
-};
+export type ActorAuditLog = Pick<typeof s.auditLogs.$inferSelect, keyof typeof auditLogSelection>;
 
-export async function listActorsLogs(args: ListActorsLogsArgs): Promise<ActorAuditLog[]> {
+export async function listActorsLogs(args: ListActorsLogsArgs): Promise<Paginated<ActorAuditLog>> {
   const db = args.db ?? mdb;
   const actorId = args.actorId ?? tryGetRequestEvent()?.locals.session?.user.id;
   if (!actorId) throw new Error("actorId is missing");
@@ -101,15 +114,24 @@ export async function listActorsLogs(args: ListActorsLogsArgs): Promise<ActorAud
       )
     : undefined;
 
-  return db
-    .select({
-      id: s.auditLogs.id,
-      action: s.auditLogs.action,
-      userAgent: s.auditLogs.userAgent,
-      metadata: s.auditLogs.metadata,
-      createdAt: s.auditLogs.createdAt,
-    })
-    .from(s.auditLogs)
-    .where(and(eq(s.auditLogs.actorId, actorId), eq(s.auditLogs.actorType, "user"), searchFilter))
-    .orderBy(desc(s.auditLogs.createdAt));
+  const where = and(eq(s.auditLogs.actorId, actorId), eq(s.auditLogs.actorType, "user"), searchFilter);
+  const pagination = buildPagination(args, { perPage: 25 });
+  const orderBy = buildOrderClause(args, {
+    columns: auditOrderColumns,
+    defaultSortBy: "createdAt",
+    defaultSortDir: "desc",
+  });
+
+  const [logs, totalRows] = await Promise.all([
+    db
+      .select(auditLogSelection)
+      .from(s.auditLogs)
+      .where(where)
+      .orderBy(...orderBy)
+      .limit(pagination.limit)
+      .offset(pagination.offset),
+    db.select({ total: count() }).from(s.auditLogs).where(where),
+  ]);
+
+  return buildPaginatedResult(logs, totalRows[0]?.total ?? 0, pagination);
 }

@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { dev } from "$app/env";
   import { goto } from "$app/navigation";
   import { page } from "$app/state";
   import { authClient } from "$lib/auth-client";
@@ -41,7 +40,7 @@
     formData = {
       email: "test@example.com",
       password: "password",
-    }
+    };
   }
 
   async function handleSubmit(e: SubmitEvent & { currentTarget: HTMLFormElement }) {
@@ -106,8 +105,8 @@
     />
   </FormInput>
 
-  {#if dev}
-    <Button onclick={loginDev} disabled={!!pending} type='submit'>
+  {#if process.env.NODE_ENV === "production"}
+    <Button onclick={loginDev} disabled={!!pending} type="submit">
       {#if pending === "email"}<SpinnerIcon class="animate-spin" />{/if}
       <span>Log In With Dev Credentials</span>
     </Button>

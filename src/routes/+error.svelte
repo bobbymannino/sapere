@@ -4,7 +4,7 @@
   import Empty from "$lib/components/empty.svelte";
   import Meta from "$lib/components/meta.svelte";
   import { Button } from "$lib/components/ui/button";
-  import { ChevronLeftIcon, ErrorIcon } from "$lib/icons";
+  import { ChevronLeftIcon, CircleErrorIcon } from "$lib/icons";
 
   let isNotFound = $derived(page.status === 404);
   let title = $derived(isNotFound ? "Page not found" : "Something went wrong");
@@ -19,7 +19,7 @@
 
 <main class="flex-center min-h-svh p-5">
   <div class="w-full max-w-lg">
-    <Empty {title} {description} icon={ErrorIcon} color="destructive">
+    <Empty {title} {description} icon={CircleErrorIcon} color="destructive">
       <div class="flex flex-wrap justify-center gap-2">
         <Button href={resolve("/(app)/workspaces")}>
           <ChevronLeftIcon data-icon="inline-start" />

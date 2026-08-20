@@ -19,7 +19,7 @@
     recentWorkspaces={data.recentWorkspaces}
     recentDocuments={data.recentDocuments}
   />
-  <main class="grid w-full grid-rows-[auto_1fr_auto]">
+  <main class="grid w-full min-w-0 grid-rows-[auto_1fr_auto]">
     <AppBreadcrumbs>
       <CommandBar workspaces={data.commandWorkspaces} />
     </AppBreadcrumbs>
