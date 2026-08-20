@@ -50,7 +50,7 @@
       </Button.Root>
     </Empty>
   {:else}
-    <div class="flex flex-col">
+    <div class="flex min-w-0 flex-col">
       <div class="flex flex-wrap items-center gap-2 p-4">
         <form class="min-w-3xs flex-1" method="get">
           <label for="q" class="sr-only">Search</label>
@@ -84,7 +84,7 @@
       {:else}
         <AuditTable logs={logs.results} />
         {#if logs.totalPages > 1}
-          <Pagination count={logs.total} perPage={logs.perPage} page={logs.page} class="pbe-5" />
+          <Pagination count={logs.total} perPage={logs.perPage} page={logs.page} class="mbs-5 pbe-5" />
         {/if}
       {/if}
     </div>
