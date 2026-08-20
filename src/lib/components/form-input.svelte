@@ -2,7 +2,7 @@
   import AlertTitle from "$lib/components/ui/alert/alert-title.svelte";
   import Alert from "$lib/components/ui/alert/alert.svelte";
   import Label from "$lib/components/ui/label/label.svelte";
-  import { ErrorIcon } from "$lib/icons";
+  import { CircleErrorIcon } from "$lib/icons";
   import type { Snippet } from "svelte";
 
   type Props = {
@@ -22,7 +22,7 @@
 
   {#each errors as error}
     <Alert variant="destructive">
-      <ErrorIcon />
+      <CircleErrorIcon />
       <AlertTitle>{error}</AlertTitle>
     </Alert>
   {/each}

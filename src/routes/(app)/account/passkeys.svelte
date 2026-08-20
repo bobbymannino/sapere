@@ -7,7 +7,7 @@
   import * as Dialog from "$lib/components/ui/dialog";
   import * as Input from "$lib/components/ui/input";
   import { formatDateTime } from "$lib/date-format";
-  import { ErrorIcon, SpinnerIcon, TrashIcon } from "$lib/icons";
+  import { CircleErrorIcon, SpinnerIcon, TrashIcon } from "$lib/icons";
   import type { Passkey } from "@better-auth/passkey";
   import { onMount } from "svelte";
   import * as v from "valibot";
@@ -149,7 +149,7 @@
     </form>
     {#if error}
       <Alert.Root variant="destructive">
-        <ErrorIcon />
+        <CircleErrorIcon />
         <Alert.Title>{error}</Alert.Title>
       </Alert.Root>
     {/if}
@@ -168,7 +168,7 @@
 
     {#if error}
       <Alert.Root variant="destructive">
-        <ErrorIcon />
+        <CircleErrorIcon />
         <Alert.Title>{error}</Alert.Title>
       </Alert.Root>
     {/if}

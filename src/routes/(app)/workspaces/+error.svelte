@@ -4,7 +4,7 @@
   import Empty from "$lib/components/empty.svelte";
   import Meta from "$lib/components/meta.svelte";
   import { Button } from "$lib/components/ui/button";
-  import { ChevronLeftIcon, ErrorIcon, WorkspaceIcon } from "$lib/icons";
+  import { ChevronLeftIcon, CircleErrorIcon, WorkspaceIcon } from "$lib/icons";
 
   let isNotFound = $derived(page.status === 404);
   let title = $derived(isNotFound ? "Workspace not found" : "Workspace unavailable");
@@ -13,7 +13,7 @@
       ? "This workspace may have been deleted, renamed, or you may not have access to it."
       : (page.error?.message ?? "The workspace could not be loaded."),
   );
-  let icon = $derived(isNotFound ? WorkspaceIcon : ErrorIcon);
+  let icon = $derived(isNotFound ? WorkspaceIcon : CircleErrorIcon);
 </script>
 
 <Meta {title} {description} robots="noindex,nofollow" />

@@ -9,7 +9,7 @@
   import * as Command from "$lib/components/ui/command";
   import * as Kbd from "$lib/components/ui/kbd";
   import { setDocumentPinnedCommand } from "$lib/documents.remote";
-  import { ErrorIcon, SearchIcon, SpinnerIcon } from "$lib/icons";
+  import { CircleErrorIcon, SearchIcon, SpinnerIcon } from "$lib/icons";
   import { flushSync } from "svelte";
 
   import CommandBarItem from "./command-bar-item.svelte";
@@ -120,7 +120,7 @@
 
     {#if commandError}
       <Command.Item disabled>
-        <ErrorIcon class="text-destructive" />
+        <CircleErrorIcon class="text-destructive" />
         <span>{commandError}</span>
       </Command.Item>
       <Command.Separator />

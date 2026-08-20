@@ -18,7 +18,7 @@
     <li class="flex flex-col gap-1 border-b p-4 text-sm">
       <ActionBadge action={l.action} />
       {#if metadata}
-        <span class="break-words">{metadata}</span>
+        <span class="wrap-break-word">{metadata}</span>
       {/if}
       <span class="text-muted-foreground flex flex-wrap items-center gap-x-2">
         <AuditTimestamp createdAt={l.createdAt} />

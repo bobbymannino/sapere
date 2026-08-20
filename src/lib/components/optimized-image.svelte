@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { ErrorIcon, PictureIcon, SpinnerIcon } from "$lib/icons";
+  import { CircleErrorIcon, PictureIcon, SpinnerIcon } from "$lib/icons";
   import { cn, type WithElementRef, type WithoutChildren } from "$lib/utils";
   import { onMount } from "svelte";
   import type { ClassValue, HTMLImgAttributes } from "svelte/elements";
@@ -112,7 +112,7 @@
         role="img"
         aria-label={errorLabel}
       >
-        <ErrorIcon aria-hidden="true" />
+        <CircleErrorIcon aria-hidden="true" />
         {#if showErrorLabel}
           <span>{errorLabel}</span>
         {/if}

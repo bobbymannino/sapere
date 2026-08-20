@@ -4,7 +4,7 @@
   import Empty from "$lib/components/empty.svelte";
   import Meta from "$lib/components/meta.svelte";
   import { Button } from "$lib/components/ui/button";
-  import { ChevronLeftIcon, ErrorIcon, MarkdownIcon } from "$lib/icons";
+  import { ChevronLeftIcon, CircleErrorIcon, MarkdownIcon } from "$lib/icons";
 
   let isNotFound = $derived(page.status === 404);
   let title = $derived(isNotFound ? "Document not found" : "Document unavailable");
@@ -13,7 +13,7 @@
       ? "This document may have been deleted, renamed, or you may not have access to it."
       : (page.error?.message ?? "The document could not be loaded."),
   );
-  let icon = $derived(isNotFound ? MarkdownIcon : ErrorIcon);
+  let icon = $derived(isNotFound ? MarkdownIcon : CircleErrorIcon);
 </script>
 
 <Meta {title} {description} robots="noindex,nofollow" />
