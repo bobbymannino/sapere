@@ -58,6 +58,15 @@
       {/if}
     </div>
 
-    <DocumentPinButton documentId={id} documentTitle={title} {pinnedAt} bind:error={pinError} hideLabel />
+    <DocumentPinButton
+      documentId={id}
+      documentTitle={title}
+      {pinnedAt}
+      bind:error={pinError}
+      hideLabel
+      class={pinnedAt
+        ? null
+        : "can-hover:opacity-0 can-hover:group-hover/card:opacity-100 can-hover:group-focus-within/card:opacity-100 can-hover:focus-visible:opacity-100"}
+    />
   </Card.Footer>
 </Card.Root>
