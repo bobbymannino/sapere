@@ -11,6 +11,7 @@
 
   import type { PageProps } from "./$types";
   import AuditTable from "./audit-table.svelte";
+  import SortMenu from "./sort-menu.svelte";
 
   let { data }: PageProps = $props();
 
@@ -50,27 +51,32 @@
     </Empty>
   {:else}
     <div class="flex flex-col">
-      <form class="p-4" method="get">
-        <label for="q" class="sr-only">Search</label>
-        <InputGroup.Root>
-          <InputGroup.Addon align="inline-start" class="can-hover:flex hidden">
-            <Kbd.Root class="can-hover:flex hidden">/</Kbd.Root>
-          </InputGroup.Addon>
-          <InputGroup.Input
-            type="search"
-            placeholder="Search actions and metadata"
-            name="q"
-            id="q"
-            value={data.search ?? ""}
-            bind:ref={searchInput}
-          />
-          <InputGroup.Addon align="inline-end">
-            <InputGroup.Button type="submit">
-              <SearchIcon />
-            </InputGroup.Button>
-          </InputGroup.Addon>
-        </InputGroup.Root>
-      </form>
+      <div class="flex flex-wrap items-center gap-2 p-4">
+        <form class="min-w-3xs flex-1" method="get">
+          <label for="q" class="sr-only">Search</label>
+          <input type="hidden" name="sortBy" value={data.sortBy ?? ""} />
+          <input type="hidden" name="sortDir" value={data.sortDir ?? ""} />
+          <InputGroup.Root>
+            <InputGroup.Addon align="inline-start" class="can-hover:flex hidden">
+              <Kbd.Root class="can-hover:flex hidden">/</Kbd.Root>
+            </InputGroup.Addon>
+            <InputGroup.Input
+              type="search"
+              placeholder="Search actions and metadata"
+              name="q"
+              id="q"
+              value={data.search ?? ""}
+              bind:ref={searchInput}
+            />
+            <InputGroup.Addon align="inline-end">
+              <InputGroup.Button type="submit">
+                <SearchIcon />
+              </InputGroup.Button>
+            </InputGroup.Addon>
+          </InputGroup.Root>
+        </form>
+        <SortMenu sortBy={data.sortBy} sortDir={data.sortDir} />
+      </div>
       {#if logs.results.length === 0}
         <Empty icon={SearchIcon} title="No Matching Logs" description="No audit logs match that search">
           <Button.Root variant="outline" href={resolve("/(app)/account/audit")}>Clear search</Button.Root>
