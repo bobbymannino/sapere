@@ -8,7 +8,7 @@
 
 <Sidebar.Header class="p-3">
   <Button.Root variant="ghost" href={resolve("/(app)")} class="justify-start">
-    <Logo class="size-4" aria-hidden="true" />
+    <Logo class="size-4 text-primary" aria-hidden="true" />
     {APP_NAME}
   </Button.Root>
 </Sidebar.Header>
