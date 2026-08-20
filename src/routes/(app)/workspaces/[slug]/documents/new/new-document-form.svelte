@@ -12,12 +12,12 @@
   type FieldName = "title" | "slug";
   type Props = {
     workspace: WorkspaceCardSelection;
+    title?: string | null
   };
 
-  let { workspace }: Props = $props();
+  let { workspace, title }: Props = $props();
   let pending = $state(false);
-  let title = $state("");
-  let slug = $state("");
+  let slug = $derived(title ? slugify(title) : "")
 
   function fieldErrors(field: FieldName) {
     return page.form?.valiErrors?.nested?.[field] ?? [];
@@ -79,7 +79,7 @@
         name="slug"
         required
         autocapitalize="none"
-        bind:value={() => slug, (value) => (slug = slugify(String(value ?? "")))}
+        bind:value={() => slug, (value) => (slug = slugify(value))}
       />
       {#each fieldErrors("slug") as error (error)}
         <Field.FieldError>{error}</Field.FieldError>

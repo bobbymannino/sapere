@@ -14,8 +14,10 @@ async function loadWorkspace(ownerId: string, slug: string) {
   return workspace;
 }
 
-export const load: PageServerLoad = async ({ parent }) => {
+export const load: PageServerLoad = async ({ parent, url }) => {
   const { workspace } = await parent();
+
+  const title = url.searchParams.get("title");
 
   return {
     breadcrumbs: [
@@ -24,6 +26,7 @@ export const load: PageServerLoad = async ({ parent }) => {
       { label: "Documents", href: resolve("/(app)/workspaces/[slug]/documents", { slug: workspace.slug }) },
       { label: "New" },
     ],
+    title,
   };
 };
 

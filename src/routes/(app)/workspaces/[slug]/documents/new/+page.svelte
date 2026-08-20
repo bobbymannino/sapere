@@ -23,7 +23,7 @@
     </Card.Header>
 
     <Card.Content>
-      <NewDocumentForm workspace={data.workspace} />
+      <NewDocumentForm workspace={data.workspace} title={data.title} />
     </Card.Content>
   </Card.Root>
 </main>

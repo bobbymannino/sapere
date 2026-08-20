@@ -29,9 +29,8 @@
     sortDir?: LiteralUnion<SortOption["sortDir"]>;
   };
 
-  let { workspaceSlug, search = "", sortBy = "updatedAt", sortDir = "desc" }: Props = $props();
+  let { workspaceSlug, search = $bindable(""), sortBy = "updatedAt", sortDir = "desc" }: Props = $props();
 
-  const searchValue = $derived(search ?? "");
   const sortOption = $derived(sortOptions.find((option) => option.value === `${sortBy}:${sortDir}`) ?? sortOptions[0]);
   const perPage = $derived(page.url.searchParams.get("perPage"));
   let searchInput: Nullable<HTMLInputElement> = $state(null);
@@ -79,7 +78,7 @@
       <InputGroup.Input
         type="search"
         name="search"
-        value={searchValue}
+        bind:value={search}
         bind:ref={searchInput}
         placeholder="Search documents"
         aria-label="Search documents"
