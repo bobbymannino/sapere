@@ -52,6 +52,7 @@
     "bits-ui": "^2.18.1",
     "clsx": "^2.1.1",
     "drizzle-kit": "^1.0.0-rc.5-ab785fc",
+    "drizzle-seed": "1.0.0-rc.5-ab785fc",
     "oxfmt": "^0.63.0",
     "oxlint": "^1.78.0",
     "oxlint-tsgolint": "^7.0.2001",
