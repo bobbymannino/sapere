@@ -17,7 +17,7 @@ type SlideInArgs = {
 
 /** Animates a sidebar link/item in on mount, staggered by its list index. Pass `false` to skip. */
 export const slideInRight: Action<HTMLElement, SlideInArgs | undefined> = (node, args) => {
-  const { index = 0, ease = "outQuad" } = args ?? {};
+  const { index = 0, ease = "out(3)" } = args ?? {};
 
   if (index === false) return;
   if (prefersReducedMotion.current) {
@@ -36,7 +36,7 @@ export const slideInRight: Action<HTMLElement, SlideInArgs | undefined> = (node,
 
 /** Animates a sidebar link/item in on mount, staggered by its list index. */
 export const slideInDown: Action<HTMLElement, SlideInArgs | undefined> = (node, args) => {
-  const { index = 0, ease = "outQuad" } = args ?? {};
+  const { index = 0, ease = "out(3)" } = args ?? {};
 
   if (index === false) return;
   if (prefersReducedMotion.current) {
