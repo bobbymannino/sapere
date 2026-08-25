@@ -1,8 +1,8 @@
 {
   "version": "8",
   "dialect": "postgres",
-  "id": "3ba9f8e8-a654-4937-b163-cdacda8039ad",
-  "prevIds": ["ac78c4e7-efde-4c3a-bd33-5124bdfe0d2c"],
+  "id": "6c520b6a-a8cb-4693-854b-a7348f2926be",
+  "prevIds": ["3ba9f8e8-a654-4937-b163-cdacda8039ad"],
   "ddl": [
     {
       "isRlsEnabled": false,
@@ -99,6 +99,19 @@
       "generated": null,
       "identity": null,
       "name": "provider_id",
+      "entityType": "columns",
+      "schema": "public",
+      "table": "accounts"
+    },
+    {
+      "type": "text",
+      "typeSchema": null,
+      "notNull": true,
+      "dimensions": 0,
+      "default": null,
+      "generated": null,
+      "identity": null,
+      "name": "issuer",
       "entityType": "columns",
       "schema": "public",
       "table": "accounts"
@@ -1166,6 +1179,34 @@
       "method": "btree",
       "concurrently": false,
       "name": "accounts_user_id_idx",
+      "entityType": "indexes",
+      "schema": "public",
+      "table": "accounts"
+    },
+    {
+      "nameExplicit": true,
+      "columns": [
+        {
+          "value": "issuer",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        },
+        {
+          "value": "account_id",
+          "isExpression": false,
+          "asc": true,
+          "nullsFirst": false,
+          "opclass": null
+        }
+      ],
+      "isUnique": true,
+      "where": null,
+      "with": "",
+      "method": "btree",
+      "concurrently": false,
+      "name": "accounts_issuer_account_id_unique",
       "entityType": "indexes",
       "schema": "public",
       "table": "accounts"

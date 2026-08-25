@@ -90,6 +90,8 @@ await db.insert(s.accounts).values({
   id: `${TEST_USER.id}-credential`,
   accountId: TEST_USER.id,
   providerId: "credential",
+  // Matches createLocalAccountIssuer("credential") from @better-auth/core.
+  issuer: "local:credential",
   userId: TEST_USER.id,
   password: await hashPassword(TEST_USER.password),
   createdAt: now,
