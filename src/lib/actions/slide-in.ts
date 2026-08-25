@@ -10,8 +10,15 @@ function reveal(node: HTMLElement) {
   node.style.opacity = "1";
 }
 
+type SlideInArgs = {
+  index?: number | false;
+  ease?: string;
+};
+
 /** Animates a sidebar link/item in on mount, staggered by its list index. Pass `false` to skip. */
-export const slideInRight: Action<HTMLElement, number | false | undefined> = (node, index = 0) => {
+export const slideInRight: Action<HTMLElement, SlideInArgs | undefined> = (node, args) => {
+  const { index = 0, ease = "outQuad" } = args ?? {};
+
   if (index === false) return;
   if (prefersReducedMotion.current) {
     reveal(node);
@@ -22,13 +29,16 @@ export const slideInRight: Action<HTMLElement, number | false | undefined> = (no
     x: [-16, 0],
     duration: 250,
     delay: index * 45,
-    ease: "outQuad",
+    ease,
   });
   void animation.then(() => reveal(node));
 };
 
 /** Animates a sidebar link/item in on mount, staggered by its list index. */
-export const slideInDown: Action<HTMLElement, number | undefined> = (node, index = 0) => {
+export const slideInDown: Action<HTMLElement, SlideInArgs | undefined> = (node, args) => {
+  const { index = 0, ease = "outQuad" } = args ?? {};
+
+  if (index === false) return;
   if (prefersReducedMotion.current) {
     reveal(node);
     return;
@@ -38,7 +48,7 @@ export const slideInDown: Action<HTMLElement, number | undefined> = (node, index
     y: [-16, 0],
     duration: 250,
     delay: index * 45,
-    ease: "outQuad",
+    ease,
   });
   void animation.then(() => reveal(node));
 };
