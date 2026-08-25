@@ -16,7 +16,7 @@
   let { data }: PageProps = $props();
   let documents = $derived(data.documents);
   let hasSearch = $derived(Boolean(data.search));
-  let search = $state(data.search ?? "")
+  let search = $state(data.search ?? "");
 
   function onkeydown(e: KeyboardEvent) {
     if (e.defaultPrevented || isTextFieldTarget(e.target)) return;
@@ -64,7 +64,11 @@
       description={hasSearch ? "No documents match your search." : "This workspace does not have any documents yet."}
       icon={MarkdownIcon}
     >
-      <Button href={resolve(`/(app)/workspaces/[slug]/documents/new?title=${encodeURIComponent(search)}`, { slug: data.workspace.slug })}>
+      <Button
+        href={resolve(`/(app)/workspaces/[slug]/documents/new?title=${encodeURIComponent(search)}`, {
+          slug: data.workspace.slug,
+        })}
+      >
         <MarkdownIcon />
         <span>New Document</span>
       </Button>

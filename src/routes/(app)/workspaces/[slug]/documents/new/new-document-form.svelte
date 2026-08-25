@@ -12,12 +12,12 @@
   type FieldName = "title" | "slug";
   type Props = {
     workspace: WorkspaceCardSelection;
-    title?: string | null
+    title?: string | null;
   };
 
   let { workspace, title }: Props = $props();
   let pending = $state(false);
-  let slug = $derived(title ? slugify(title) : "")
+  let slug = $derived(title ? slugify(title) : "");
 
   function fieldErrors(field: FieldName) {
     return page.form?.valiErrors?.nested?.[field] ?? [];
