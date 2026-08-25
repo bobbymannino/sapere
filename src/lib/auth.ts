@@ -1,3 +1,4 @@
+import { BETTER_AUTH_URL } from "$app/env/private";
 import { getRequestEvent } from "$app/server";
 import { db } from "$db";
 import { recordAuditEvent } from "$db/audit";
@@ -26,6 +27,7 @@ const PASSKEY_ACTIONS: Record<string, AuditAction> = {
 };
 
 export const auth = betterAuth({
+  baseURL: BETTER_AUTH_URL,
   database: drizzleAdapter(db, {
     provider: "pg",
     transaction: true,
