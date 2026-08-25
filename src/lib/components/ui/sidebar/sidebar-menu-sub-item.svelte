@@ -17,7 +17,7 @@
   data-slot="sidebar-menu-sub-item"
   data-sidebar="menu-sub-item"
   class={cn("group/menu-sub-item relative", className)}
-  use:slideInRight={index}
+  use:slideInRight={{ index }}
   {...restProps}
 >
   {@render children?.()}
