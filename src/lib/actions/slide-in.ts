@@ -1,4 +1,4 @@
-import { animate } from "motion";
+import { animate } from "animejs";
 import type { Action } from "svelte/action";
 import { prefersReducedMotion } from "svelte/motion";
 
@@ -17,12 +17,14 @@ export const slideInRight: Action<HTMLElement, number | false | undefined> = (no
     reveal(node);
     return;
   }
-  const animation = animate(
-    node,
-    { opacity: [0, 1], transform: ["translateX(-12px)", "translateX(0)"] },
-    { duration: 0.25, delay: index * 0.045, ease: "easeOut" },
-  );
-  void animation.finished.finally(() => reveal(node));
+  const animation = animate(node, {
+    opacity: [0, 1],
+    x: [-12, 0],
+    duration: 250,
+    delay: index * 45,
+    ease: "outQuad",
+  });
+  void animation.then(() => reveal(node));
 };
 
 /** Animates a sidebar link/item in on mount, staggered by its list index. */
@@ -31,10 +33,12 @@ export const slideInDown: Action<HTMLElement, number | undefined> = (node, index
     reveal(node);
     return;
   }
-  const animation = animate(
-    node,
-    { opacity: [0, 1], transform: ["translateY(-12px)", "translateY(0)"] },
-    { duration: 0.25, delay: index * 0.045, ease: "easeOut" },
-  );
-  void animation.finished.finally(() => reveal(node));
+  const animation = animate(node, {
+    opacity: [0, 1],
+    y: [-12, 0],
+    duration: 250,
+    delay: index * 45,
+    ease: "outQuad",
+  });
+  void animation.then(() => reveal(node));
 };
