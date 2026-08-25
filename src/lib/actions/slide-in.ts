@@ -19,7 +19,7 @@ export const slideInRight: Action<HTMLElement, number | false | undefined> = (no
   }
   const animation = animate(node, {
     opacity: [0, 1],
-    x: [-12, 0],
+    x: [-16, 0],
     duration: 250,
     delay: index * 45,
     ease: "outQuad",
@@ -35,7 +35,7 @@ export const slideInDown: Action<HTMLElement, number | undefined> = (node, index
   }
   const animation = animate(node, {
     opacity: [0, 1],
-    y: [-12, 0],
+    y: [-16, 0],
     duration: 250,
     delay: index * 45,
     ease: "outQuad",
