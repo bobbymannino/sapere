@@ -9,6 +9,8 @@
 
   type Props = {
     inputImage?: File;
+    /** URL of an existing image to load into the editor, used when no `inputImage` is given. */
+    inputImageUrl?: string;
     outputImage?: File;
     open?: boolean;
     /** @default 16 / 9 */
@@ -21,6 +23,7 @@
 
   let {
     inputImage,
+    inputImageUrl,
     outputImage = $bindable(),
     open = $bindable(false),
     aspectRatio = 16 / 9,
@@ -40,9 +43,66 @@
 
   /** The image currently being edited, either the provided one or a newly picked one. */
   let image = $state<File>();
+  /** Set while an existing image is being fetched from `inputImageUrl`. */
+  let isLoading = $state(false);
+  /** The URL already loaded (or being loaded), so the same image isn't fetched twice. */
+  let loadedUrl: string | undefined;
+
   $effect(() => {
-    image = inputImage;
+    if (inputImage) {
+      loadedUrl = undefined;
+      image = inputImage;
+      return;
+    }
+
+    if (!inputImageUrl) {
+      loadedUrl = undefined;
+      image = undefined;
+      return;
+    }
+
+    if (loadedUrl === inputImageUrl) return;
+
+    loadedUrl = inputImageUrl;
+    void loadImageFromUrl(inputImageUrl);
   });
+
+  const extensionsByType: Record<string, string> = {
+    "image/avif": "avif",
+    "image/bmp": "bmp",
+    "image/gif": "gif",
+    "image/jpeg": "jpg",
+    "image/png": "png",
+    "image/webp": "webp",
+  };
+
+  /** Fetches an existing image so it can be edited like a freshly picked one. */
+  async function loadImageFromUrl(url: string) {
+    isLoading = true;
+    error = undefined;
+
+    try {
+      const response = await fetch(url);
+      if (!response.ok) throw new Error(`Request failed with status ${response.status}`);
+
+      const blob = await response.blob();
+      // A newer image was picked or loaded while this request was in flight.
+      if (loadedUrl !== url) return;
+
+      const extension = extensionsByType[blob.type] ?? "png";
+      zoom = 1;
+      cropPosition = { x: 0, y: 0 };
+      image = new File([blob], `image.${extension}`, { type: blob.type, lastModified: Date.now() });
+    } catch (e) {
+      console.error("Failed to load image", e);
+      if (loadedUrl === url) {
+        loadedUrl = undefined;
+        error = "Failed to load that image, please try again.";
+      }
+    } finally {
+      if (loadedUrl === url || !loadedUrl) isLoading = false;
+    }
+  }
 
   let imageUrl = $state<string>();
   $effect(() => {
@@ -74,6 +134,7 @@
     }
 
     error = undefined;
+    loadedUrl = undefined;
     zoom = 1;
     cropPosition = { x: 0, y: 0 };
     image = newImage;
@@ -84,7 +145,7 @@
 
   /** Flips the working image itself, so the cropper stays in sync with what's shown. */
   async function flip(x: boolean, y: boolean) {
-    if (!image || isPending || flipping) return;
+    if (!image || isPending || isLoading || flipping) return;
 
     flipping = x ? "vertical" : "horizontal";
 
@@ -112,7 +173,7 @@
   }
 
   async function saveAndClose() {
-    if (!image || isPending) return;
+    if (!image || isPending || isLoading) return;
 
     if (cropArea.width < 1 || cropArea.height < 1) {
       error = "Select an area to crop first.";
@@ -156,14 +217,14 @@
     event.preventDefault();
     dragDepth = 0;
     isDraggingOver = false;
-    if (isPending) return;
+    if (isPending || isLoading) return;
     setImage(event.dataTransfer?.files?.[0]);
   }
 
   function ondragenter(event: DragEvent) {
     event.preventDefault();
     dragDepth += 1;
-    if (!isPending) isDraggingOver = true;
+    if (!isPending && !isLoading) isDraggingOver = true;
   }
 
   function ondragover(event: DragEvent) {
@@ -197,7 +258,14 @@
 
     <!-- svelte-ignore a11y_no_static_element_interactions -->
     <div {ondrop} {ondragenter} {ondragover} {ondragleave}>
-      {#if imageUrl}
+      {#if isLoading}
+        <div
+          class="border-muted-foreground/30 text-muted-foreground flex aspect-video w-full flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed"
+        >
+          <SpinnerIcon class="size-8 animate-spin" />
+          <span class="text-sm font-medium">Loading image…</span>
+        </div>
+      {:else if imageUrl}
         <div class="mb-2 flex justify-end gap-1">
           <Button.Root
             variant="outline"
@@ -273,11 +341,11 @@
 
     <Dialog.Footer>
       <input type="file" class="hidden" accept={acceptedTypes} bind:this={input} onchange={imageChange} />
-      <Button.Root variant="outline" disabled={isPending} class="me-auto" onclick={() => input.click()}>
+      <Button.Root variant="outline" disabled={isPending || isLoading} class="me-auto" onclick={() => input.click()}>
         {image ? "Change Image" : "Upload Image"}
       </Button.Root>
       <Button.Root variant="ghost" onclick={cancel} disabled={isPending}>Cancel</Button.Root>
-      <Button.Root onclick={saveAndClose} disabled={isPending || !!flipping || !image}>
+      <Button.Root onclick={saveAndClose} disabled={isPending || isLoading || !!flipping || !image}>
         {#if isPending}<SpinnerIcon class="animate-spin" />{/if}
         <span>Save</span>
       </Button.Root>

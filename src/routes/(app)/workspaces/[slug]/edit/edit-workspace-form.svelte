@@ -38,6 +38,8 @@
   let imagePreviewUrl: string | null = $state(null);
   let removeImage = $state(false);
   let imageEditorOpen = $state(false);
+  /** Whether the editor was opened to edit the workspace's existing image rather than a new upload. */
+  let editingCurrentImage = $state(false);
 
   let currentImageUrl = $derived(
     workspace.image && !image && !removeImage
@@ -63,6 +65,12 @@
   function clearSelectedImage() {
     clearImagePreview();
     image = null;
+    editingCurrentImage = false;
+  }
+
+  function openImageEditor(useCurrentImage: boolean) {
+    editingCurrentImage = useCurrentImage;
+    imageEditorOpen = true;
   }
 
   function onImageSave(cropped: File) {
@@ -186,11 +194,14 @@
 
     <Field.Field data-invalid={fieldInvalid("image")}>
       <Field.FieldLabel>Image</Field.FieldLabel>
-      <Field.FieldDescription>Upload a new thumbnail or remove the current one.</Field.FieldDescription>
+      <Field.FieldDescription>Edit the current thumbnail, upload a new one, or remove it.</Field.FieldDescription>
 
       {#if currentImageUrl}
         <OptimizedImage src={currentImageUrl} alt="" class="aspect-video w-full rounded-3xl" />
-        <div>
+        <div class="flex gap-2">
+          <Button type="button" variant="outline" disabled={pending} onclick={() => openImageEditor(true)}>
+            Edit current image
+          </Button>
           <Button type="button" variant="destructive" disabled={pending} onclick={removeCurrentImage}>
             <TrashIcon data-icon="inline-start" />
             Remove image
@@ -210,7 +221,7 @@
       {/if}
 
       <div class="flex gap-2">
-        <Button type="button" variant="outline" disabled={pending} onclick={() => (imageEditorOpen = true)}>
+        <Button type="button" variant="outline" disabled={pending} onclick={() => openImageEditor(false)}>
           {image ? "Change new image" : "Upload new image"}
         </Button>
         {#if image}
@@ -220,7 +231,12 @@
         {/if}
       </div>
 
-      <ImageEditor bind:open={imageEditorOpen} inputImage={image ?? undefined} onSave={onImageSave} />
+      <ImageEditor
+        bind:open={imageEditorOpen}
+        inputImage={image ?? undefined}
+        inputImageUrl={editingCurrentImage && !image ? (currentImageUrl ?? undefined) : undefined}
+        onSave={onImageSave}
+      />
 
       {#each fieldErrors("image") as error (error)}
         <Field.FieldError>{error}</Field.FieldError>
