@@ -105,7 +105,7 @@
     />
   </FormInput>
 
-  {#if process.env.NODE_ENV === "production"}
+  {#if process.env.NODE_ENV === "development"}
     <Button onclick={loginDev} disabled={!!pending} type="submit">
       {#if pending === "email"}<SpinnerIcon class="animate-spin" />{/if}
       <span>Log In With Dev Credentials</span>
