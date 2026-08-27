@@ -1,29 +1,46 @@
 <script lang="ts">
   import { pop } from "$lib/actions/pop";
   import * as ToggleGroup from "$lib/components/ui/toggle-group";
-  import { DarkModeIcon, MoonIcon, SunIcon } from "$lib/icons";
-  import { isThemeMode, type ThemeMode } from "$lib/theme";
-  import { setMode, userPrefersMode } from "mode-watcher";
+  import { DarkModeIcon, type IconComponent, MoonIcon, SunIcon } from "$lib/icons";
+  import { isThemeMode, type RevealOrigin, setModeWithReveal, type ThemeMode } from "$lib/theme";
+  import { userPrefersMode } from "mode-watcher";
 
-  let systemIcon: HTMLElement;
-  let darkIcon: HTMLElement;
-  let lightIcon: HTMLElement;
+  const options: { mode: ThemeMode; label: string; icon: IconComponent }[] = [
+    { mode: "system", label: "Use system theme", icon: DarkModeIcon },
+    { mode: "dark", label: "Use dark theme", icon: MoonIcon },
+    { mode: "light", label: "Use light theme", icon: SunIcon },
+  ];
+
+  let icons: HTMLElement[] = [];
+
+  /** Set on activation, then consumed by the value change it triggers. */
+  let revealOrigin: RevealOrigin | undefined;
 
   function selectThemeMode(mode: string) {
     if (isThemeMode(mode)) {
-      setMode(mode);
+      setModeWithReveal(mode, revealOrigin);
     }
   }
 
-  function keepSelectedThemeMode(event: Event, mode: ThemeMode) {
-    if (userPrefersMode.current === mode) {
-      event.preventDefault();
+  function activate(event: MouseEvent & { currentTarget: HTMLElement }, mode: ThemeMode, index: number) {
+    // Re-selecting the current mode would clear the toggle group's value.
+    if (userPrefersMode.current === mode) event.preventDefault();
+
+    // Keyboard activation reports a click at (0, 0), so use the button instead.
+    if (event.detail === 0) {
+      const { left, top, width, height } = event.currentTarget.getBoundingClientRect();
+      revealOrigin = { x: left + width / 2, y: top + height / 2 };
+    } else {
+      revealOrigin = { x: event.clientX, y: event.clientY };
     }
+
+    const icon = icons[index];
+    if (icon) pop(icon);
   }
 
   function keepSelectedThemeModeFromKeyboard(event: KeyboardEvent, mode: ThemeMode) {
     if (event.key !== "Enter" && event.key !== " ") return;
-    keepSelectedThemeMode(event, mode);
+    if (userPrefersMode.current === mode) event.preventDefault();
   }
 </script>
 
@@ -35,37 +52,14 @@
   value={userPrefersMode.current}
   onValueChange={selectThemeMode}
 >
-  <ToggleGroup.Item
-    onclick={(event) => {
-      keepSelectedThemeMode(event, "system");
-      if (systemIcon) pop(systemIcon);
-    }}
-    onkeydown={(event) => keepSelectedThemeModeFromKeyboard(event, "system")}
-    aria-label="Use system theme"
-    value="system"
-  >
-    <span bind:this={systemIcon} class="inline-flex"><DarkModeIcon /></span>
-  </ToggleGroup.Item>
-  <ToggleGroup.Item
-    onclick={(event) => {
-      keepSelectedThemeMode(event, "dark");
-      if (darkIcon) pop(darkIcon);
-    }}
-    onkeydown={(event) => keepSelectedThemeModeFromKeyboard(event, "dark")}
-    aria-label="Use dark theme"
-    value="dark"
-  >
-    <span bind:this={darkIcon} class="inline-flex"><MoonIcon /></span>
-  </ToggleGroup.Item>
-  <ToggleGroup.Item
-    onclick={(event) => {
-      keepSelectedThemeMode(event, "light");
-      if (lightIcon) pop(lightIcon);
-    }}
-    onkeydown={(event) => keepSelectedThemeModeFromKeyboard(event, "light")}
-    aria-label="Use light theme"
-    value="light"
-  >
-    <span bind:this={lightIcon} class="inline-flex"><SunIcon /></span>
-  </ToggleGroup.Item>
+  {#each options as option, index (option.mode)}
+    <ToggleGroup.Item
+      onclick={(event) => activate(event, option.mode, index)}
+      onkeydown={(event) => keepSelectedThemeModeFromKeyboard(event, option.mode)}
+      aria-label={option.label}
+      value={option.mode}
+    >
+      <span bind:this={icons[index]} class="inline-flex"><option.icon /></span>
+    </ToggleGroup.Item>
+  {/each}
 </ToggleGroup.Root>

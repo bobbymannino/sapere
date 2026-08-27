@@ -16,6 +16,6 @@
 
 <Meta />
 <Analytics />
-<ModeWatcher />
+<ModeWatcher synchronousModeChanges />
 
 {@render children()}
